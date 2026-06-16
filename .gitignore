@@ -1,0 +1,26 @@
+# created by virtualenv automatically
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]g
+*$py.class
+
+# Environments (Do NOT sync these!)
+.venv/
+venv/
+ENV/
+env/
+
+# PyCharm / JetBrains files
+.idea/
+*.iws
+
+# MacOS specific files
+.DS_Store
+
+
+# Local configuration/secrets (if you ever use .env files)
+.env
+.local
+
+flask_session/
