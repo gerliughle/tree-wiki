@@ -23,24 +23,41 @@ mock_branches = [
         "_id": ID_TRUNK,
         "author_id": ID_AUTHOR,
         "name": "Bonsai",
+        "description": "A general care guide for Bonsai trees. These tips are widely applicable,"
+                       "but will often be replaced by more specific care info. Beyond care tips,"
+                       "fundamental care concepts can be shared here to give background knowledge.",
         "parent_id": None
     },
     {
         "_id": ID_DECIDUOUS,
         "author_id": ID_AUTHOR,
         "name": "Deciduous",
+        "description": "Deciduous trees lose their leaves or needles in Winter. They require this cycle, so "
+                       "keeping them in temperate climates or indoors can hurt them long term. Deciduous "
+                       "trees are often prized for their Fall colors, and their bare branches in Winter "
+                       "allow an opportunity to appreciate their intricate branch structure. Many Deciduous "
+                       "trees are specifically displayed during their dormant period in winter.",
         "parent_id": ID_TRUNK
     },
     {
         "_id": ID_MAPLE_GENUS,
         "author_id": ID_AUTHOR,
         "name": "Maple",
+        "description": "A very popular genus of trees, Maples have thousands of varieties, many of which are popular "
+                       "for Bonsai. Japanese Maples are extremely popular, and more people are experimenting with "
+                       "maples native to their regions. Bonsai-suitable maples should not have excessively large leaves "
+                       "or long internodes.",
         "parent_id": ID_DECIDUOUS
     },
     {
         "_id": ID_JAPANESE_MAPLE,
         "author_id": ID_AUTHOR,
         "name": "Japanese Maple",
+        "description":"One of the most popular Bonsai subjects, there are hundreds of varieties of Japanese Maples. "
+                      "Many have unique care needs and characteristics, and some are not well suited for Bonsai. "
+                      "The standard Acer Palmatum is a vigorous and popular species. Many JM's are prized for their "
+                      "small leaves, varied colors throughout the year, and capabilities for finely ramified "
+                      "canopies. ",
         "parent_id": ID_MAPLE_GENUS
     }
 ]
