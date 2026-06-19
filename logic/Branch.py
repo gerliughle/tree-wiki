@@ -1,4 +1,6 @@
+
 class Branch:
+
     def __init__(self,
                  _id,
                  author_id,
@@ -24,3 +26,17 @@ class Branch:
         """ Return the objects from the database. """
         from data.Database import Database
         return Database.read_data()
+
+
+    @classmethod
+    def lookup_branch_id(cls, _id):
+        """ Return the Branch object for _id """
+        return cls.branch_map[_id]
+
+    @staticmethod
+    def get_leaves_for_branch(branch_id):
+        pass
+
+
+    def __str__(self):
+        return f"Branch object: {self.name}. Id: {self._id}"
