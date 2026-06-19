@@ -28,13 +28,13 @@ mock_branches = [
     {
         "_id": ID_DECIDUOUS,
         "author_id": ID_AUTHOR,
-        "name": "Deciduous Branch",
+        "name": "Deciduous",
         "parent_id": ID_TRUNK
     },
     {
         "_id": ID_MAPLE_GENUS,
         "author_id": ID_AUTHOR,
-        "name": "Maple Genus",
+        "name": "Maple",
         "parent_id": ID_DECIDUOUS
     },
     {
@@ -138,6 +138,16 @@ mock_leaves = [
         "seasons": ["Spring", "Summer"],
         "phases": ["2nd", "3rd+"],
         "text": "Pinch out the central growth tip of fresh shoots down to the first pair of leaves. This stops long leggy nodes from ruining the silhouette."
+    },
+    {
+        "_id": ObjectId(),
+        "author_id": ID_AUTHOR,
+        "branch_id": ID_JAPANESE_MAPLE,
+        "category": "Pruning",
+        "subcategory": "Subcategory 2",
+        "seasons": ["Spring", "Summer"],
+        "phases": ["2nd", "3rd+"],
+        "text": "Another subcategory in Pruning."
     },
     {
         "_id": ObjectId(),

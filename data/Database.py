@@ -14,8 +14,12 @@ class Database:
         branch_map = {}
         branch_dicts = get_all_branches()
         branches = [Branch.build(branch, branch_map) for branch in branch_dicts]
+        print(f"Branch map contains {len(branch_map)} branches")
 
         leaf_map = {}
         leaf_dicts = get_all_leaves()
         leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
-        return branches, leaves
+        print(f"Branch map contains {len(leaf_map)} branches")
+
+        return branches, leaves, branch_map, leaf_map
+
