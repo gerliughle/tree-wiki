@@ -35,3 +35,15 @@ class Leaf:
             leaf_map
         )
 
+    def to_dict(self):
+        return {
+            "_id": self._id,
+            "author_id": self.author_id,
+            "branch_id": self.branch_id,
+            "category": self.category,
+            "subcategory": self.subcategory,
+            "seasons": self.seasons,
+            "phases": self.phases,
+            "text": self.text,
+        }
+

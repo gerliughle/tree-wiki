@@ -19,7 +19,7 @@ class Branch:
     def build(cls, branch_dict, branch_map):
         """ Build a branch, add to map. """
         return Branch(
-            branch_dict['_id'],
+            branch_dict["_id"],
             branch_dict['author_id'],
             branch_dict['name'],
             branch_dict['description'],
@@ -27,11 +27,14 @@ class Branch:
             branch_map
         )
 
-    @staticmethod
-    def read_data():
-        """ Return the objects from the database. """
-        from data.Database import Database
-        return Database.read_data()
+    def to_dict(self):
+        return {
+            '_id': self._id,
+            'author_id': self.author_id,
+            'name': self.name,
+            'description': self.description,
+            'parent_id': self.parent_id
+        }
 
     @staticmethod
     def get_leaves_for_branch(branch_id):
