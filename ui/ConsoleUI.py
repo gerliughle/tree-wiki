@@ -1,5 +1,7 @@
 from logic.Branch import Branch
 from logic.TreeEngine import TreeEngine
+from logic.UserManager import UserManager
+from logic.UserManager import UserManager
 
 class ConsoleUI:
     engine = None
@@ -8,11 +10,14 @@ class ConsoleUI:
     @classmethod
     def init(cls):
         cls.engine = TreeEngine()
+        cls.usermanager = UserManager()
 
     @classmethod
     def run(cls):
 
         branch_name = "Japanese Maple"
+        phase_filter=["1st", "2nd", "3rd+"]
+        season_filter=["Spring"]
 
         #WHAT IS MY TESTING GOAL?
         # I want an engine file to work.
@@ -22,12 +27,8 @@ class ConsoleUI:
         print("\nTesting branch lookup:")
 
         branch = cls.engine.lookup_branch_by_name(branch_name)
-
-        if branch:
-            print(f"{branch.name=}")
-            print(f"{branch._id=}")
-        print()
-
+        if branch is None:
+            print(f"Error. No results for '{branch_name}'")
 
         #Goal 2:
         # show the number of leaves that a branch has.
@@ -35,7 +36,9 @@ class ConsoleUI:
         print(f"Number of leaves for {branch.name}: {len(leaves)}")
         print()
 
-        # goal 3: update category list
+        # goal 3: update category list.
+
+        # build category list for grouping. Probably should be done manually for ordering.
         every_leaf = TreeEngine.get_leaves()
 
         for leaf in every_leaf:
@@ -44,13 +47,49 @@ class ConsoleUI:
 
         #goal 4
         # create a very simple layout
-        leaves = TreeEngine.get_care_guide(branch._id)
+        inherited_leaves, heritage = TreeEngine.get_care_guide(branch._id)
 
-        print(f"# of leaves in inherited care guide: {len(leaves)}\n\n")
-        cls.display_care_guide(branch, leaves)
+        print(f"# of leaves in inherited care guide: {len(inherited_leaves)}\n\n")
+        print("Heritage:")
+
+        for branch in heritage:
+            print(f"  {branch.name}")
+
 
         #goal 5
         # Incorporate filters.
+
+        phase_filtered = TreeEngine.filter_phase(inherited_leaves, phase_filter)
+        season_filtered = TreeEngine.filter_season(phase_filtered, season_filter)
+        cls.display_care_guide(branch, season_filtered)
+
+        all_users = cls.usermanager.get_all_users()
+        user = all_users[0]
+        print(f"Thank you, {user.username}.")
+
+
+        #goal 6
+        #print source list thing. too ez.
+
+
+        #goal 7
+        # actual database probably.
+        # kinda done.
+        # once this is sort of working, add user object, then add author to
+        # so gotta figure out user stuff, and possibly userstate at same time.
+        # all of everything i guess. login. right now, no real differenc, but knows who you are.
+        # eventually can add in collections.
+
+        # all the data.
+
+        # users/userstates. need to really think that one out.
+        # need to make 2 templates, an admin and a user who can have his own
+        # collection. but no editing or anything.
+
+        # editing data.
+        # taking a while to add in real data, thinking thru heirarchy,
+        # then eventually starting a basic site with BOOTSTRAP
+
 
 
 

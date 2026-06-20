@@ -10,7 +10,8 @@ class TreeEngine:
     @classmethod
     def __init__(cls):
         """ Generate the branch and leaf objects. """
-        cls.all_branches, cls.all_leaves, cls.branch_map, cls.leaf_map = Branch.read_data()
+        from data.Database import Database
+        cls.all_branches, cls.all_leaves, cls.branch_map, cls.leaf_map = Database.read_data()
         print(f"Branches loaded: {len(cls.all_branches)}")
         print(f"Leaves loaded: {len(cls.all_leaves)}")
 
@@ -49,14 +50,16 @@ class TreeEngine:
 
     @classmethod
     def get_care_guide(cls, branch_id):
-        """ Main care guide builder. Gets leaves, checks inheritance, filters rules."""
+        """ Main care guide builder. Gets leaves, checks inheritances to build new list. """
 
         subcategory_list = set() # subcategories that already have a leaf
+        heritage = []
         care_guide = [] # list of all leaves in a care guide. Returned.
 
         current_branch = cls.lookup_branch(branch_id)
 
         while current_branch is not None:
+            heritage.insert(0, current_branch)
             print(f"Checking {current_branch.name}")
             current_leaves = cls.get_leaves_for_branch(current_branch._id)
 
@@ -70,4 +73,35 @@ class TreeEngine:
 
             current_branch = cls.lookup_branch(current_branch.parent_id)
 
-        return care_guide
+        return care_guide, heritage
+
+    @classmethod
+    def filter_phase(cls, leaves, phases):
+        """ Returns a list of leaves filtered by phase. """
+        filtered_leaves = []
+        print(f"Filtering list of {len(leaves)} for phases: {phases}.")
+        for leaf in leaves:
+            if not any(item in phases for item in leaf.phases):
+                #print(f"No match found in  {leaf.subcategory}: {leaf.phases}. Removing.")
+                leaves.remove(leaf)
+            else:
+                #print(f"Match found in {leaf.subcategory}: {leaf.phases}. Keeping.")
+                filtered_leaves.append(leaf)
+        print(f"Returning list filtered for phases of {len(filtered_leaves)}.\n")
+        return filtered_leaves
+
+    @classmethod
+    def filter_season(cls, leaves, seasons):
+        """ Returns a list of leaves filtered by season. """
+        filtered_leaves = []
+        print(f"Filtering list of {len(leaves)} for seasons: {seasons}.")
+        for leaf in leaves:
+            if not any(item in seasons for item in leaf.seasons):
+                #print(f"No match found in  {leaf.subcategory}: {leaf.seasons}. Removing.")
+                leaves.remove(leaf)
+            else:
+                #print(f"Match found in {leaf.subcategory}: {leaf.seasons}. Keeping.")
+                filtered_leaves.append(leaf)
+        print(f"Returning list filtered for seasons of {len(filtered_leaves)}.\n")
+        return filtered_leaves
+
