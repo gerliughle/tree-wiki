@@ -1,0 +1,56 @@
+<nav class="navbar fixed-top navbar-expand-md bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="../static/assets/layer-forward.svg" alt="BonsaiTree Logo" width="30" height="24"
+                 class="d-inline-block align-text-top">
+            BonsaiTree
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav flex-fill">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Care Guides</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Collection</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <div class="btn-group btn-group-sm" role="group" aria-label="Temperature Unit Selection">
+                    <input type="radio" class="btn-check" name="tempUnit" id="unitF" checked autocomplete="off">
+                    <label class="btn btn-outline-secondary btn-sm" for="unitF">°F</label>
+
+                    <input type="radio" class="btn-check" name="tempUnit" id="unitC" autocomplete="off">
+                    <label class="btn btn-outline-secondary btn-sm" for="unitC">°C</label>
+                </div>
+
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        {% if user %}
+                            {{ user }}
+                        {% else %}
+                            Not Logged In
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Account</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</nav>
