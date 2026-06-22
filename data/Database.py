@@ -51,7 +51,15 @@ class Database:
         """ Returns data to original hard coded sample data, as a backup. """
         cls.connect()
 
+        print("This will restore data to original dummy data.")
+        print("Are you sure you want to continue? This is permanent. Y/N: ")
+        if input() != "Y":
+            "Exiting."
+            return
+        print("Restoring data.")
+
         # Remake collections
+        cls.__branches = cls.__database.Branches
         cls.__branches.drop()
         cls.__branches = cls.__database.Branches
         cls.__leaves.drop()

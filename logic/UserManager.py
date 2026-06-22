@@ -1,6 +1,6 @@
 
 
-class UserManager():
+class UserManager:
     __all_users = []
 
     @classmethod

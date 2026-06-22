@@ -80,12 +80,6 @@ class ConsoleUI:
         # all of everything i guess. login. right now, no real differenc, but knows who you are.
         # eventually can add in collections.
 
-        # all the data.
-
-        # users/userstates. need to really think that one out.
-        # need to make 2 templates, an admin and a user who can have his own
-        # collection. but no editing or anything.
-
         # editing data.
         # taking a while to add in real data, thinking thru heirarchy,
         # then eventually starting a basic site with BOOTSTRAP
@@ -116,10 +110,6 @@ class ConsoleUI:
                     print(f"   Seasons:{leaf.seasons}")
                     print(f"   Phases: {leaf.phases}")
                     print(f"   {leaf.text}\n")
-
-
-
-
 
 
 
