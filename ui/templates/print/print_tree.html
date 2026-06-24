@@ -1,0 +1,25 @@
+{% extends 'template.html' %}
+
+{% block title %}Tree View{% endblock %}
+{% block content %}
+
+<div class="container my-2"> <!-- page body container -->
+    <div class="container my-3"><h2>Care Guides</h2></div>
+    <div class="container my-3">
+    <span>The BonsaiTree is made up of branches. Each one is a care guide for bonsai, and inherits knowledge from
+        further up the tree, while add more specific info. When the techniques lack explanations or context, try
+        exploring further up the branch's origin to find foundational knowledge.</span>
+    </div>
+    <div class="row">
+        <ul class="list-group col-lg-4 list-group-flush shadow-sm mb-2">
+            <li class="list-group-item"><h6> Select a tree to view:</h6></li>
+            {% for branch in branches %}
+            <a href="/show_branch?branch={{ branch._id }}" class="list-group-item list-group-item-action">
+                {{ branch.name }}
+            </a>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

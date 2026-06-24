@@ -36,6 +36,10 @@ class Branch:
             'parent_id': self.parent_id
         }
 
+    @property
+    def id(self):
+        return self._id
+
 
     def __str__(self):
         return f"Branch object: {self.name}. Id: {self._id}"

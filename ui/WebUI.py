@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, g, redirect, url_for
 from flask_session import Session
 from logic.Branch import Branch
 from logic.Leaf import Leaf
@@ -53,31 +53,39 @@ class WebUI:
         return cls.engine.leaf_map
 
     @staticmethod
+    @__app.before_request
+    def login_admin():
+        """ Auto-logins user0. To replace with real login. """
+        if "user_id" not in session:
+            all_users = WebUI.usermanager.get_all_users()
+            if all_users:
+                session["user_id"] = str(all_users[0].id)
+                print(f"Auto logged in id: {session['user_id']}")
+        current_user_id = session.get("user_id")
+        if current_user_id:
+            g.current_user = WebUI.usermanager.lookup_user(ObjectId(current_user_id))
+        else:
+            g.current_user = None
+
+    @staticmethod
+    @__app.context_processor
+    def inject_user():
+        return dict(current_user=getattr(g, "current_user", None))
+
+    @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
-        users = WebUI.usermanager.get_all_users()
-        user_id = users[0].id
-        if "user" in session:
-            session.clear()
-        if "user" not in session:
-            session["user"] = user_id
-        print(f"{session['user']=}")
-        current_user = WebUI.usermanager.lookup_user(user_id)
-        current_username = current_user.username
-
         branch_id = ObjectId(request.args["branch"])
         print(f"{branch_id=}")
         branch = WebUI.engine.lookup_branch(branch_id)
 
-        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)  # FIXME, prob should have better id getter.
+        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
         page_context = {
-            "user": current_username,
             "branch": branch,
             "care_guide": care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": category_list,
         }
-        print(f"{current_username=}")
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
 
@@ -90,31 +98,29 @@ class WebUI:
     @__app.route('/')
     def homepage():
         """ Sets Flask routes to homepage. """
-        users = WebUI.usermanager.get_all_users()
-        user_id = users[0].id
-        if "user" in session:
-            session.clear()
-        if "user" not in session:
 
-            session["user"] = user_id
-        print(f"{session['user']=}")
-        current_user = WebUI.usermanager.lookup_user(user_id)
-        current_username = current_user.username
         test_branch = "Japanese Maple"
         branch = WebUI.engine.lookup_branch_by_name(test_branch)
-        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch._id) # FIXME, prob should have better id getter.
+        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch.id)
         page_context = {
-            "user": current_username,
             "branch": branch,
             "care_guide": care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": category_list,
         }
-        print(f"{current_username=}")
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
 
         return render_template("index.html", **page_context)
+
+    @staticmethod
+    @__app.route('/print_tree')
+    def tree():
+        """ Will eventually be replaced. For now, allows selection of any branch."""
+        all_branches = WebUI.engine.get_branches()
+        return render_template("print/print_tree.html", branches=all_branches)
+
+
 
     @classmethod
     def run(cls):

@@ -12,7 +12,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav flex-fill">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Care Guides</a>
+                    <a class="nav-link active" aria-current="page" href="/print_tree">Care Guides</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Collection</a>
@@ -34,8 +34,8 @@
                 <div class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
-                        {% if user %}
-                            {{ user }}
+                        {% if current_user %}
+                        {{ current_user.username }}
                         {% else %}
                             Not Logged In
                         {% endif %}

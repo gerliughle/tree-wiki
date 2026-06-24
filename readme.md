@@ -48,6 +48,7 @@ Then other to-dos:
 * Tree View
 * About page/legend
 * Tooltips
+* Auto hiding categories/seasons doesn't work with the JS filters.
 * 
 
 
