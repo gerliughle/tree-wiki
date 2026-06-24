@@ -36,10 +36,6 @@ class Branch:
             'parent_id': self.parent_id
         }
 
-    @staticmethod
-    def get_leaves_for_branch(branch_id):
-        pass
-
 
     def __str__(self):
         return f"Branch object: {self.name}. Id: {self._id}"

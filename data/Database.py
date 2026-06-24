@@ -53,7 +53,8 @@ class Database:
 
         print("This will restore data to original dummy data.")
         print("Are you sure you want to continue? This is permanent. Y/N: ")
-        if input() != "Y":
+        user_input = input().lower()
+        if user_input != "y":
             "Exiting."
             return
         print("Restoring data.")

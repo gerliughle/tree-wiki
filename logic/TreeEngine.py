@@ -53,13 +53,14 @@ class TreeEngine:
         """ Main care guide builder. Gets leaves, checks inheritances to build new list. """
 
         subcategory_list = set() # subcategories that already have a leaf
-        heritage = []
+        breadcrumbs = []
         care_guide = [] # list of all leaves in a care guide. Returned.
+        category_list = []
 
         current_branch = cls.lookup_branch(branch_id)
 
         while current_branch is not None:
-            heritage.insert(0, current_branch)
+            breadcrumbs.insert(0, current_branch)
             print(f"Checking {current_branch.name}")
             current_leaves = cls.get_leaves_for_branch(current_branch._id)
 
@@ -68,16 +69,19 @@ class TreeEngine:
                     subcategory_list.add(leaf.subcategory)
                     care_guide.append(leaf)
                     print(f"Added {leaf.subcategory} to leaf guide.")
+                if leaf.category not in category_list:
+                    category_list.append(leaf.category)
                 else:
                     print(f"Not using {current_branch.name} {leaf.subcategory}. Subcategory already used.")
 
             current_branch = cls.lookup_branch(current_branch.parent_id)
-
-        return care_guide, heritage
+        return care_guide, breadcrumbs, category_list
 
     @classmethod
     def filter_phase(cls, leaves, phases):
-        """ Returns a list of leaves filtered by phase. """
+        """ Returns a list of leaves filtered by phase.
+
+        DEPRECATED. This should be done with JS on the page. """
         filtered_leaves = []
         print(f"Filtering list of {len(leaves)} for phases: {phases}.")
         for leaf in leaves:
