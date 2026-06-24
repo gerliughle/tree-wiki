@@ -69,8 +69,22 @@ class WebUI:
         print(f"{session['user']=}")
         current_user = WebUI.usermanager.lookup_user(user_id)
         current_username = current_user.username
+        test_branch = "Japanese Maple"
+        branch = WebUI.engine.lookup_branch_by_name(test_branch)
+        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch._id) # FIXME, prob should have better id getter.
+        page_context = {
+            "user": current_username,
+            "branch": branch,
+            "care_guide": care_guide,
+            "breadcrumbs": breadcrumbs,
+            "category_list": category_list,
+        }
         print(f"{current_username=}")
-        return render_template("index.html", user=current_username)
+        print(f"{branch.name=}")
+        print(f"Care guide length: {len(care_guide)}")
+        print(f"Care guide: {care_guide}")
+
+        return render_template("index.html", **page_context)
 
     @classmethod
     def run(cls):

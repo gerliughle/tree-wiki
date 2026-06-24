@@ -1,0 +1,30 @@
+<div class="d-flex flex-column gap-2">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">{{ leaf.subcategory }}</h5>
+            <div class="card-body d-flex flex-column gap-2">
+                <div class="border-start border-2 border-primary">
+                    <div class="card-body p-2 m-2">
+                        <span class="badge rounded-pill text-bg-primary">1st</span>
+                        <span class="badge rounded-pill text-bg-primary">2nd</span>
+                        <span class="badge rounded-pill text-bg-primary">3rd+</span>
+                        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="#">Bonsai</a></li>
+                                <li class="breadcrumb-item"><a href="#">Broadleaf</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><a href="#">Broadleaf
+                                    Deciduous</a></li>
+                                <li class="breadcrumb-item"><a href="#">Maple</a></li>
+                                <li class="breadcrumb-item"><a href="#">Japanese Maple</a></li>
+                            </ol>
+                        </nav>
+                        <p class="card-text">{{ leaf.text }}
+                        </p>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
