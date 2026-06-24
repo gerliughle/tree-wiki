@@ -3,9 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BonsaiTree WIP</title>
+    <title>{% block title %} Default Title {% endblock %} - BonsaiTree</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <style>
+        body {
+            padding-top: 75px; /* Adjust this to match your navbar height */
+        }
+    </style>
 </head>
 
 
@@ -16,6 +21,18 @@
 {% block content %}
 <h1>Default Content</h1>
 {% endblock %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+
+Copyright 2026 Joshua Shaw.<br>
+All Work in progress, do not use or share without permission.
+        </div>
+    </div>
+</div>
+</p>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

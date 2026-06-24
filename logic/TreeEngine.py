@@ -43,6 +43,10 @@ class TreeEngine:
         return cls.all_leaves
 
     @classmethod
+    def get_branches(cls):
+        return cls.all_branches
+
+    @classmethod
     def lookup_branch(cls, branch_id):
         if branch_id in cls.branch_map:
             return cls.branch_map[branch_id]
@@ -61,18 +65,19 @@ class TreeEngine:
 
         while current_branch is not None:
             breadcrumbs.insert(0, current_branch)
-            print(f"Checking {current_branch.name}")
+            # print(f"Checking {current_branch.name}")
             current_leaves = cls.get_leaves_for_branch(current_branch._id)
 
             for leaf in current_leaves:
                 if leaf.subcategory not in subcategory_list:
                     subcategory_list.add(leaf.subcategory)
                     care_guide.append(leaf)
-                    print(f"Added {leaf.subcategory} to leaf guide.")
+                    # print(f"Added {leaf.subcategory} to leaf guide.")
                 if leaf.category not in category_list:
                     category_list.append(leaf.category)
                 else:
-                    print(f"Not using {current_branch.name} {leaf.subcategory}. Subcategory already used.")
+                    # print(f"Not using {current_branch.name} {leaf.subcategory}. Subcategory already used.")
+                    pass
 
             current_branch = cls.lookup_branch(current_branch.parent_id)
         return care_guide, breadcrumbs, category_list
