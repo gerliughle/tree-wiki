@@ -1,21 +1,54 @@
-<div class="d-flex flex-column gap-2">
-    <div class="card shadow-sm">
+<div class="d-flex flex-column my-2">
+    <div class="card leaf-card"
+         data-card-seasons="{{ leaf.seasons | join(',') }}"
+         data-card-phase="{{ leaf.phases | join(',') }}">
         <div class="card-body">
             <h5 class="card-title">{{ leaf.subcategory }}</h5>
-            <div class="card-body d-flex flex-column gap-2">
+            <div class="card-body d-flex flex-column">
                 <div class="border-start border-2 border-primary">
-                    <div class="card-body p-2 m-2">
+                    <div class="card-body p-2">
+                        {% if "1st" in leaf.phases %}
                         <span class="badge rounded-pill text-bg-primary">1st</span>
+                        {% endif %}
+                        {% if "2nd" in leaf.phases %}
                         <span class="badge rounded-pill text-bg-primary">2nd</span>
+                        {% endif %}
+                        {% if "3rd+" in leaf.phases %}
                         <span class="badge rounded-pill text-bg-primary">3rd+</span>
+                        {% endif %}
                         <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="#">Bonsai</a></li>
-                                <li class="breadcrumb-item"><a href="#">Broadleaf</a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><a href="#">Broadleaf
-                                    Deciduous</a></li>
-                                <li class="breadcrumb-item"><a href="#">Maple</a></li>
-                                <li class="breadcrumb-item"><a href="#">Japanese Maple</a></li>
+                            <ol class="breadcrumb" style="font-size: 0.85rem !important;">
+                                {% for crumb in breadcrumbs[:-1] %}
+                                <li class="breadcrumb-item">
+                                    {% if crumb._id == leaf.branch_id %} <!-- emphasize the source -->
+                                    <a href="/show_branch?branch={{ crumb._id }}"
+                                       class="link-danger link-underline link-underline-opacity-0
+                                       link-underline-opacity-50-hover link-underline-danger fw-bold">
+                                        {{ crumb.name }}
+                                    </a>
+                                    {% else %}
+                                    <a href="/show_branch?branch={{ crumb._id }}"
+                                       class="link-danger link-underline link-underline-opacity-0
+                                       link-underline-opacity-50-hover link-underline-danger">
+                                        {{ crumb.name }}
+                                    </a>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                                <li class="breadcrumb-item">
+                                    {% if breadcrumbs[-1]._id == leaf.branch_id %} <!-- emphasize the source -->
+                                    <span class="link-danger link-underline link-underline-opacity-0
+                                       link-underline-opacity-50-hover link-underline-danger fw-bold">
+                                        {{ breadcrumbs[-1].name }}
+                                    </span>
+                                    {% else %}
+                                    <span
+                                       class="link-danger link-underline link-underline-opacity-0
+                                       link-underline-opacity-50-hover link-underline-danger">
+                                        {{ breadcrumbs[-1].name }}
+                                    </span>
+                                    {% endif %}
+                                </li>
                             </ol>
                         </nav>
                         <p class="card-text">{{ leaf.text }}

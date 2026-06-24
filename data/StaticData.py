@@ -156,7 +156,7 @@ mock_leaves = [
         "author_id": None,
         "branch_id": None, # ID_MAPLE_GENUS
         "category": "Pruning",
-        "subcategory": "Branch Removal",
+        "subcategory": "Structural Pruning",
         "seasons": ["Summer"],
         "phases": ["2nd", "3rd+"],
         "text": "You can take remove a branch but this can cause a burst of new growth. Do this in Summer after the Spring flush to avoid long internodes in the new shoots."

@@ -5,6 +5,7 @@ from logic.Leaf import Leaf
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
 from ui.UserState import UserState
+from bson import ObjectId
 
 class WebUI:
     __app = Flask(__name__)
@@ -51,6 +52,36 @@ class WebUI:
     def get_leaf_map(cls):
         return cls.engine.leaf_map
 
+    @staticmethod
+    @__app.route('/show_branch', methods=["GET", "POST"])
+    def show_branch():
+        users = WebUI.usermanager.get_all_users()
+        user_id = users[0].id
+        if "user" in session:
+            session.clear()
+        if "user" not in session:
+            session["user"] = user_id
+        print(f"{session['user']=}")
+        current_user = WebUI.usermanager.lookup_user(user_id)
+        current_username = current_user.username
+
+        branch_id = ObjectId(request.args["branch"])
+        print(f"{branch_id=}")
+        branch = WebUI.engine.lookup_branch(branch_id)
+
+        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)  # FIXME, prob should have better id getter.
+        page_context = {
+            "user": current_username,
+            "branch": branch,
+            "care_guide": care_guide,
+            "breadcrumbs": breadcrumbs,
+            "category_list": category_list,
+        }
+        print(f"{current_username=}")
+        print(f"{branch.name=}")
+        print(f"Care guide length: {len(care_guide)}")
+
+        return render_template("index.html", **page_context)
 
     @staticmethod
     @__app.route('/index')
@@ -82,7 +113,6 @@ class WebUI:
         print(f"{current_username=}")
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
-        print(f"Care guide: {care_guide}")
 
         return render_template("index.html", **page_context)
 
