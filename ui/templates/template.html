@@ -37,57 +37,59 @@ All Work in progress, do not use or share without permission.
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
-<script> <!-- This is straight up AI code. This is for toggle filters for phase/season. -->
-document.addEventListener("DOMContentLoaded", function() {
 
-    // 1. Define the core filtering engine
-    function filterLeafCards() {
-        // Gather current active filters, cleaned up for comparison
-        const chosenSeasons = Array.from(document.querySelectorAll('[data-season].active'))
-                                   .map(btn => btn.getAttribute('data-season').trim().toLowerCase());
 
-        const chosenPhases = Array.from(document.querySelectorAll('[data-phase].active'))
-                                  .map(btn => btn.getAttribute('data-phase').trim());
-
-        // Scan and filter every leaf card on the page
-        document.querySelectorAll('.leaf-card').forEach(card => {
-            const rawSeasons = card.getAttribute('data-card-seasons');
-            const rawPhases = card.getAttribute('data-card-phase');
-
-            // Skip invalid or empty cards gracefully
-            if (!rawSeasons || !rawPhases) {
-                card.classList.add('d-none');
-                return;
-            }
-
-            const cardSeasons = rawSeasons.split(',').map(s => s.trim().toLowerCase());
-            const cardPhases = rawPhases.split(',').map(p => p.trim());
-
-            // Evaluate multi-select intersection logic gates
-            const matchesSeason = cardSeasons.some(s => chosenSeasons.includes(s));
-            const matchesPhase = cardPhases.some(p => chosenPhases.includes(p));
-
-            // Toggle visibility (Both gates must pass to show the card)
-            card.classList.toggle('d-none', !(matchesSeason && matchesPhase));
-        });
-    }
-
-    // 2. Run the filter immediately on page load to sync layout state
-    filterLeafCards();
-
-// 3. Attach click listeners to the button groups
-    document.querySelectorAll('[data-season], [data-phase]').forEach(button => {
-        button.addEventListener('click', function() {
-            // Manually toggle the active class since the HTML isn't using data-bs-toggle
-            this.classList.toggle('active');
-
-            // Immediately recalculate which cards should show
-            filterLeafCards();
-        });
-    });
-
-});
-</script>
+{#<script> <!-- This is straight up AI code. This is for toggle filters for phase/season. -->#}
+{#document.addEventListener("DOMContentLoaded", function() {#}
+{##}
+{#    // 1. Define the core filtering engine#}
+{#    function filterLeafCards() {#}
+{#        // Gather current active filters, cleaned up for comparison#}
+{#        const chosenSeasons = Array.from(document.querySelectorAll('[data-season].active'))#}
+{#                                   .map(btn => btn.getAttribute('data-season').trim().toLowerCase());#}
+{##}
+{#        const chosenPhases = Array.from(document.querySelectorAll('[data-phase].active'))#}
+{#                                  .map(btn => btn.getAttribute('data-phase').trim());#}
+{##}
+{#        // Scan and filter every leaf card on the page#}
+{#        document.querySelectorAll('.leaf-card').forEach(card => {#}
+{#            const rawSeasons = card.getAttribute('data-card-seasons');#}
+{#            const rawPhases = card.getAttribute('data-card-phase');#}
+{##}
+{#            // Skip invalid or empty cards gracefully#}
+{#            if (!rawSeasons || !rawPhases) {#}
+{#                card.classList.add('d-none');#}
+{#                return;#}
+{#            }#}
+{##}
+{#            const cardSeasons = rawSeasons.split(',').map(s => s.trim().toLowerCase());#}
+{#            const cardPhases = rawPhases.split(',').map(p => p.trim());#}
+{##}
+{#            // Evaluate multi-select intersection logic gates#}
+{#            const matchesSeason = cardSeasons.some(s => chosenSeasons.includes(s));#}
+{#            const matchesPhase = cardPhases.some(p => chosenPhases.includes(p));#}
+{##}
+{#            // Toggle visibility (Both gates must pass to show the card)#}
+{#            card.classList.toggle('d-none', !(matchesSeason && matchesPhase));#}
+{#        });#}
+{#    }#}
+{##}
+{#    // 2. Run the filter immediately on page load to sync layout state#}
+{#    filterLeafCards();#}
+{##}
+{#// 3. Attach click listeners to the button groups#}
+{#    document.querySelectorAll('[data-season], [data-phase]').forEach(button => {#}
+{#        button.addEventListener('click', function() {#}
+{#            // Manually toggle the active class since the HTML isn't using data-bs-toggle#}
+{#            this.classList.toggle('active');#}
+{##}
+{#            // Immediately recalculate which cards should show#}
+{#            filterLeafCards();#}
+{#        });#}
+{#    });#}
+{##}
+{#});#}
+{#</script>#}
 </body>
 </html>
 

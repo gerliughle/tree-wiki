@@ -53,6 +53,17 @@ Then other to-dos:
 
 
 Problems:
+Problem 0:
+Dynamic site doesn't update on filters. Gonna drop JS and stick to flask.
+Also will cut season filter it is pointless. 
+Need to have phase selctor be a form (with apply button)
+Then it reloads the page, pushing the phase list with GET to update the URL.
+
+Need to load page initially by sending all phases i guess
+
+
+
+Problem 1:
 Phase inheritance. (May also apply to seasons)
 It does not apply to seasons actually. Those should overwrite so you can change them. 
 The general inheritance rule is that child subcategories replace parent ones.
@@ -91,3 +102,4 @@ bootstrap card list items maybe
 
 Problem 3: 
 Database backups
+
