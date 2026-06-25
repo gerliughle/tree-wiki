@@ -2,69 +2,65 @@
 
 {% block title %}{{ branch.name }} Care Guide{% endblock %}
 {% block content %}
-<!-- Hero -->
-<div class="container col-xxl-8 px-4 py-5">
-    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-        <div class="col-10 col-sm-8 col-lg-6">
-            <img
-                    src="../static/assets/japanese_maple.jpg"
-                    class="d-block mx-lg-auto img-fluid"
-                    alt="Japanese Maple"
-                    width="700"
-                    height="500"
-                    loading="lazy"
-            />
-        </div>
-        <div class="col-lg-6">
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    {% for crumb in breadcrumbs[:-1] %}
-                    <li class="breadcrumb-item"><a href="/show_branch?branch={{ crumb._id }}"
-                    class="link-danger link-underline link-underline-opacity-0 link-underline-opacity-50-hover link-underline-danger">{{ crumb.name }}</a></li>
-                    {% endfor %}
-                    <li class="breadcrumb-item"></li>
-                </ol>
-            </nav>
-            <h1 class="display-3  lh-1 mb-3">
-                {{ branch.name }}
-            </h1>
-            <p class="lead">
-                {{ branch.description }}
-            </p>
-        </div>
-    </div>
-</div>
-
-
-<div class="container my-2"> <!-- page body container -->
-    <!-- Filter Box -->
-    <div class="card shadow-sm mb-2">
-        <div class="card-header d-flex justify-content-start align-items-center">
-            <h4 class="h5 mb-0 p-2">Filters:</h4>
-            <div class="btn-group btn-group-sm p-2" role="group">
-                <span type="label" class="btn btn-group-text-primary disabled">Phase: </span>
-                <button class="btn btn-outline-primary active" data-phase="1st">1st</button>
-                <button class="btn btn-outline-primary active" data-phase="2nd">2nd</button>
-                <button class="btn btn-outline-primary active" data-phase="3rd+">3rd+</button>
+    <!-- Hero -->
+    <div class="container col-xxl-8 px-4 py-5">
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <img
+                        src="../static/assets/japanese_maple.jpg"
+                        class="d-block mx-lg-auto img-fluid"
+                        alt="Japanese Maple"
+                        width="700"
+                        height="500"
+                        loading="lazy"
+                />
             </div>
-            <div class="btn-group btn-group-sm p-2" role="group">
-                <span type="label" class="btn btn-group-text-primary disabled">Season: </span>
-                <button type="button" class="btn btn-outline-primary active" data-season="Spring">Spring
-                </button>
-                <button type="button" class="btn btn-outline-primary active" data-season="Summer">Summer
-                </button>
-                <button type="button" class="btn btn-outline-primary active" data-season="Fall">Fall</button>
-                <button type="button" class="btn btn-outline-primary active" data-season="Winter">Winter
-                </button>
+            <div class="col-lg-6">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        {% for crumb in breadcrumbs[:-1] %}
+                            <li class="breadcrumb-item"><a href="/show_branch?branch={{ crumb._id }}"
+                                                           class="link-danger link-underline link-underline-opacity-0 link-underline-opacity-50-hover link-underline-danger">{{ crumb.name }}</a>
+                            </li>
+                        {% endfor %}
+                        <li class="breadcrumb-item"></li>
+                    </ol>
+                </nav>
+                <h1 class="display-3  lh-1 mb-3">
+                    {{ branch.name }}
+                </h1>
+                <p class="lead">
+                    {{ branch.description }}
+                </p>
             </div>
         </div>
     </div>
 
-    <!--Category container -->
-    {% for category in category_list %}
-    {% include 'components/category.html' %}
-    {% endfor %}
 
-</div>
+    <div class="container my-2"> <!-- page body container -->
+        <!-- Filter Box -->
+        <div class="card shadow-sm mb-2">
+            <div class="card-header d-flex justify-content-start align-items-center">
+                <h4 class="h5 mb-0 p-2">Filters:</h4>
+                <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
+                    <label class="btn btn-group-text-primary disabled">Phase:</label>
+
+                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="1st">1st</label>
+                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="2nd">2nd</label>
+                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
+                </div>
+                <button type="submit" class="btn btn-outline-primary btn-sm">Apply</button>
+            </div>
+        </div>
+
+        <!--Category container -->
+        {% for category in category_list %}
+            {% include 'components/category.html' %}
+        {% endfor %}
+
+    </div>
 
 {% endblock %}
