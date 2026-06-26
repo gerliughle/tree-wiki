@@ -145,3 +145,14 @@ class Database:
 
         return branches, leaves, branch_map, leaf_map
 
+    @classmethod
+    def add_user(cls, username, pw_hash):
+        cls.connect()
+        user_dict = {
+            "username": username,
+            "pw_hash": pw_hash,
+            "role":"user"
+        }
+        cls.__users.insert_one(user_dict)
+        return User.build(user_dict)
+

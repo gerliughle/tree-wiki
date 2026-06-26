@@ -54,17 +54,15 @@ class WebUI:
 
     @staticmethod
     @__app.before_request
-    def login_admin():
-        """ Auto-logins user0. To replace with real login. """
-        if "user_id" not in session:
-            all_users = WebUI.usermanager.get_all_users()
-            if all_users:
-                session["user_id"] = str(all_users[0].id)
-                print(f"Auto logged in id: {session['user_id']}")
+    def assign_user():
+        """ Assigns user on page click """
         current_user_id = session.get("user_id")
+
         if current_user_id:
+            print("Current user found in session.")
             g.current_user = WebUI.usermanager.lookup_user(ObjectId(current_user_id))
         else:
+            print("No user found in session.")
             g.current_user = None
 
     @staticmethod
@@ -144,19 +142,12 @@ class WebUI:
         all_branches = WebUI.engine.get_branches()
         return render_template("print/print_tree.html", branches=all_branches)
 
-    @staticmethod
-    @__app.route('/login')
-    def login():
-        return render_template("user/login.html")
-
-
-
     @classmethod
     def run(cls):
+        from ui.routes.EditRoutes import EditRoutes
+        from ui.routes.UserRoutes import UserRoutes
+
         cls.__app.config["SESSION_TYPE"] = "filesystem"
+        cls.__app.secret_key = "my_secret_key"
         Session(cls.__app)
         cls.__app.run(host="0.0.0.0")
-
-if __name__ == "__main__":
-    WebUI.init()
-    WebUI.run()
