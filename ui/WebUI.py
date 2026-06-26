@@ -75,16 +75,38 @@ class WebUI:
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
-        branch_id = ObjectId(request.args["branch"])
+        if "branch" in request.args:
+            try:
+                branch_id = ObjectId(request.args["branch"])
+            except:
+                return render_template("error.html")
+        else:
+            return render_template("error.html")
         print(f"{branch_id=}")
         branch = WebUI.engine.lookup_branch(branch_id)
+        if branch:
+            care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
+        else:
+            return render_template("error.html")
+        phases = []
+        if "1st" in request.args:
+            phases.append("1st")
+        if "2nd" in request.args:
+            phases.append("2nd")
+        if "3rd+" in request.args:
+            phases.append("3rd+")
+        if len(phases) == 0:
+            phases = ["1st", "2nd", "3rd+"]
 
-        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
+        filtered_care_guide = WebUI.engine.filter_care_guide(care_guide,"phases", phases)
+
+
         page_context = {
             "branch": branch,
-            "care_guide": care_guide,
+            "care_guide": filtered_care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": category_list,
+            "phases": phases
         }
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
@@ -102,11 +124,13 @@ class WebUI:
         test_branch = "Japanese Maple"
         branch = WebUI.engine.lookup_branch_by_name(test_branch)
         care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch.id)
+        phases = ["1st", "2nd", "3rd+"]
         page_context = {
             "branch": branch,
             "care_guide": care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": category_list,
+            "phases": phases
         }
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
@@ -115,10 +139,15 @@ class WebUI:
 
     @staticmethod
     @__app.route('/print_tree')
-    def tree():
+    def print_tree():
         """ Will eventually be replaced. For now, allows selection of any branch."""
         all_branches = WebUI.engine.get_branches()
         return render_template("print/print_tree.html", branches=all_branches)
+
+    @staticmethod
+    @__app.route('/login')
+    def login():
+        return render_template("user/login.html")
 
 
 

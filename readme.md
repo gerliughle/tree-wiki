@@ -19,6 +19,7 @@ Done:
 * Appropriate breadcrumbs for leaves
 * Functional breadcrumbs
 * Breadcrumb design/sizing
+* * Temp Selector system
 
 Flask Routes:
 * index.html
@@ -37,7 +38,7 @@ Branch page To-Do:
 * Create child section in header
 * Header images
 * Page footer
-* Temp Selector system
+
 * Make category order consistent
 
 Then other to-dos:

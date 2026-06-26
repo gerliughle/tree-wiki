@@ -83,34 +83,16 @@ class TreeEngine:
         return care_guide, breadcrumbs, category_list
 
     @classmethod
-    def filter_phase(cls, leaves, phases):
-        """ Returns a list of leaves filtered by phase.
+    def filter_care_guide(cls, leaves, filter, filter_list):
+        """ Filters a list of leaves.
 
-        DEPRECATED. This should be done with JS on the page. """
+         leaves = source list of leaves
+         filter = str name of the filter ("phases", "seasons")
+         filter_list = list to filter against """
         filtered_leaves = []
-        print(f"Filtering list of {len(leaves)} for phases: {phases}.")
         for leaf in leaves:
-            if not any(item in phases for item in leaf.phases):
-                #print(f"No match found in  {leaf.subcategory}: {leaf.phases}. Removing.")
-                leaves.remove(leaf)
-            else:
-                #print(f"Match found in {leaf.subcategory}: {leaf.phases}. Keeping.")
+            if any(item in filter_list for item in getattr(leaf, filter)):
+                #print(f"Match found in {leaf.subcategory}: {leaf.filter}. Keeping.")
                 filtered_leaves.append(leaf)
-        print(f"Returning list filtered for phases of {len(filtered_leaves)}.\n")
+        print(f"Returning filtered list of {len(filtered_leaves)}.\n")
         return filtered_leaves
-
-    @classmethod
-    def filter_season(cls, leaves, seasons):
-        """ Returns a list of leaves filtered by season. """
-        filtered_leaves = []
-        print(f"Filtering list of {len(leaves)} for seasons: {seasons}.")
-        for leaf in leaves:
-            if not any(item in seasons for item in leaf.seasons):
-                #print(f"No match found in  {leaf.subcategory}: {leaf.seasons}. Removing.")
-                leaves.remove(leaf)
-            else:
-                #print(f"Match found in {leaf.subcategory}: {leaf.seasons}. Keeping.")
-                filtered_leaves.append(leaf)
-        print(f"Returning list filtered for seasons of {len(filtered_leaves)}.\n")
-        return filtered_leaves
-

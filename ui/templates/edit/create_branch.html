@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% block title %}Create Branch{% endblock %}
+{% block content %}
+
+    <div class="container my-2">
+        <form method="POST" action="/do_create_branch">
+            <h3 class="col-lg-8">Create a new branch</h3>
+            <select class="form-select" aria-label="Select parent branch">
+                <option selected disabled>Select parent branch</option>
+                {% for branch in branches %}
+                    <option value="{{ branch.id }}">{{ branch.name }}</option>
+                {% endfor %}
+            </select>
+
+
+
+    </form>
+
+
+    </div>
+
+
+{% endblock %}
