@@ -22,12 +22,14 @@ mock_branches = [
         "name": "Bonsai",
         "description": "A general care guide for Bonsai trees. These tips are widely applicable,"
                        "but will often be replaced by more specific care info. Beyond care tips,"
-                       "fundamental care concepts can be shared here to give background knowledge."
+                       "fundamental care concepts can be shared here to give background knowledge.",
+        "image":"bonsai.jpg"
     },
     {
         "author_id": None, # Parent: Bonsai
         "name": "Broadleaf",
-        "description": "A tree with leaves."
+        "description": "A tree with leaves.",
+        "image":"broadleaf.jpg"
     },
     {
         "author_id": None, # Parent: Broadleaf
@@ -36,7 +38,8 @@ mock_branches = [
                        "keeping them in temperate climates or indoors can hurt them long term. Deciduous "
                        "trees are often prized for their Fall colors, and their bare branches in Winter "
                        "allow an opportunity to appreciate their intricate branch structure. Many Deciduous "
-                       "trees are specifically displayed during their dormant period in winter."
+                       "trees are specifically displayed during their dormant period in winter.",
+        "image":"deciduous_broadleaf.jpg"
     },
     {
         "author_id": None, # Parent: Broadleaf Deciduous
@@ -44,7 +47,8 @@ mock_branches = [
         "description": "A very popular genus for bonsai, Maples have thousands of varieties, many of which are popular "
                        "for Bonsai. Japanese Maples are extremely popular, and more people are experimenting with "
                        "maples native to their regions. Bonsai-suitable maples should not have excessively large leaves "
-                       "or long internodes."
+                       "or long internodes.",
+        "image":"maple.jpg"
     },
     {
         "author_id": None, # Parent Maple
@@ -53,7 +57,8 @@ mock_branches = [
                       "Many have unique care needs and characteristics, and some are not well suited for Bonsai. "
                       "The standard Acer Palmatum is a vigorous and popular species. Many JM's are prized for their "
                       "small leaves, varied colors throughout the year, and capabilities for finely ramified "
-                      "canopies. "
+                      "canopies. ",
+        "image":"japanese_maple.jpg"
     }
 ]
 
