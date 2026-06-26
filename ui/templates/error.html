@@ -1,10 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "template.html" %}
+
+{% block title %}Error{% endblock %}
+{% block content %}
+<div class="container py-3 pb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="mt-4">Error</h1>
+        </div>
+    </div>
+    <div class="row pb-5">
+        <div class="col-lg-5">
+            <span>Something has gone wrong. Please try returning to the Care Guide selection screen.</span>
+        </div>
+        <div class="col-lg-3"><a class="btn btn-primary" href="/print_tree">Care Guides</a></div>
+    </div>
+</div>
+{% endblock %}

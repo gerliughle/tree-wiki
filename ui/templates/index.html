@@ -7,7 +7,7 @@
         <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
             <div class="col-10 col-sm-8 col-lg-6">
                 <img
-                        src="../static/assets/japanese_maple.jpg"
+                        src="../static/assets/branch_img/{{ branch.image }}"
                         class="d-block mx-lg-auto img-fluid"
                         alt="Japanese Maple"
                         width="700"
@@ -20,7 +20,8 @@
                     <ol class="breadcrumb">
                         {% for crumb in breadcrumbs[:-1] %}
                             <li class="breadcrumb-item"><a href="/show_branch?branch={{ crumb._id }}"
-                                                           class="link-danger link-underline link-underline-opacity-0 link-underline-opacity-50-hover link-underline-danger">{{ crumb.name }}</a>
+                                                           class="link-danger link-underline link-underline-opacity-0
+                                                           link-underline-opacity-50-hover link-underline-danger">{{ crumb.name }}</a>
                             </li>
                         {% endfor %}
                         <li class="breadcrumb-item"></li>
@@ -38,23 +39,37 @@
 
 
     <div class="container my-2"> <!-- page body container -->
-        <!-- Filter Box -->
-        <div class="card shadow-sm mb-2">
-            <div class="card-header d-flex justify-content-start align-items-center">
-                <h4 class="h5 mb-0 p-2">Filters:</h4>
-                <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
-                    <label class="btn btn-group-text-primary disabled">Phase:</label>
-
-                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="1st">1st</label>
-                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="2nd">2nd</label>
-                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" checked>
-                    <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
+        <!-- Filter Form -->
+        <form method="GET" action="/show_branch">
+            <input type="hidden" name="branch" value="{{ branch.id }}"/>
+            <div class="card shadow-sm mb-2">
+                <div class="card-header d-flex justify-content-start align-items-center">
+                    <h4 class="h5 mb-0 p-2">Filters:</h4>
+                    <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
+                        <label class="btn btn-group-text-primary disabled">Phase:</label>
+                        {% if "1st" in phases %}
+                            <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st" checked>
+                        {% else %}
+                            <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st">
+                        {% endif %}
+                        <label class="btn btn-outline-primary" for="1st">1st</label>
+                        {% if "2nd" in phases %}
+                            <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd" checked>
+                        {% else %}
+                            <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd">
+                        {% endif %}
+                        <label class="btn btn-outline-primary" for="2nd">2nd</label>
+                        {% if "3rd+" in phases %}
+                            <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+" checked>
+                        {% else %}
+                            <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+">
+                        {% endif %}
+                        <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Apply</button>
                 </div>
-                <button type="submit" class="btn btn-outline-primary btn-sm">Apply</button>
             </div>
-        </div>
+        </form>
 
         <!--Category container -->
         {% for category in category_list %}
