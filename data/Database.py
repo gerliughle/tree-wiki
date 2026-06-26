@@ -106,8 +106,6 @@ class Database:
             all_leaves[i]['branch_id'] = id_list[4]
             cls.__leaves.insert_one(all_leaves[i])
 
-
-
     @classmethod
     def read_data(cls):
         """ Reads data from database and builds objects. """
