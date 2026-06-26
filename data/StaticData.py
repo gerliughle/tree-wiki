@@ -1,18 +1,19 @@
 from bson import ObjectId
+from logic.User import User
 
+josh_pw = User.hash_password("oiufdsa1")
+user_pw = User.hash_password("oiufdsa2")
 
 mock_users = [
     {
         "username": "josh",
-        "hash":"",
-        "role": "admin",
-        "email":""
+        "pw_hash":josh_pw,
+        "role": "admin"
     },
     {
         "username": "public_user",
-        "hash":"",
-        "role": "user",
-        "email":""
+        "pw_hash":user_pw,
+        "role": "user"
     }
 ]
 

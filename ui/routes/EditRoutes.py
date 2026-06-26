@@ -18,8 +18,7 @@ from flask import render_template
 # Suggestion button somewhere
 
 
-
-class EditRoutes(WebUI):
+class EditRoutes:
     __app = WebUI.get_app()
 
     @staticmethod

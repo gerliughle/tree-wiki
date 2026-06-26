@@ -1,4 +1,5 @@
-
+from flask import session, g
+from bson import ObjectId
 
 class UserManager:
     __all_users = []
@@ -19,3 +20,28 @@ class UserManager:
     @classmethod
     def get_all_users(cls):
         return cls.all_users
+
+    @classmethod
+    def read_user(cls, username):
+        for user in cls.all_users:
+            if username == user.username:
+                print("Username match.")
+                return user
+        else:
+            print("No username match.")
+            return None
+
+    @classmethod
+    def login(cls, user):
+        session["user_id"] = str(user.id)
+
+    @staticmethod
+    def logout():
+        session.pop("user_id", None)
+
+    @classmethod
+    def add_user(cls, username, pw_hash):
+        from data.Database import Database
+        user = Database.add_user(username, pw_hash)
+        cls.all_users.append(user)
+        return user

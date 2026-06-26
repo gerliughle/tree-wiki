@@ -1,2 +1,5 @@
-from logic.Branch import Branch
-from logic.Leaf import Leaf
+from ui.WebUI import WebUI
+
+if __name__ == "__main__":
+    WebUI.init()
+    WebUI.run()

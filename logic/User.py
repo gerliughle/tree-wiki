@@ -1,25 +1,31 @@
+import bcrypt
+
 class User:
     __username = ""
-    __hash = ""
+    __pw_hash = ""
     __role = ""
-    __email = ""
 
-    def __init__(self, _id, username, hash, role, email):
+    def __init__(self, _id, username, pw_hash, role):
         self._id = _id
         self.__username = username
-        self.__hase = hash
+        self.__pw_hash = pw_hash
         self.__role = role
-        self.__email = email
 
     @staticmethod
     def build(user_dict):
         return User(
             user_dict["_id"],
             user_dict["username"],
-            user_dict["hash"],
-            user_dict["role"],
-            user_dict["email"]
+            user_dict["pw_hash"],
+            user_dict["role"]
         )
+
+    def to_dict(self):
+        return {
+            "username": self.__username,
+            "pw_hash": self.__pw_hash,
+            "role": self.__role
+        }
 
     @property
     def username(self):
@@ -28,3 +34,14 @@ class User:
     @property
     def id(self):
         return self._id
+
+    @staticmethod
+    def hash_password(password):
+        salt = bcrypt.gensalt(13)
+        pw_hash = bcrypt.hashpw(password.encode(), salt)
+        return pw_hash
+
+    def verify_password(self, password):
+        result = bcrypt.checkpw(password.encode(), self.__pw_hash)
+        return result
+
