@@ -178,14 +178,20 @@ class Database:
         return local_branch
 
     @classmethod
-    def delete_branch(cls, branch):
+    def delete_branch(cls, branch, children):
         cls.connect()
+        cls.__branches.update_many(
+            {"parent_id": branch.id},
+            {"$set": {"parent_id": branch.parent_id}}
+        )
+
+        if children:
+            for child in children:
+                setattr(child, "parent_id", branch.parent_id)
+
         delete_doc = cls.__branches.delete_one({"_id": branch.id})
+
         if delete_doc.acknowledged:
             print("Deleted branch")
         else:
             print("Did not complete deletion.")
-        # FIXME shit i should probably update parent of all children to this one's parents.
-        # which means i need a child finder. which i wanted anyways for like, reverse breadcrumbs.
-        #also, this doesn't work. something wrong with passing thru the ids'
-

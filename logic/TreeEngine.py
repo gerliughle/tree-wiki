@@ -84,6 +84,17 @@ class TreeEngine:
         return care_guide, breadcrumbs, category_list
 
     @classmethod
+    def get_children_of_branch(cls, branch_id):
+        children_list = []
+        current_branch = cls.lookup_branch(branch_id)
+        print(f"Finding children for {current_branch.name}")
+        for branch in cls.all_branches:
+            if branch_id == branch.parent_id:
+                children_list.append(branch)
+                print(f"Child found: {branch.name}")
+        return children_list
+
+    @classmethod
     def filter_care_guide(cls, leaves, filter, filter_list):
         """ Filters a list of leaves.
 
@@ -115,9 +126,11 @@ class TreeEngine:
     @classmethod
     def delete_branch(cls, branch_id):
         from data.Database import Database
-        delete_branch = cls.lookup_branch(ObjectId(branch_id))
+        branch_id = ObjectId(branch_id)
+        delete_branch = cls.lookup_branch(branch_id)
         delete_name = delete_branch.name
-        Database.delete_branch(delete_branch)
+        children = cls.get_children_of_branch(branch_id)
+        Database.delete_branch(delete_branch, children)
         cls.all_branches.remove(delete_branch)
         return delete_name
 

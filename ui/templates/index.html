@@ -33,6 +33,19 @@
                 <p class="lead">
                     {{ branch.description }}
                 </p>
+            {% if children|length > 0 %}
+                Children:
+                <ul>
+                    {% for child in children %}
+
+                        <li>
+                            <a href="/show_branch?branch={{ child._id }}" class="link-danger link-underline
+                            link-underline-opacity-0 link-underline-opacity-50-hover link-underline-danger">{{ child.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             </div>
         </div>
     </div>

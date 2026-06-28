@@ -97,14 +97,15 @@ class WebUI:
             phases = ["1st", "2nd", "3rd+"]
 
         filtered_care_guide = WebUI.engine.filter_care_guide(care_guide,"phases", phases)
-
+        children = TreeEngine.get_children_of_branch(branch.id)
 
         page_context = {
             "branch": branch,
             "care_guide": filtered_care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": category_list,
-            "phases": phases
+            "phases": phases,
+            "children": children
         }
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
@@ -123,12 +124,14 @@ class WebUI:
         branch = WebUI.engine.lookup_branch_by_name(default_branch)
         care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch.id)
         phases = ["1st", "2nd", "3rd+"]
+        children = TreeEngine.get_children_of_branch(branch.id)
         page_context = {
             "branch": branch,
             "care_guide": care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": category_list,
-            "phases": phases
+            "phases": phases,
+            "children": children
         }
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
