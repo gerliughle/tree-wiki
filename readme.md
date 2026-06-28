@@ -38,6 +38,7 @@ Branch page To-Do:
 * Create child section in header
 * Header images
 * Page footer
+* redesign to be less round and floaty. a bit more table-y would be more functional
 
 * Make category order consistent
 
