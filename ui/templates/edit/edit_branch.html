@@ -4,8 +4,10 @@
 
     <div class="container my-2 col-md-4 col-6 d-flex-vertical">
         <form method="POST" action="/do_edit_branch">
+        <input type="hidden" name="branch_id" value="{{ edit_branch.id }}">
             <h3 class="col-lg-8">Editing {{ edit_branch.name }}</h3>
-            <span>Edit parent branch:</span>
+        <span>Leave fields blank if you don't want to make any changes.</span>
+            <h1>Edit parent branch:</h1>
             <select class="form-select" aria-label="Change parent branch" name="parent_branch_id" required>
                 <option selected value="">-Don't change parent-</option>
                 {% for branch in branches %}
@@ -15,20 +17,20 @@
                 {% endfor %}
             </select>
             <div class="form-floating w-100">
-                <input name="branch_name" class="form-control" id="branch_name" placeholder="Branch Name" required>
+                <input name="branch_name" class="form-control" id="branch_name" placeholder="Branch Name">
                 <label for="branch_name">{{ edit_branch.name }}</label>
             </div>
             <div class="form-floating w-100">
                 <input name="branch_description" class="form-control" id="branch_description"
-                       placeholder="Branch Description" required>
+                       placeholder="Branch Description">
                 <label for="branch_description">{{ edit_branch.description }}</label>
             </div>
             <div class="row">
-                <span class="text-info col12 my-1">Note: Must upload image with lowercase_and_underscores.jpg format.</span>
+                <span class="text-info col12 my-1">Note: If you changed the name, you must upload/edit the image with lowercase_and_underscores.jpg format.</span>
             </div>
             <div class="row">
                 <div class="col 1">
-                    <button type="submit" class="btn btn-primary">Edit</button>
+                    <button type="submit" class="btn btn-primary">Submit Edits</button>
                     <a href="/">Cancel</a>
                 </div>
             </div>
