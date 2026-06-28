@@ -1,5 +1,6 @@
 from logic.Branch import Branch
 from logic.Leaf import Leaf
+from bson import ObjectId
 
 class TreeEngine:
     all_branches = []
@@ -110,3 +111,13 @@ class TreeEngine:
         edited_branch = Database.edit_branch(branch_id, branch_edits)
         # cls.all_branches[edited_branch.id] = edited_branch # I don't think this is necessary. I update the obj direct.
         return edited_branch
+
+    @classmethod
+    def delete_branch(cls, branch_id):
+        from data.Database import Database
+        delete_branch = cls.lookup_branch(ObjectId(branch_id))
+        delete_name = delete_branch.name
+        Database.delete_branch(delete_branch)
+        cls.all_branches.remove(delete_branch)
+        return delete_name
+

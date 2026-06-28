@@ -119,8 +119,8 @@ class WebUI:
     def homepage():
         """ Sets Flask routes to homepage. """
 
-        test_branch = "Japanese Maple"
-        branch = WebUI.engine.lookup_branch_by_name(test_branch)
+        default_branch = "Japanese Maple"
+        branch = WebUI.engine.lookup_branch_by_name(default_branch)
         care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch.id)
         phases = ["1st", "2nd", "3rd+"]
         page_context = {

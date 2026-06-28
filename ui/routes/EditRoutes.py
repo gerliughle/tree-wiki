@@ -61,6 +61,11 @@ class EditRoutes:
         branch = TreeEngine.add_branch(branch_dict)
         return render_template("edit/confirm_branch_created.html", branch=branch)
 
+
+
+    # FIXME URGENT: There is something borked. I think it's editing the wrong branch, and maybe
+    # mixing the parent branch with the edit branch.
+    # Trace the branch id's that are passed.
     @staticmethod
     @__app.route('/select_edit_branch')
     def select_edit_branch():
@@ -71,9 +76,7 @@ class EditRoutes:
     @__app.route('/edit_branch', methods=['POST'])
     def edit_branch():
         all_branches = WebUI.get_all_branches()
-        branch_id = ""
-        if "branch_id" in request.form:
-            branch_id = ObjectId(request.form["branch_id"])
+        branch_id = ObjectId(request.form["select_branch_id"])
         print(f"{branch_id=}")
         branch = TreeEngine.lookup_branch(branch_id)
         print(f"Branch loaded if this is a name: {branch.name}")
@@ -84,12 +87,7 @@ class EditRoutes:
     def do_edit_branch():
         """ FIXME needs lots of form validation, checking dupes, etc.
 
-
-        Note for tomorrow josh: you are modifying this to edit a branch.
-        this is a UI layer, you want to pass an 'update' dict to the tree engine
-        which passes to database to update_one.
-
-        the update_one thing takes the id to update, then $set: payload. """
+        Form design should have better labels, and be better in general. """
         branch_id = ObjectId(request.form["branch_id"])
         branch_edits = {}
         if "branch_name" in request.form:
@@ -100,11 +98,36 @@ class EditRoutes:
         if "branch_description" in request.form:
             if request.form["branch_description"].strip() != "":
                 branch_edits["description"] = request.form["branch_description"].strip()
-        if "parent_branch_id" in request.form:
-            if request.form["parent_branch_id"] != "":
-                branch_edits["parent_id"] = ObjectId(request.form["parent_branch_id"])
+        if "select_branch_id" in request.form:
+            if request.form["select_branch_id"] != "":
+                branch_edits["parent_id"] = ObjectId(request.form["select_branch_id"])
 
         branch_author = session.get("user_id")
         print(f"Testing flask_login. {branch_author=}")
         updated_branch = TreeEngine.edit_branch(branch_id, branch_edits)
         return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
+
+    @staticmethod
+    @__app.route('/select_delete_branch')
+    def delete_branch():
+        all_branches = WebUI.get_all_branches()
+        return render_template("edit/select_delete_branch.html", branches=all_branches)
+
+    @staticmethod
+    @__app.route('/check_delete_branch', methods=['POST'])
+    def check_delete_branch():
+        delete_branch = ""
+        if "select_branch_id" in request.form:
+            delete_branch = TreeEngine.lookup_branch(ObjectId(request.form["select_branch_id"]))
+        print(f"Delete branch name: {delete_branch.name=}")
+        return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
+
+    @staticmethod
+    @__app.route('/do_delete_branch', methods=['POST'])
+    def do_delete_branch():
+        delete_name = ""
+        if "branch_id" in request.form:
+            delete_branch_id = request.form["branch_id"] #It's a string
+            delete_name = TreeEngine.delete_branch(delete_branch_id)
+        return render_template("edit/confirm_branch_deleted.html", delete_name=delete_name)
+
