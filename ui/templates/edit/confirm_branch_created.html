@@ -2,5 +2,8 @@
 {% block title %}New Branch Created{% endblock %}
 
 {% block content %}
-<div class="container col-8 my-5">Branch "created"</div>
+<div class="container col-8 my-5">
+    <h2>Branch "created"</h2>
+<a class="btn btn-primary" href="/show_branch?branch={{ branch.id }}">View Page</a>
+</div>
 {% endblock %}

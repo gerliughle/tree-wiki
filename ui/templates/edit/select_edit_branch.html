@@ -1,0 +1,24 @@
+{% extends "template.html" %}
+{% block title %}Select Branch to Edit{% endblock %}
+{% block content %}
+    <div class="container col-md-4 col-8">
+
+     <form method="POST" action="/edit_branch">
+         <h3 class="my-2">Select a branch to edit</h3>
+            <select class="form-select my-1" aria-label="Select branch to edit" name="branch_id" required>
+                <option selected value="">Select branch</option>
+                {% for branch in branches %}
+                    <option value="{{ branch.id }}">{{ branch.name }}</option>
+                {% endfor %}
+            </select>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Select</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

@@ -42,23 +42,73 @@ class EditRoutes:
         if "branch_description" in request.form:
             branch_description = request.form["branch_description"].strip()
         if "parent_branch_id" in request.form:
-            parent_branch_id = request.form["parent_branch_id"]
+            parent_branch_id = ObjectId(request.form["parent_branch_id"])
         else:
             print("No branch id")
         branch_image = str(branch_name.strip().lower().replace(" ", "_") + ".jpg")
         branch_author = session.get("user_id")
-        print(f"{parent_branch_id=}")
-
-        # user = UserManager.add_user(username, pw_hash)
-
-        # call a logic, pass the params.
         branch_dict = {
             "author_id": branch_author,
             "name": branch_name,
             "description": branch_description,
             "image": branch_image,
-            "parent_id": ObjectId(parent_branch_id)
+            "parent_id": parent_branch_id
         }
-        TreeEngine.add_branch(branch_dict)
+        branch = TreeEngine.add_branch(branch_dict)
+        return render_template("edit/confirm_branch_created.html", branch=branch)
 
-        return render_template("edit/confirm_branch_created.html")
+    @staticmethod
+    @__app.route('/select_edit_branch')
+    def select_edit_branch():
+        all_branches = WebUI.get_all_branches()
+        return render_template("edit/select_edit_branch.html", branches=all_branches)
+
+    @staticmethod
+    @__app.route('/edit_branch', methods=['POST'])
+    def edit_branch():
+        all_branches = WebUI.get_all_branches()
+        branch_id = ""
+        if "branch_id" in request.form:
+            branch_id = ObjectId(request.form["branch_id"])
+        print(f"{branch_id=}")
+        branch = TreeEngine.lookup_branch(branch_id)
+        print(f"Branch loaded if this is a name: {branch.name}")
+        return render_template("edit/edit_branch.html", edit_branch=branch, branches=all_branches)
+
+    @staticmethod
+    @__app.route('do_edit_branch', methods=['POST'])
+    def do_edit_branch():
+        """ FIXME needs lots of form validation, checking dupes, etc.
+
+
+        Note for tomorrow josh: you are modifying this to edit a branch.
+        this is a UI layer, you want to pass an 'update' dict to the tree engine
+        which passes to database to update_one.
+
+        the update_one thing takes the id to update, then $set: payload. """
+        branch_name = ""
+        branch_description = ""
+        parent_branch_id = ""
+        branch_image = ""
+        if "branch_name" in request.form:
+            if request.form["branch_name"].strip() != "":
+                branch_name = request.form["branch_name"].strip()
+                branch_image = str(branch_name.strip().lower().replace(" ", "_") + ".jpg")
+        if "branch_description" in request.form:
+            if request.form["branch_description"].strip() != "":
+                branch_description = request.form["branch_description"].strip()
+        if "parent_branch_id" in request.form:
+            if request.form["parent_branch_id"] != "":
+                parent_branch_id = ObjectId(request.form["parent_branch_id"])
+
+
+        branch_author = session.get("user_id")
+        branch_dict = {
+            "author_id": branch_author,
+            "name": branch_name,
+            "description": branch_description,
+            "image": branch_image,
+            "parent_id": parent_branch_id
+        }
+        branch = TreeEngine.add_branch(branch_dict)
+        return render_template("edit/confirm_branch_created.html", branch=branch)

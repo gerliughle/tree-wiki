@@ -102,3 +102,4 @@ class TreeEngine:
         from data.Database import Database
         branch = Database.add_branch(branch_dict, cls.branch_map)
         cls.all_branches.append(branch)
+        return branch
