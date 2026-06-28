@@ -45,3 +45,7 @@ class User:
         result = bcrypt.checkpw(password.encode(), self.__pw_hash)
         return result
 
+    @property
+    def role(self):
+        return self.__role
+
