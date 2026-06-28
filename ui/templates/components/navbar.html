@@ -41,13 +41,9 @@
                         {% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        {% if current_user %}
-                        <li><a class="dropdown-item" href="#">Profile</a></li>
-                        <li><a class="dropdown-item" href="#">Account</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                    {% if current_user %}
                         {% if current_user.role == "admin" %}
+                            <li><span class="dropdown-item" href="/create_branch">Admin Features:</span></li>
                         <li><a class="dropdown-item" href="/create_branch">Create Branch</a></li>
                         <li>
                             <hr class="dropdown-divider">

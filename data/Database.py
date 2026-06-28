@@ -153,6 +153,12 @@ class Database:
             "pw_hash": pw_hash,
             "role":"user"
         }
-        cls.__users.insert_one(user_dict)
+        cls.__users.insert_one(user_dict) # mutes dict with _id
         return User.build(user_dict)
+
+    @classmethod
+    def add_branch(cls, branch_dict, branch_map):
+        cls.connect()
+        cls.__branches.insert_one(branch_dict)
+        return Branch.build(branch_dict, branch_map)
 

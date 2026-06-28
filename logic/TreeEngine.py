@@ -96,3 +96,9 @@ class TreeEngine:
                 filtered_leaves.append(leaf)
         print(f"Returning filtered list of {len(filtered_leaves)}.\n")
         return filtered_leaves
+
+    @classmethod
+    def add_branch(cls, branch_dict):
+        from data.Database import Database
+        branch = Database.add_branch(branch_dict, cls.branch_map)
+        cls.all_branches.append(branch)

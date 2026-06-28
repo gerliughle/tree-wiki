@@ -2,21 +2,33 @@
 {% block title %}Create Branch{% endblock %}
 {% block content %}
 
-    <div class="container my-2">
+    <div class="container my-2 col-md-4 col-6 d-flex-vertical">
         <form method="POST" action="/do_create_branch">
             <h3 class="col-lg-8">Create a new branch</h3>
-            <select class="form-select" aria-label="Select parent branch">
-                <option selected disabled>Select parent branch</option>
+            <select class="form-select" aria-label="Select parent branch" name="parent_branch_id" required>
+                <option selected value="">Select parent branch</option>
                 {% for branch in branches %}
                     <option value="{{ branch.id }}">{{ branch.name }}</option>
                 {% endfor %}
             </select>
-
-
-
-    </form>
-
-
+            <div class="form-floating w-100">
+                <input name="branch_name" class="form-control" id="branch_name" placeholder="Branch Name" required>
+                <label for="branch_name">Enter Branch name</label>
+            </div>
+            <div class="form-floating w-100">
+                <input name="branch_description" class="form-control" id="branch_description"
+                       placeholder="Branch Description" required>
+                <label for="branch_description">Enter Branch description</label>
+            </div>
+            <div class="row">
+                <span class="text-info col12 my-1">Note: Must upload image with lowercase_and_underscores.jpg format.</span>
+            </div>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </form>
     </div>
 
 
