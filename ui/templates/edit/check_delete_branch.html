@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+{% block title %}Select Branch to Edit{% endblock %}
+{% block content %}
+    <div class="container col-md-4 col-8">
+
+        <form method="POST" action="/do_delete_branch">
+            <input type="hidden" name="branch_id" value="{{ delete_branch.id }}">
+            <h3 class="my-2">Are you sure you want to delete {{ delete_branch.name }}?</h3>
+            <span class="text-info">Warning, this cannot be undone.</span>
+
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

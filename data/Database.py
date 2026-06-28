@@ -2,6 +2,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
 from configparser import ConfigParser
+from bson import ObjectId
 
 from data import StaticData
 from data.StaticData import get_all_branches, get_all_leaves
@@ -176,4 +177,15 @@ class Database:
 
         return local_branch
 
+    @classmethod
+    def delete_branch(cls, branch):
+        cls.connect()
+        delete_doc = cls.__branches.delete_one({"_id": branch.id})
+        if delete_doc.acknowledged:
+            print("Deleted branch")
+        else:
+            print("Did not complete deletion.")
+        # FIXME shit i should probably update parent of all children to this one's parents.
+        # which means i need a child finder. which i wanted anyways for like, reverse breadcrumbs.
+        #also, this doesn't work. something wrong with passing thru the ids'
 
