@@ -8,6 +8,7 @@ from data.StaticData import get_all_branches, get_all_leaves
 from logic.Branch import Branch
 from logic.Leaf import Leaf
 from logic.User import User
+from logic.TreeEngine import TreeEngine
 
 
 class Database:
@@ -161,4 +162,18 @@ class Database:
         cls.connect()
         cls.__branches.insert_one(branch_dict)
         return Branch.build(branch_dict, branch_map)
+
+    @classmethod
+    def edit_branch(cls, branch_id, branch_edits):
+        cls.connect()
+        cls.__branches.update_one(
+            {"_id": branch_id},
+            {"$set": branch_edits}
+        )
+        local_branch = TreeEngine.lookup_branch(branch_id)
+        for key, value in branch_edits.items():
+            setattr(local_branch, key, value)
+
+        return local_branch
+
 

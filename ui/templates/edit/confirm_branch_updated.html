@@ -1,9 +1,9 @@
 {% extends "template.html" %}
-{% block title %}{{ branch.name }} Branch Created{% endblock %}
+{% block title %}{{ branch.name }} has been Updated{% endblock %}
 
 {% block content %}
 <div class="container col-8 my-5">
-    <h2>{{ branch.name }} has been created as a new branch.</h2>
+    <h2>{{ branch.name }} has been updated.</h2>
 <a class="btn btn-primary" href="/show_branch?branch={{ branch.id }}">View Page</a>
 </div>
 {% endblock %}

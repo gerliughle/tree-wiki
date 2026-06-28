@@ -103,3 +103,10 @@ class TreeEngine:
         branch = Database.add_branch(branch_dict, cls.branch_map)
         cls.all_branches.append(branch)
         return branch
+
+    @classmethod
+    def edit_branch(cls, branch_id, branch_edits):
+        from data.Database import Database
+        edited_branch = Database.edit_branch(branch_id, branch_edits)
+        # cls.all_branches[edited_branch.id] = edited_branch # I don't think this is necessary. I update the obj direct.
+        return edited_branch
