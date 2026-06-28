@@ -35,21 +35,22 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                        aria-expanded="false">
                         {% if current_user %}
-                        {{ current_user.username }}
+                            {{ current_user.username }}
                         {% else %}
                             Not Logged In
                         {% endif %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                    {% if current_user %}
-                        {% if current_user.role == "admin" %}
-                            <li><span class="dropdown-item" href="/create_branch">Admin Features:</span></li>
-                        <li><a class="dropdown-item" href="/create_branch">Create Branch</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        {% endif %}
-                        <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        {% if current_user %}
+                            {% if current_user.role == "admin" %}
+                                <li><span class="dropdown-item" href="/create_branch">Admin Features:</span></li>
+                                <li><a class="dropdown-item" href="/create_branch">Create Branch</a></li>
+                                <li><a class="dropdown-item" href="/select_edit_branch">Edit Branch</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
                         {% else %}
                             <li><a class="dropdown-item" href="/login">Login</a></li>
                         {% endif %}
