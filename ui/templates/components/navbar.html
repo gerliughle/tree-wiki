@@ -14,12 +14,18 @@
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/print_tree">Care Guides</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Collection</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/create_branch">About</a>
-                </li>
+
+                {% if current_user.role == "admin" %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Edit
+                            Branches</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/create_branch">Create Branch</a></li>
+                            <li><a class="dropdown-item" href="/select_edit_branch">Edit Branch</a></li>
+                            <li><a class="dropdown-item" href="/select_delete_branch">Delete Branch</a></li>
+                        </ul>
+                    <li class="nav-item"><a class="nav-link" href="/select_edit_leaf">Leaf Editor</a></li>
+                {% endif %}
             </ul>
 
             <div class="d-flex align-items-center gap-3">
@@ -42,15 +48,6 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         {% if current_user %}
-                            {% if current_user.role == "admin" %}
-                                <li><span class="dropdown-item" href="/create_branch">Admin Features:</span></li>
-                                <li><a class="dropdown-item" href="/create_branch">Create Branch</a></li>
-                                <li><a class="dropdown-item" href="/select_edit_branch">Edit Branch</a></li>
-                                <li><a class="dropdown-item" href="/select_delete_branch">Delete Branch</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                            {% endif %}
                             <li><a class="dropdown-item" href="/logout">Logout</a></li>
                         {% else %}
                             <li><a class="dropdown-item" href="/login">Login</a></li>

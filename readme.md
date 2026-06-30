@@ -19,10 +19,20 @@ Done:
 * Appropriate breadcrumbs for leaves
 * Functional breadcrumbs
 * Breadcrumb design/sizing
-* * Temp Selector system
+* Auto hiding categories/seasons doesn't work with the JS filters.
+* Database backup
+* Logins/accounts
+* Create child section in header
+* Header images
+* Page footer
+
 
 Flask Routes:
 * index.html
+* Login
+* Create Branch
+* Edit Branch
+* Delete Branch
 
 Templates:
 * index.html >> should be branch.html
@@ -34,24 +44,20 @@ Templates:
 
 Branch page To-Do:
 * Create subcategory setup to allow multiple shared leaves in one subcategory
-* for different phases. 
-* Create child section in header
-* Header images
-* Page footer
+* for different phases.
 * redesign to be less round and floaty. a bit more table-y would be more functional
-
 * Make category order consistent
+* I removed season filtering, but could be added if it expands column view to be more usable.
 
 Then other to-dos:
-* Logins/accounts
 * Editing Data system
-* Database backup
 * Homepage
+* Integrate edit links into page design (add child, clone branch, etc)
 * Tree View
 * About page/legend
 * Tooltips
-* Auto hiding categories/seasons doesn't work with the JS filters.
-* 
+* input validation
+* Temp Selector system
 
 
 Problems:
@@ -101,7 +107,4 @@ This could impact like, having different breadcrumbs for multiple entries on one
 Problem 2: 
 How to display different leaves on same subcategory.
 bootstrap card list items maybe
-
-Problem 3: 
-Database backups
 

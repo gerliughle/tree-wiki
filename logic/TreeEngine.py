@@ -84,6 +84,29 @@ class TreeEngine:
         return care_guide, breadcrumbs, category_list
 
     @classmethod
+    def get_inherited_leaves(cls, branch_id):
+
+        subcategory_list = set() # subcategories that already have a leaf
+        inherited_leaves = [] # list of inherited leaves only
+        category_list = []
+
+        branch = cls.lookup_branch(branch_id)
+        current_branch = cls.lookup_branch(branch.parent_id)
+
+        while current_branch is not None:
+            # print(f"Checking {current_branch.name}")
+            current_leaves = cls.get_leaves_for_branch(current_branch._id)
+
+            for leaf in current_leaves:
+                if leaf.subcategory not in subcategory_list:
+                    subcategory_list.add(leaf.subcategory)
+                    inherited_leaves.append(leaf)
+                    # print(f"Added {leaf.subcategory} to leaf guide.")
+
+            current_branch = cls.lookup_branch(current_branch.parent_id)
+        return inherited_leaves
+
+    @classmethod
     def get_children_of_branch(cls, branch_id):
         children_list = []
         current_branch = cls.lookup_branch(branch_id)

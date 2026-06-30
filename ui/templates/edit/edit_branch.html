@@ -8,7 +8,7 @@
             <h3 class="col-lg-8">Editing {{ edit_branch.name }}</h3>
             <span>Leave fields blank if you don't want to make any changes.</span>
             <h6>Change parent branch:</h6>
-            <select class="form-select my-1" aria-label="Change parent branch" name="select_branch_id" required>
+            <select class="form-select my-1" aria-label="Change parent branch" name="select_branch_id">
                 <option selected value="">--Change parent branch branch--</option>
                 {% for branch in branches %}
                     {% if edit_branch.id != branch.id %}
