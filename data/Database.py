@@ -95,16 +95,16 @@ class Database:
         all_leaves = StaticData.get_all_leaves()
         for leaf in all_leaves:
             leaf['author_id'] = admin_id.inserted_id
-        for i in range(3): # 3 trunk leaves
+        for i in range(3):  # 3 trunk leaves
             all_leaves[i]['branch_id'] = id_list[0]
             cls.__leaves.insert_one(all_leaves[i])
         # 0 broadleaf leaves
-        for i in range(3, 5): # 2 deciduous broadleaf leaves
+        for i in range(3, 5):  # 2 deciduous broadleaf leaves
             all_leaves[i]['branch_id'] = id_list[2]
             cls.__leaves.insert_one(all_leaves[i])
         all_leaves[5]['branch_id'] = id_list[3]
         cls.__leaves.insert_one(all_leaves[5])
-        for i in range(6, 10): # 4 JM leaves
+        for i in range(6, 10):  # 4 JM leaves
             all_leaves[i]['branch_id'] = id_list[4]
             cls.__leaves.insert_one(all_leaves[i])
 
@@ -113,7 +113,7 @@ class Database:
         """ Reads data from database and builds objects. """
         cls.connect()
 
-        branch_map ={}
+        branch_map = {}
         branches_dict = list(cls.__branches.find())
         branches = [Branch.build(branch, branch_map) for branch in branches_dict]
 
@@ -153,9 +153,9 @@ class Database:
         user_dict = {
             "username": username,
             "pw_hash": pw_hash,
-            "role":"user"
+            "role": "user"
         }
-        cls.__users.insert_one(user_dict) # mutes dict with _id
+        cls.__users.insert_one(user_dict)  # mutes dict with _id
         return User.build(user_dict)
 
     @classmethod
@@ -195,3 +195,41 @@ class Database:
             print("Deleted branch")
         else:
             print("Did not complete deletion.")
+
+    @classmethod
+    def rebuild_leaves(cls):
+        """ Migrates leaf object data to support entries feature. Only run once (ideally). """
+        cls.connect()
+        all_leaves = list(cls.__leaves.find())
+
+        for leaf_dict in all_leaves:
+            if "phases" not in leaf_dict or "text" not in leaf_dict:
+                continue
+
+            entries = [
+                {
+                    "text": leaf_dict["text"],
+                    "phases": leaf_dict["phases"]
+                }
+            ]
+            cls.__leaves.update_one(
+                {"_id": leaf_dict["_id"]},
+                {
+                    "$set": {"entries": entries},
+                    "$unset": {"text": "", "phases": ""}
+                }
+            )
+
+    @classmethod
+    def migration_error_check(cls):
+        cls.connect()
+        all_leaves = list(cls.__leaves.find())
+
+        for leaf_dict in all_leaves:
+            for leaf_check in all_leaves:
+                if leaf_dict["subcategory"] == leaf_check["subcategory"] \
+                    and leaf_dict["category"] == leaf_check["category"] \
+                    and leaf_dict["_id"] != leaf_check["_id"] \
+                    and leaf_dict["branch_id"] == leaf_check["branch_id"]:
+                    print(f"Error found? {leaf_dict['_id']} conflict with {leaf_check['_id']}")
+
