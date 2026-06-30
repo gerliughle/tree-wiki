@@ -7,8 +7,7 @@ class Leaf:
                  category,
                  subcategory,
                  seasons,
-                 phases,
-                 text,
+                 entries,
                  leaf_map):
         self._id = _id
         self.author_id = author_id
@@ -16,8 +15,7 @@ class Leaf:
         self.category = category
         self.subcategory = subcategory
         self.seasons = seasons
-        self.phases = phases
-        self.text = text
+        self.entries = entries
         leaf_map[_id] = self
 
     @classmethod
@@ -30,8 +28,7 @@ class Leaf:
             leaf_dict["category"],
             leaf_dict["subcategory"],
             leaf_dict["seasons"],
-            leaf_dict["phases"],
-            leaf_dict["text"],
+            leaf_dict["entries"],
             leaf_map
         )
 
@@ -43,7 +40,6 @@ class Leaf:
             "category": self.category,
             "subcategory": self.subcategory,
             "seasons": self.seasons,
-            "phases": self.phases,
-            "text": self.text,
+            "entries": self.entries
         }
 
