@@ -96,7 +96,7 @@ class WebUI:
         if len(phases) == 0:
             phases = ["1st", "2nd", "3rd+"]
 
-        filtered_care_guide = WebUI.engine.filter_care_guide(care_guide,"phases", phases)
+        filtered_care_guide = WebUI.engine.filter_phases(care_guide, phases)
         children = TreeEngine.get_children_of_branch(branch.id)
 
         page_context = {
