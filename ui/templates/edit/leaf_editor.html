@@ -1,0 +1,72 @@
+{% extends "template.html" %}
+{% block title %}Leaf Editor{% endblock %}
+{% block content %}
+    <div class="container col-md-4 col-8">
+
+        <form method="POST" action="/create_inherited_subcat">
+            <h3 class="my-2">Select an inherited leaf to overwrite.</h3>
+
+            <select class="form-select my-1" aria-label="Select inherited leaf" name="inherited_leaf" required>
+                <option selected value="">Select category</option>
+                {% for leaf in inherited_leaves %}
+                    <option value="{{ leaf.subcategory }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
+                {% endfor %}
+            </select>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Select</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+        <form method="POST" action="/edit_leaf">
+            <h3 class="my-2">Select a leaf from {{ branch.name }} to edit.</h3>
+
+            <select class="form-select my-1" aria-label="Select branch leaf" name="branch_leaf" required>
+                <option selected value="">Select category</option>
+                {% for leaf in branch_leaves %}
+                    <option value="{{ leaf.subcategory }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
+                {% endfor %}
+            </select>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Select</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+        <form method="POST" action="/create_subcat_leaf">
+            <h3 class="my-2">Create a new subcategory at this level.</h3>
+
+            <div class="form-floating w-100">
+                <input name="new_subcategory" class="form-control" id="new_subcategory"
+                       placeholder="New Subcategory" required>
+                <label for="new_subcategory">Enter new Subcategory name</label>
+            </div>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+        <form method="POST" action="/delete_leaf">
+            <h3 class="my-2">Select a leaf from {{ branch.name }} to delete.</h3>
+
+            <select class="form-select my-1" aria-label="Select branch leaf to delete" name="delete_leaf" required>
+                <option selected value="">Select leaf to delete</option>
+                {% for leaf in branch_leaves %}
+                    <option value="{{ leaf.subcategory }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
+                {% endfor %}
+            </select>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

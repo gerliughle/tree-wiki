@@ -7,9 +7,6 @@ from bson import ObjectId
 
 # Routes needed:
 # Admin routes:
-# - Create Branch - yeehaw.
-# - Edit Branch. Can make a form that pulls name/desc as defaults, lets you change.
-# - delete branch
 # - Create Leaf
 # - Edit Leaf
 # - Duplicate leaf to new branch
@@ -130,4 +127,31 @@ class EditRoutes:
             delete_branch_id = request.form["branch_id"] #It's a string
             delete_name = TreeEngine.delete_branch(delete_branch_id)
         return render_template("edit/confirm_branch_deleted.html", delete_name=delete_name)
+
+    @staticmethod
+    @__app.route('/select_edit_leaf')
+    def select_edit_leaf():
+        all_branches = WebUI.get_all_branches()
+        return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
+
+    @staticmethod
+    @__app.route('/leaf_editor', methods=['POST'])
+    def leaf_editor():
+        branch_id = ""
+        if "select_branch_id" in request.form:
+            branch_id = ObjectId(request.form["select_branch_id"])
+
+        branch = TreeEngine.lookup_branch(branch_id)
+        branch_leaves = TreeEngine.get_leaves_for_branch(branch_id)
+        inherited_leaves = TreeEngine.get_inherited_leaves(branch_id)
+
+        page_context = {
+            "branch":branch,
+            "branch_leaves":branch_leaves,
+            "inherited_leaves":inherited_leaves
+        }
+
+        return render_template('edit/leaf_editor.html', **page_context)
+
+
 
