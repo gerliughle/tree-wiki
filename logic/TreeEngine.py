@@ -118,17 +118,17 @@ class TreeEngine:
         return children_list
 
     @classmethod
-    def filter_care_guide(cls, leaves, filter, filter_list):
+    def filter_phases(cls, leaves, phase_list):
         """ Filters a list of leaves.
 
          leaves = source list of leaves
          filter = str name of the filter ("phases", "seasons")
-         filter_list = list to filter against """
+         phase_list = list to filter against """
         filtered_leaves = []
         for leaf in leaves:
-            if any(item in filter_list for item in getattr(leaf, filter)):
-                #print(f"Match found in {leaf.subcategory}: {leaf.filter}. Keeping.")
-                filtered_leaves.append(leaf)
+            for entry in leaf.entries:
+                if any(item in phase_list for item in entry["phases"]):
+                    filtered_leaves.append(leaf)
         print(f"Returning filtered list of {len(filtered_leaves)}.\n")
         return filtered_leaves
 
