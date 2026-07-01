@@ -54,6 +54,12 @@ class TreeEngine:
         return None
 
     @classmethod
+    def lookup_leaf(cls, leaf_id):
+        if leaf_id in cls.leaf_map:
+            return cls.leaf_map[leaf_id]
+        return None
+
+    @classmethod
     def get_care_guide(cls, branch_id):
         """ Main care guide builder. Gets leaves, checks inheritances to build new list. """
 

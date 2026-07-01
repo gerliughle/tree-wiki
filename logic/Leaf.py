@@ -43,3 +43,7 @@ class Leaf:
             "entries": self.entries
         }
 
+    @property
+    def id(self):
+        return self._id
+

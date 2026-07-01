@@ -144,14 +144,35 @@ class EditRoutes:
         branch = TreeEngine.lookup_branch(branch_id)
         branch_leaves = TreeEngine.get_leaves_for_branch(branch_id)
         inherited_leaves = TreeEngine.get_inherited_leaves(branch_id)
+        print(f"Branch_leaves count: {len(branch_leaves)}. Inherited_leaves count: {len(inherited_leaves)}")
 
         page_context = {
             "branch":branch,
             "branch_leaves":branch_leaves,
             "inherited_leaves":inherited_leaves
         }
-
         return render_template('edit/leaf_editor.html', **page_context)
+
+
+    @staticmethod
+    @__app.route('/create_inherited_subcat', methods=['POST'])
+    def create_inherited_subcat():
+        source_branch_id = ""
+        inherited_leaf_id = "" # The branch i am cloning from
+        target_branch_id = "" # The branch i am creating a leaf for
+
+        if "target_branch_id" in request.form:
+            target_branch_id = ObjectId(request.form["target_branch_id"])
+        target_branch = TreeEngine.lookup_branch(target_branch_id)
+
+        if "inherited_leaf_id" in request.form:
+            inherited_leaf_id = ObjectId(request.form["inherited_leaf_id"])
+        leaf = TreeEngine.lookup_leaf(inherited_leaf_id)
+        source_branch_id = leaf.branch_id
+        source_branch = TreeEngine.lookup_branch(source_branch_id)
+
+        return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch, target_branch=target_branch)
+
 
 
 

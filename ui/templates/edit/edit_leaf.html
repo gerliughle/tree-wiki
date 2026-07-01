@@ -1,0 +1,96 @@
+{% extends "template.html" %}
+{% block title %}Create/Edit Leaf{% endblock %}
+{% block content %}
+
+    <div class="container my-2 col-md-8 col-10 d-flex-vertical">
+        <form method="POST" action="/do_edit_leaf">
+            {#            <input type="hidden" name="branch_id" value="{{ source_branch.id }}">#}
+
+            {% if source_branch.id != target_branch_id %}
+                <!-- if making a NEW leaf that is inherited/vs actually editing. -->
+                <!-- passes on the target_branch_id, and original category/subcategory. -->
+                <h3 class="col-lg-8">Creating a new leaf. </h3>
+                <h5>'{{ leaf.category }}: {{ leaf.subcategory }}' Leaf
+                    for {{ target_branch.name }}.</h5>
+                <h5>Referencing {{ source_branch.name }} </h5>
+                <span>You are cloning an 'inherited' leaf to create a new, specific one for {{ target_branch.name }}.
+                    Some fields cannot be changed to ensure the inherited leaf is replaced. You can have multiple text
+                    entries, with the intention that they would apply to different phases of growth. </span>
+
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="branch-name">Branch Name:</span>
+                    <input type="text" class="form-control" name="branch_name" placeholder="{{ target_branch.name }}"
+                           readonly>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="category">Category:</span>
+                    <input type="text" class="form-control" name="category" placeholder="{{ leaf.category }}"
+                           readonly>
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="subcategory">Subcategory:</span>
+                    <input type="text" class="form-control" name="subcategory" placeholder="{{ leaf.subcategory }}"
+                           readonly>
+                </div>
+
+            {% endif %}
+
+            <!-- Season Selector -->
+            <div class="btn-group p-2 mb-3" data-toggle="buttons" role="group">
+                <label class="btn btn-group-text-primary disabled">Season(s):</label>
+                <input type="checkbox" class="btn-check" id="Spring" autocomplete="off" name="Spring" checked>
+                <label class="btn btn-outline-primary" for="Spring">Spring</label>
+                <input type="checkbox" class="btn-check" id="Summer" autocomplete="off" name="Summer" checked>
+                <label class="btn btn-outline-primary" for="Summer">Summer</label>
+                <input type="checkbox" class="btn-check" id="Fall" autocomplete="off" name="Fall" checked>
+                <label class="btn btn-outline-primary" for="Fall">Fall</label>
+                <input type="checkbox" class="btn-check" id="Winter" autocomplete="off" name="Winter" checked>
+                <label class="btn btn-outline-primary" for="Winter">Winter</label>
+
+            </div>
+            <!-- then an entry builder thing. Have 4 entries which can be enabled or not with checkboxes.
+            Each one has checkbox, phase selector, and text -->
+
+            <!-- idk how to make this look neat.. -->
+
+            <div class="input-group">
+                <span class="input-group-text" id="entry-1">Entry 1</span>
+                <input type="text" class="form-control" placeholder="">
+
+            </div>
+            <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
+                <label class="btn btn-group-text-primary disabled">Phase:</label>
+                {% if "1st" in phases %}
+                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st" checked>
+                {% else %}
+                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st">
+                {% endif %}
+                <label class="btn btn-outline-primary" for="1st">1st</label>
+                {% if "2nd" in phases %}
+                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd" checked>
+                {% else %}
+                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd">
+                {% endif %}
+                <label class="btn btn-outline-primary" for="2nd">2nd</label>
+                {% if "3rd+" in phases %}
+                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+" checked>
+                {% else %}
+                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+">
+                {% endif %}
+                <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
+            </div>
+
+
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">{% if source_branch.id != target_branch_id %}
+                        Create{% else %}Edit{% endif %} Leaf
+                    </button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}
