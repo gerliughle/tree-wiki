@@ -219,3 +219,29 @@ class EditRoutes:
             print(f"No leaf created and returned.")
         branch = TreeEngine.lookup_branch(branch_id)
         return render_template("edit/confirm_leaf_created.html", leaf=leaf, branch=branch)
+
+
+    @staticmethod
+    @__app.route('/check_delete_leaf', methods=['POST'])
+    def check_delete_leaf():
+        delete_leaf = ""
+        if "delete_leaf_id" in request.form:
+            delete_leaf = TreeEngine.lookup_leaf(ObjectId(request.form["delete_leaf_id"]))
+        if delete_leaf:
+            print("Delete leaf selected")
+        else:
+            print("No leaf found to delete.")
+        branch = TreeEngine.lookup_branch(delete_leaf.branch_id)
+        return render_template("edit/check_delete_leaf.html", delete_leaf=delete_leaf, branch=branch)
+
+    @staticmethod
+    @__app.route('/do_delete_leaf', methods=['POST'])
+    def do_delete_leaf():
+        delete_leaf_id = ""
+        if "leaf_id" in request.form:
+            delete_leaf_id = ObjectId(request.form["leaf_id"])
+        delete_leaf = TreeEngine.lookup_leaf(delete_leaf_id)
+        branch = TreeEngine.lookup_branch(delete_leaf.branch_id)
+        TreeEngine.delete_leaf(delete_leaf_id)
+
+        return render_template("edit/confirm_leaf_deleted.html", branch=branch)

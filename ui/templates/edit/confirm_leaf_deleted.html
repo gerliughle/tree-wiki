@@ -1,0 +1,9 @@
+{% extends "template.html" %}
+{% block title %}Leaf Deleted{% endblock %}
+
+{% block content %}
+    <div class="container col-8 my-5">
+        <h2>{{ branch.name }}'s Leaf has been permanently deleted.</h2>
+        <a class="btn btn-primary" href="/show_branch?branch={{ branch.id }}">View Page</a>
+    </div>
+{% endblock %}

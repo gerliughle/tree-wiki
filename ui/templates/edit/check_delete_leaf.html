@@ -1,11 +1,11 @@
 {% extends "template.html" %}
-{% block title %}Confirm Branch Deletion{% endblock %}
+{% block title %}Confirm Leaf Deletion{% endblock %}
 {% block content %}
     <div class="container col-md-4 col-8">
 
-        <form method="POST" action="/do_delete_branch">
-            <input type="hidden" name="branch_id" value="{{ delete_branch.id }}">
-            <h3 class="my-2">Are you sure you want to delete {{ delete_branch.name }}?</h3>
+        <form method="POST" action="/do_delete_leaf">
+            <input type="hidden" name="leaf_id" value="{{ delete_leaf.id }}">
+            <h3 class="my-2">Are you sure you want to delete the {{ delete_leaf.category }} - {{ delete_leaf.subcategory }} Leaf from {{ branch.name }}?</h3>
             <span class="text-info">Warning, this cannot be undone.</span>
 
             <div class="row">

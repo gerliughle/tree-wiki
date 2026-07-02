@@ -194,13 +194,23 @@ class Database:
         if delete_doc.acknowledged:
             print("Deleted branch")
         else:
-            print("Did not complete deletion.")
+            print("Did not complete branch deletion.")
 
     @classmethod
     def add_leaf(cls, leaf_dict, leaf_map):
         cls.connect()
         cls.__leaves.insert_one(leaf_dict)
         return Leaf.build(leaf_dict, leaf_map)
+
+    @classmethod
+    def delete_leaf(cls, leaf):
+        cls.connect()
+        delete_doc = cls.__leaves.delete_one({"_id": leaf.id})
+
+        if delete_doc.acknowledged:
+            print("Deleted leaf")
+        else:
+            print("Did not complete leaf deletion.")
 
     @classmethod
     def rebuild_leaves(cls):
