@@ -5,7 +5,7 @@
     <div class="container my-2 col-md-8 col-10 d-flex-vertical">
         <form method="POST" action="/do_edit_leaf">
 
-            {% if source_branch.id != target_branch_id %}
+            {% if source_branch.id != target_branch.id %}
                 <!-- if making a NEW leaf that is inherited/vs actually editing. -->
                 <!-- passes on the target_branch_id, and original category/subcategory. -->
                 <h3 class="col-lg-8">Creating a new leaf. </h3>
@@ -16,25 +16,33 @@
                     Some fields cannot be changed to ensure the inherited leaf is replaced. You can have multiple text
                     entries, with the intention that they would apply to different phases of growth. </span>
 
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="branch-name">Branch Name:</span>
-                    <input type="text" class="form-control" name="branch_name" value="{{ target_branch.name }}"
-                           readonly disabled>
-                    <input type="hidden" name="branch_id" value="{{ target_branch.id }}">
-                </div>
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="category">Category:</span>
-                    <input type="text" class="form-control" value="{{ leaf.category }}"
-                           readonly disabled>
-                <input type="hidden" name="category" value="{{ leaf.category }}">
-                </div>
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="subcategory">Subcategory:</span>
-                    <input type="text" class="form-control" value="{{ leaf.subcategory }}"
-                           readonly disabled>
-                <input type="hidden" name="subcategory" value="{{ leaf.subcategory }}">
-                </div>
+            {% else %}
+                <h3 class="col-lg-8">Editing existing leaf. </h3>
+                <h5>'{{ leaf.category }}: {{ leaf.subcategory }}' Leaf
+                    for {{ target_branch.name }}.</h5>
+                <span>You are editing the existing leaf for {{ target_branch.name }}. You can have multiple text
+                    entries, with the intention that they would apply to different phases of growth. </span>
+
             {% endif %}
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="branch-name">Branch Name:</span>
+                <input type="text" class="form-control" name="branch_name" value="{{ target_branch.name }}"
+                       readonly disabled>
+                <input type="hidden" name="branch_id" value="{{ target_branch.id }}">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="category">Category:</span>
+                <input type="text" class="form-control" value="{{ leaf.category }}"
+                       readonly disabled>
+                <input type="hidden" name="category" value="{{ leaf.category }}">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="subcategory">Subcategory:</span>
+                <input type="text" class="form-control" value="{{ leaf.subcategory }}"
+                       readonly disabled>
+                <input type="hidden" name="subcategory" value="{{ leaf.subcategory }}">
+            </div>
+
 
             <!-- Season Selector -->
 
@@ -64,7 +72,7 @@
                     Original Entries
                 </div>
                 <div class="card-body p-2"><h6>{{ leaf.category }}: {{ leaf.subcategory }}</h6>
-            <span>{{ source_branch.name }}</span></div>
+                    <span>{{ source_branch.name }}</span></div>
                 <ul class="list-group list-group-flush">
                     {% for entry in leaf.entries %}
                         <li class="list-group-item">
