@@ -4,7 +4,6 @@
 
     <div class="container my-2 col-md-8 col-10 d-flex-vertical">
         <form method="POST" action="/do_edit_leaf">
-            {#            <input type="hidden" name="branch_id" value="{{ source_branch.id }}">#}
 
             {% if source_branch.id != target_branch_id %}
                 <!-- if making a NEW leaf that is inherited/vs actually editing. -->
@@ -19,23 +18,26 @@
 
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="branch-name">Branch Name:</span>
-                    <input type="text" class="form-control" name="branch_name" placeholder="{{ target_branch.name }}"
-                           readonly>
+                    <input type="text" class="form-control" name="branch_name" value="{{ target_branch.name }}"
+                           readonly disabled>
+                    <input type="hidden" name="branch_id" value="{{ target_branch.id }}">
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="category">Category:</span>
-                    <input type="text" class="form-control" name="category" placeholder="{{ leaf.category }}"
-                           readonly>
+                    <input type="text" class="form-control" value="{{ leaf.category }}"
+                           readonly disabled>
+                <input type="hidden" name="category" value="{{ leaf.category }}">
                 </div>
                 <div class="input-group mb-3">
                     <span class="input-group-text" id="subcategory">Subcategory:</span>
-                    <input type="text" class="form-control" name="subcategory" placeholder="{{ leaf.subcategory }}"
-                           readonly>
+                    <input type="text" class="form-control" value="{{ leaf.subcategory }}"
+                           readonly disabled>
+                <input type="hidden" name="subcategory" value="{{ leaf.subcategory }}">
                 </div>
-
             {% endif %}
 
             <!-- Season Selector -->
+
             <div class="btn-group p-2 mb-3" data-toggle="buttons" role="group">
                 <label class="btn btn-group-text-primary disabled">Season(s):</label>
                 <input type="checkbox" class="btn-check" id="Spring" autocomplete="off" name="Spring" checked>
@@ -48,20 +50,21 @@
                 <label class="btn btn-outline-primary" for="Winter">Winter</label>
 
             </div>
-            <!-- then an entry builder thing. Have 4 entries which can be enabled or not with checkboxes.
-            Each one has checkbox, phase selector, and text -->
 
-            <!-- idk how to make this look neat.. -->
+            <!-- Four entries input -->
 
-            <p class="mb-3">Existing entries for reference below. All entries will be overwritten when submitting this form. If you
-                want
-                to reference any old data, copy it into a new entry and ensure it is selected to be added. Entries can
-                have any unique combination of applicable phases.
-
+            <p class="mb-3">Any existing entries will be overwritten when submitting this form. If you
+                want to reference any old data, copy it into a new entry and ensure it is selected to be added. Entries
+                can have any unique combination of applicable phases.
                 In the case where you want to "end the chain" and stop inheriting a leaf for a subcategory, submit this
-                form with no
-                entries selected. The subcategory will not show up on the selected branch page or any children.</p>
+                form with no entries selected. The subcategory will not show up on the selected branch page or any
+                children.</p>
             <div class="card mb-3">
+                <div class="card-header">
+                    Original Entries
+                </div>
+                <div class="card-body p-2"><h6>{{ leaf.category }}: {{ leaf.subcategory }}</h6>
+            <span>{{ source_branch.name }}</span></div>
                 <ul class="list-group list-group-flush">
                     {% for entry in leaf.entries %}
                         <li class="list-group-item">
@@ -85,12 +88,12 @@
                     <h5>Entry editor:</h5>
                 </div>
                 <ul class="list-group list-group-flush">
-                    {% for new_entry in [1,2,3,4] %}
+                    {% for new_entry in [1,2,3,4] %} <!-- Entry loop -->
                         <li class="list-group-item">
                             <div class="row g-3 align-items-baseline">
                                 <div class="form-check form-switch col-auto">
                                     <input class="form-check-input" type="checkbox" role="switch"
-                                           id="entry_enabled_{{ loop.index }}">
+                                           id="entry_enabled_{{ loop.index }}" name="entry_enabled_{{ loop.index }}">
                                     <label class="form-check-label col-form-label" for="entry_enabled_{{ loop.index }}">Entry {{ loop.index }}
                                         Enabled</label>
                                 </div>

@@ -197,6 +197,12 @@ class Database:
             print("Did not complete deletion.")
 
     @classmethod
+    def add_leaf(cls, leaf_dict, leaf_map):
+        cls.connect()
+        cls.__leaves.insert_one(leaf_dict)
+        return Leaf.build(leaf_dict, leaf_map)
+
+    @classmethod
     def rebuild_leaves(cls):
         """ Migrates leaf object data to support entries feature. Only run once (ideally). """
         cls.connect()

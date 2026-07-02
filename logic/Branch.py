@@ -30,7 +30,6 @@ class Branch:
             branch_map
         )
 
-    @staticmethod
     def to_dict(self):
         return {
             '_id': self._id,

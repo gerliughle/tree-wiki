@@ -1,6 +1,6 @@
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
-from flask import render_template, request, session
+from flask import render_template, request, session, redirect, url_for
 from flask_login import current_user, login_required
 from bson import ObjectId
 
@@ -157,7 +157,6 @@ class EditRoutes:
     @staticmethod
     @__app.route('/create_inherited_subcat', methods=['POST'])
     def create_inherited_subcat():
-        source_branch_id = ""
         inherited_leaf_id = "" # The branch i am cloning from
         target_branch_id = "" # The branch i am creating a leaf for
 
@@ -173,6 +172,50 @@ class EditRoutes:
 
         return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch, target_branch=target_branch)
 
+    @staticmethod
+    @__app.route('/do_edit_leaf', methods=['POST'])
+    def do_edit_leaf():
+        """ FIXME more validation """
+        branch_id = ""
+        category = ""
+        subcategory = ""
 
-
-
+        if "branch_id" in request.form:
+            branch_id = ObjectId(request.form["branch_id"])
+        if "category" in request.form:
+            category = request.form["category"]
+        if "subcategory" in request.form:
+            subcategory = request.form["subcategory"]
+        author_id = session.get("user_id") # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
+        season_list = ['Spring', 'Summer', 'Fall', 'Winter']
+        seasons = []
+        for season in season_list:
+            if season in request.form:
+                seasons.append(season)
+        entries = []
+        for i in range(1,5):
+            if 'entry_enabled_'+str(i) in request.form:
+                phases = []
+                if 'phase_1st_' + str(i) in request.form:
+                    phases.append("1st")
+                if 'phase_2nd_' + str(i) in request.form:
+                    phases.append("2nd")
+                if 'phase_3rd+_' + str(i) in request.form:
+                    phases.append("3rd+")
+                entry = {"text": request.form["entry_text_" + str(i)], "phases": phases}
+                entries.append(entry)
+        leaf_dict = {
+            "author_id": author_id,
+            "branch_id": branch_id,
+            "category": category,
+            "subcategory": subcategory,
+            "seasons": seasons,
+            "entries": entries
+        }
+        leaf = TreeEngine.add_leaf(leaf_dict)
+        if leaf:
+            print(f"leaf created. Id: {leaf.id}")
+        else:
+            print(f"No leaf created and returned.")
+        branch = TreeEngine.lookup_branch(branch_id)
+        return render_template("edit/confirm_leaf_created.html", leaf=leaf, branch=branch)
