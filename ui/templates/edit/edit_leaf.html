@@ -53,33 +53,76 @@
 
             <!-- idk how to make this look neat.. -->
 
-            <div class="input-group">
-                <span class="input-group-text" id="entry-1">Entry 1</span>
-                <input type="text" class="form-control" placeholder="">
+            <p class="mb-3">Existing entries for reference below. All entries will be overwritten when submitting this form. If you
+                want
+                to reference any old data, copy it into a new entry and ensure it is selected to be added. Entries can
+                have any unique combination of applicable phases.
 
-            </div>
-            <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
-                <label class="btn btn-group-text-primary disabled">Phase:</label>
-                {% if "1st" in phases %}
-                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st" checked>
-                {% else %}
-                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st">
-                {% endif %}
-                <label class="btn btn-outline-primary" for="1st">1st</label>
-                {% if "2nd" in phases %}
-                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd" checked>
-                {% else %}
-                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd">
-                {% endif %}
-                <label class="btn btn-outline-primary" for="2nd">2nd</label>
-                {% if "3rd+" in phases %}
-                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+" checked>
-                {% else %}
-                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+">
-                {% endif %}
-                <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
-            </div>
+                In the case where you want to "end the chain" and stop inheriting a leaf for a subcategory, submit this
+                form with no
+                entries selected. The subcategory will not show up on the selected branch page or any children.</p>
+            <div class="card mb-3">
+                <ul class="list-group list-group-flush">
+                    {% for entry in leaf.entries %}
+                        <li class="list-group-item">
+                            {% if "1st" in entry["phases"] %}
+                                <span class="badge rounded-pill text-bg-primary">1st</span>
+                            {% endif %}
+                            {% if "2nd" in entry["phases"] %}
+                                <span class="badge rounded-pill text-bg-primary">2nd</span>
+                            {% endif %}
+                            {% if "3rd+" in entry["phases"] %}
+                                <span class="badge rounded-pill text-bg-primary">3rd+</span>
+                            {% endif %}
+                            <p class="card-text">{{ entry["text"] }}
+                        </li>
 
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header p-2">
+                    <h5>Entry editor:</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for new_entry in [1,2,3,4] %}
+                        <li class="list-group-item">
+                            <div class="row g-3 align-items-baseline">
+                                <div class="form-check form-switch col-auto">
+                                    <input class="form-check-input" type="checkbox" role="switch"
+                                           id="entry_enabled_{{ loop.index }}">
+                                    <label class="form-check-label col-form-label" for="entry_enabled_{{ loop.index }}">Entry {{ loop.index }}
+                                        Enabled</label>
+                                </div>
+                                <div class="btn-group btn-group-sm p-2 col-auto" data-toggle="buttons" role="group">
+                                    <label class="btn btn-group-text-primary disabled">Phase:</label>
+                                    <input type="checkbox" class="btn-check" id="phase_1st_{{ loop.index }}"
+                                           autocomplete="off" name="phase_1st_{{ loop.index }}" checked>
+                                    <label class="btn btn-outline-primary col"
+                                           for="phase_1st_{{ loop.index }}">1st</label>
+
+                                    <input type="checkbox" class="btn-check" id="phase_2nd_{{ loop.index }}"
+                                           autocomplete="off" name="phase_2nd_{{ loop.index }}" checked>
+
+                                    <label class="btn btn-outline-primary" for="phase_2nd_{{ loop.index }}">2nd</label>
+
+                                    <input type="checkbox" class="btn-check" id="phase_3rd+_{{ loop.index }}"
+                                           autocomplete="off" name="phase_3rd+_{{ loop.index }}" checked>
+
+                                    <label class="btn btn-outline-primary"
+                                           for="phase_3rd+_{{ loop.index }}">3rd+</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="entry_text_{{ loop.index }}"
+                                       class="form-label">Entry {{ loop.index }} Text:</label>
+                                <textarea class="form-control" id="entry_text_{{ loop.index }}"
+                                          name="entry_text_{{ loop.index }}" rows="3"></textarea>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
 
             <div class="row">
                 <div class="col 1">
