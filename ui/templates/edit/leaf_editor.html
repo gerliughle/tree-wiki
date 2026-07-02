@@ -52,13 +52,13 @@
                 </div>
             </div>
         </form>
-        <form method="POST" action="/delete_leaf">
+        <form method="POST" action="/check_delete_leaf">
             <h3 class="my-2">Select a leaf from {{ branch.name }} to delete.</h3>
 
-            <select class="form-select my-1" aria-label="Select branch leaf to delete" name="delete_leaf" required>
+            <select class="form-select my-1" aria-label="Select branch leaf to delete" name="delete_leaf_id" required>
                 <option selected value="">Select leaf to delete</option>
                 {% for leaf in branch_leaves %}
-                    <option value="{{ leaf.subcategory }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
+                    <option value="{{ leaf.id }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
                 {% endfor %}
             </select>
             <div class="row">
