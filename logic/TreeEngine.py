@@ -149,10 +149,20 @@ class TreeEngine:
         return delete_name
 
     @classmethod
-    def add_leaf(cls, leaf_dict):
+    def save_leaf(cls, leaf_dict):
         from data.Database import Database
-        leaf = Database.add_leaf(leaf_dict, cls.leaf_map)
-        cls.all_leaves.append(leaf)
+        leaf = Database.save_leaf(leaf_dict, cls.leaf_map)
+
+        match_index = next((i for i, all_leaf in enumerate(cls.all_leaves) if all_leaf.id == leaf.id), None)
+        if match_index is not None:
+            cls.all_leaves[match_index] = leaf
+            print("Leaf edited")
+        else:
+            cls.all_leaves.append(leaf)
+            print("Leaf Created")
+
+
+
         return leaf
 
     @classmethod

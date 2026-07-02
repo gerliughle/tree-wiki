@@ -155,20 +155,24 @@ class EditRoutes:
 
 
     @staticmethod
-    @__app.route('/create_inherited_subcat', methods=['POST'])
-    def create_inherited_subcat():
-        inherited_leaf_id = "" # The branch i am cloning from
+    @__app.route('/edit_leaf', methods=['POST'])
+    def edit_leaf():
+        leaf_id = "" # The branch i am cloning from
         target_branch_id = "" # The branch i am creating a leaf for
+
 
         if "target_branch_id" in request.form:
             target_branch_id = ObjectId(request.form["target_branch_id"])
         target_branch = TreeEngine.lookup_branch(target_branch_id)
 
-        if "inherited_leaf_id" in request.form:
-            inherited_leaf_id = ObjectId(request.form["inherited_leaf_id"])
-        leaf = TreeEngine.lookup_leaf(inherited_leaf_id)
+        if "leaf_id" in request.form:
+            leaf_id = ObjectId(request.form["leaf_id"])
+        leaf = TreeEngine.lookup_leaf(leaf_id)
         source_branch_id = leaf.branch_id
         source_branch = TreeEngine.lookup_branch(source_branch_id)
+        print(f"{source_branch=}, {target_branch=}")
+        if source_branch.id == target_branch.id:
+            print("Source and target match")
 
         return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch, target_branch=target_branch)
 
@@ -212,7 +216,7 @@ class EditRoutes:
             "seasons": seasons,
             "entries": entries
         }
-        leaf = TreeEngine.add_leaf(leaf_dict)
+        leaf = TreeEngine.save_leaf(leaf_dict)
         if leaf:
             print(f"leaf created. Id: {leaf.id}")
         else:

@@ -1,5 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from pymongo import ReturnDocument
 import os
 from configparser import ConfigParser
 from bson import ObjectId
@@ -197,16 +198,39 @@ class Database:
             print("Did not complete branch deletion.")
 
     @classmethod
-    def add_leaf(cls, leaf_dict, leaf_map):
+    def save_leaf(cls, leaf_dict, leaf_map):
+        """ This uses a filter to see if there is a leaf with the same branch, cat and subcat. If not, it adds, if so, it edits. """
         cls.connect()
-        cls.__leaves.insert_one(leaf_dict)
-        return Leaf.build(leaf_dict, leaf_map)
+
+        filter_match = {
+            "branch_id": leaf_dict["branch_id"],
+            "category": leaf_dict["category"],
+            "subcategory": leaf_dict["subcategory"],
+        }
+
+        # Replaces everything else.
+        update_payload = {
+            "$set": {
+                "author_id": leaf_dict["author_id"],
+                "branch_id": leaf_dict["branch_id"],
+                "seasons": leaf_dict["seasons"],
+                "entries": leaf_dict["entries"]
+            }
+        }
+
+        new_leaf_doc = cls.__leaves.find_one_and_update(filter_match,
+                                                        update_payload,
+                                                        upsert=True,
+                                                        return_document=ReturnDocument.AFTER)
+
+        print(new_leaf_doc)
+
+        return Leaf.build(new_leaf_doc, leaf_map)
 
     @classmethod
     def delete_leaf(cls, leaf):
         cls.connect()
         delete_doc = cls.__leaves.delete_one({"_id": leaf.id})
-
         if delete_doc.acknowledged:
             print("Deleted leaf")
         else:
@@ -244,8 +268,7 @@ class Database:
         for leaf_dict in all_leaves:
             for leaf_check in all_leaves:
                 if leaf_dict["subcategory"] == leaf_check["subcategory"] \
-                    and leaf_dict["category"] == leaf_check["category"] \
-                    and leaf_dict["_id"] != leaf_check["_id"] \
-                    and leaf_dict["branch_id"] == leaf_check["branch_id"]:
+                        and leaf_dict["category"] == leaf_check["category"] \
+                        and leaf_dict["_id"] != leaf_check["_id"] \
+                        and leaf_dict["branch_id"] == leaf_check["branch_id"]:
                     print(f"Error found? {leaf_dict['_id']} conflict with {leaf_check['_id']}")
-

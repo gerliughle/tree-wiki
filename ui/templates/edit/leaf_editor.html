@@ -3,11 +3,11 @@
 {% block content %}
     <div class="container col-md-4 col-8">
 
-        <form method="POST" action="/create_inherited_subcat">
+        <form method="POST" action="/edit_leaf">
             <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
             <h3 class="my-2">Select an inherited leaf to overwrite.</h3>
 
-            <select class="form-select my-1" aria-label="Select inherited leaf" name="inherited_leaf_id" required>
+            <select class="form-select my-1" aria-label="Select inherited leaf" name="leaf_id" required>
                 <option selected value="">Select category</option>
                 {% for leaf in inherited_leaves %}
                     <option value="{{ leaf.id }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
@@ -23,8 +23,9 @@
 
         <form method="POST" action="/edit_leaf">
             <h3 class="my-2">Select a leaf from {{ branch.name }} to edit.</h3>
+        <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
 
-            <select class="form-select my-1" aria-label="Select branch leaf" name="branch_leaf" required>
+            <select class="form-select my-1" aria-label="Select branch leaf" name="leaf_id" required>
                 <option selected value="">Select category</option>
                 {% for leaf in branch_leaves %}
                     <option value="{{ leaf.id }}">{{ leaf.category }} - {{ leaf.subcategory }}</option>
