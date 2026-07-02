@@ -1,0 +1,9 @@
+{% extends "template.html" %}
+{% block title %}Leaf Created{% endblock %}
+
+{% block content %}
+<div class="container col-8 my-5">
+    <h2>The {{ leaf.category }} - {{ leaf.subcategory }} Leaf has been created for {{ branch.name }}.</h2>
+<a class="btn btn-primary" href="/show_branch?branch={{ branch.id }}">View Page</a>
+</div>
+{% endblock %}

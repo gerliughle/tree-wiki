@@ -96,7 +96,22 @@ class WebUI:
         if len(phases) == 0:
             phases = ["1st", "2nd", "3rd+"]
 
-        filtered_care_guide = WebUI.engine.filter_phases(care_guide, phases)
+        filtered_care_guide = []
+
+        for leaf in care_guide:
+            filtered_entries = []
+            for entry in leaf.entries:
+                if any(item in entry["phases"] for item in phases):
+                    filtered_entries.append(entry)
+            if len(filtered_entries) > 0:
+                filtered_leaf = {
+                    "category": leaf.category,
+                    "subcategory": leaf.subcategory,
+                    "seasons": leaf.seasons,
+                    "entries": filtered_entries
+                }
+                filtered_care_guide.append(filtered_leaf)
+
         children = TreeEngine.get_children_of_branch(branch.id)
 
         page_context = {
@@ -109,6 +124,7 @@ class WebUI:
         }
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
+        print(f"Filtered care guide length: {len(filtered_care_guide)}")
 
         return render_template("index.html", **page_context)
 

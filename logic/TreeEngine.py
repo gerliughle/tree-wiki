@@ -123,20 +123,28 @@ class TreeEngine:
                 print(f"Child found: {branch.name}")
         return children_list
 
-    @classmethod
-    def filter_phases(cls, leaves, phase_list):
-        """ Filters a list of leaves.
+    # FIXME delete.
+    # @classmethod
+    # def filter_phases(cls, leaves, phase_list):
+    #     """ Filters a list of leaves.
+    #
+    #      leaves = source list of leaves
+    #      filter = str name of the filter ("phases", "seasons")
+    #      phase_list = list to filter against """
+    #     filtered_leaves = []
+    #     for leaf in leaves:
+    #         for entry in leaf.entries:
+    #             if any(item in phase_list for item in entry["phases"]):
+    #                 filtered_leaves.append(leaf)
+    #     print(f"Returning filtered list of {len(filtered_leaves)}.\n")
+    #     return filtered_leaves
 
-         leaves = source list of leaves
-         filter = str name of the filter ("phases", "seasons")
-         phase_list = list to filter against """
-        filtered_leaves = []
-        for leaf in leaves:
-            for entry in leaf.entries:
-                if any(item in phase_list for item in entry["phases"]):
-                    filtered_leaves.append(leaf)
-        print(f"Returning filtered list of {len(filtered_leaves)}.\n")
-        return filtered_leaves
+    # def intersect(self, compare_list):
+    #     """ Used for list intersection test in Jinja. """
+    #     if any(item in self for item in compare_list):
+    #         return self
+    #     return None
+
 
     @classmethod
     def add_branch(cls, branch_dict):
@@ -163,3 +171,9 @@ class TreeEngine:
         cls.all_branches.remove(delete_branch)
         return delete_name
 
+    @classmethod
+    def add_leaf(cls, leaf_dict):
+        from data.Database import Database
+        leaf = Database.add_leaf(leaf_dict, cls.leaf_map)
+        cls.all_leaves.append(leaf)
+        return leaf
