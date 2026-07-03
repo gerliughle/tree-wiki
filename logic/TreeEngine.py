@@ -124,12 +124,12 @@ class TreeEngine:
         return children_list
 
 
-    @classmethod
-    def add_branch(cls, branch_dict):
-        from data.Database import Database
-        branch = Database.add_branch(branch_dict, cls.branch_map)
-        cls.all_branches.append(branch)
-        return branch
+    # @classmethod
+    # def add_branch(cls, branch_dict):
+    #     from data.Database import Database
+    #     branch = Database.add_branch(branch_dict, cls.branch_map)
+    #     cls.all_branches.append(branch)
+    #     return branch
 
     @classmethod
     def edit_branch(cls, branch_id, branch_edits):
@@ -137,6 +137,21 @@ class TreeEngine:
         edited_branch = Database.edit_branch(branch_id, branch_edits)
         # cls.all_branches[edited_branch.id] = edited_branch # I don't think this is necessary. I update the obj direct.
         return edited_branch
+
+    @classmethod
+    def save_branch(cls, branch_dict):
+        from data.Database import Database
+        branch = Database.save_branch(branch_dict, cls.branch_map)
+
+        match_index = next((i for i, all_branch in enumerate(cls.all_branches) if all_branch.id == branch.id), None)
+        if match_index is not None:
+            cls.all_branches[match_index] = branch
+            print("Branch edited")
+        else:
+            cls.all_branches.append(branch)
+            print("Branch Created")
+
+        return branch
 
     @classmethod
     def delete_branch(cls, branch_id):
@@ -160,9 +175,6 @@ class TreeEngine:
         else:
             cls.all_leaves.append(leaf)
             print("Leaf Created")
-
-
-
         return leaf
 
     @classmethod
