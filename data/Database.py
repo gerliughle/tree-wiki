@@ -179,6 +179,31 @@ class Database:
         return local_branch
 
     @classmethod
+    def save_branch(cls, branch_dict, branch_map):
+        """ This either saves or creates a new branch. """
+        cls.connect()
+
+        # I receive a dict wtih either no id, and the dict to create
+        # or, an id and changes.
+        query_filter = {}
+        if branch_dict.get("_id", False):
+            query_filter["_id"] = branch_dict["_id"]
+            branch_dict.pop("_id")
+        else:
+            query_filter["_id"] = ObjectId()
+
+        update_payload = {
+            "$set": branch_dict
+        }
+
+        new_branch_doc = cls.__branches.find_one_and_update(query_filter,
+                                                          update_payload,
+                                                          upsert=True,
+                                                          return_document=ReturnDocument.AFTER)
+
+        return Branch.build(new_branch_doc, branch_map)
+
+    @classmethod
     def delete_branch(cls, branch, children):
         cls.connect()
         cls.__branches.update_many(
@@ -202,7 +227,7 @@ class Database:
         """ This uses a filter to see if there is a leaf with the same branch, cat and subcat. If not, it adds, if so, it edits. """
         cls.connect()
 
-        filter_match = {
+        query_filter = {
             "branch_id": leaf_dict["branch_id"],
             "category": leaf_dict["category"],
             "subcategory": leaf_dict["subcategory"],
@@ -218,13 +243,10 @@ class Database:
             }
         }
 
-        new_leaf_doc = cls.__leaves.find_one_and_update(filter_match,
+        new_leaf_doc = cls.__leaves.find_one_and_update(query_filter,
                                                         update_payload,
                                                         upsert=True,
                                                         return_document=ReturnDocument.AFTER)
-
-        print(new_leaf_doc)
-
         return Leaf.build(new_leaf_doc, leaf_map)
 
     @classmethod

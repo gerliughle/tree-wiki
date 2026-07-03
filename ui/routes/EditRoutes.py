@@ -55,7 +55,7 @@ class EditRoutes:
             "image": branch_image,
             "parent_id": parent_branch_id
         }
-        branch = TreeEngine.add_branch(branch_dict)
+        branch = TreeEngine.save_branch(branch_dict)
         return render_template("edit/confirm_branch_created.html", branch=branch)
 
 
@@ -86,7 +86,7 @@ class EditRoutes:
 
         Form design should have better labels, and be better in general. """
         branch_id = ObjectId(request.form["branch_id"])
-        branch_edits = {}
+        branch_edits = {"_id": branch_id}
         if "branch_name" in request.form:
             if request.form["branch_name"].strip() != "":
                 name = request.form["branch_name"].strip()
@@ -101,7 +101,7 @@ class EditRoutes:
 
         branch_author = session.get("user_id")
         print(f"Testing flask_login. {branch_author=}")
-        updated_branch = TreeEngine.edit_branch(branch_id, branch_edits)
+        updated_branch = TreeEngine.save_branch(branch_edits)
         return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
 
     @staticmethod
@@ -124,7 +124,7 @@ class EditRoutes:
     def do_delete_branch():
         delete_name = ""
         if "branch_id" in request.form:
-            delete_branch_id = request.form["branch_id"] #It's a string
+            delete_branch_id = ObjectId(request.form["branch_id"])
             delete_name = TreeEngine.delete_branch(delete_branch_id)
         return render_template("edit/confirm_branch_deleted.html", delete_name=delete_name)
 
