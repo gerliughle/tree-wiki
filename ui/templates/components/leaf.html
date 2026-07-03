@@ -7,14 +7,14 @@
                 <ol class="breadcrumb" style="font-size: 0.85rem !important;">
                     {% for crumb in breadcrumbs[:-1] %}
                         <li class="breadcrumb-item">
-                            {% if crumb._id == leaf.branch_id %} <!-- emphasize the source -->
-                                <a href="/show_branch?branch={{ crumb._id }}"
+                            {% if crumb.id == leaf.branch_id %} <!-- emphasize the source -->
+                                <a href="/show_branch?branch={{ crumb.id }}"
                                    class="link-danger link-underline link-underline-opacity-0
                                        link-underline-opacity-50-hover link-underline-danger fw-bold">
                                     {{ crumb.name }}
                                 </a>
                             {% else %}
-                                <a href="/show_branch?branch={{ crumb._id }}"
+                                <a href="/show_branch?branch={{ crumb.id }}"
                                    class="link-danger link-underline link-underline-opacity-0
                                        link-underline-opacity-50-hover link-underline-danger">
                                     {{ crumb.name }}
@@ -23,7 +23,7 @@
                         </li>
                     {% endfor %}
                     <li class="breadcrumb-item">
-                        {% if breadcrumbs[-1]._id == leaf.branch_id %} <!-- emphasize the source -->
+                        {% if breadcrumbs[-1].id == leaf.branch_id %} <!-- emphasize the source -->
                             <span class="link-danger link-underline link-underline-opacity-0
                                        link-underline-opacity-50-hover link-underline-danger fw-bold">
                                         {{ breadcrumbs[-1].name }}

@@ -25,7 +25,9 @@ Done:
 * Create child section in header
 * Header images
 * Page footer
-
+* if i delete a branch, i also need to delete all its leaves.
+* breadcrumbs are broken
+* need to make it so inherited leaves are NOT the same as matching ones
 
 Flask Routes:
 * index.html
@@ -61,11 +63,7 @@ Then other to-dos:
 
 
 Bugs and fixes:
-
-* need to make it so inherited leaves are NOT the same as matching ones
 * killswitch evaluation needs work
-* breadcrumbs are broken
-* if i delete a branch, i also need to delete all its leaves.
 
 
 been skipping any validations but it is important:
