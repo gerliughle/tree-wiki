@@ -105,12 +105,16 @@ class WebUI:
                     filtered_entries.append(entry)
             if len(filtered_entries) > 0:
                 filtered_leaf = {
+                    "id": leaf.id,
+                    "branch_id": leaf.branch_id,
                     "category": leaf.category,
                     "subcategory": leaf.subcategory,
                     "seasons": leaf.seasons,
                     "entries": filtered_entries
                 }
+
                 filtered_care_guide.append(filtered_leaf)
+                print(f"len(filtered_care_guide) = {len(filtered_care_guide)}")
 
         children = TreeEngine.get_children_of_branch(branch.id)
 

@@ -97,7 +97,7 @@ class TreeEngine:
         category_list = []
 
         branch = cls.lookup_branch(branch_id)
-        current_branch = cls.lookup_branch(branch.parent_id)
+        current_branch = cls.lookup_branch(branch.id)
 
         while current_branch is not None:
             # print(f"Checking {current_branch.name}")
@@ -110,6 +110,10 @@ class TreeEngine:
                     # print(f"Added {leaf.subcategory} to leaf guide.")
 
             current_branch = cls.lookup_branch(current_branch.parent_id)
+        for leaf in inherited_leaves: # remove current leaves
+            if leaf.branch_id == branch_id:
+                inherited_leaves.remove(leaf)
+
         return inherited_leaves
 
     @classmethod
@@ -131,12 +135,12 @@ class TreeEngine:
     #     cls.all_branches.append(branch)
     #     return branch
 
-    @classmethod
-    def edit_branch(cls, branch_id, branch_edits):
-        from data.Database import Database
-        edited_branch = Database.edit_branch(branch_id, branch_edits)
-        # cls.all_branches[edited_branch.id] = edited_branch # I don't think this is necessary. I update the obj direct.
-        return edited_branch
+    # @classmethod
+    # def edit_branch(cls, branch_id, branch_edits):
+    #     from data.Database import Database
+    #     edited_branch = Database.edit_branch(branch_id, branch_edits)
+    #     # cls.all_branches[edited_branch.id] = edited_branch # I don't think this is necessary. I update the obj direct.
+    #     return edited_branch
 
     @classmethod
     def save_branch(cls, branch_dict):
@@ -156,11 +160,16 @@ class TreeEngine:
     @classmethod
     def delete_branch(cls, branch_id):
         from data.Database import Database
-        delete_branch = cls.lookup_branch(ObjectId(branch_id))
+        delete_leaves = []
+        branch_id = ObjectId(branch_id)
+        delete_branch = cls.lookup_branch(branch_id)
         delete_name = delete_branch.name
         children = cls.get_children_of_branch(branch_id)
+
         Database.delete_branch(delete_branch, children)
-        cls.all_branches.remove(delete_branch)
+
+        cls.all_leaves = [leaf for leaf in cls.all_leaves if leaf.branch_id != branch_id]
+        cls.all_branches = [branch for branch in cls.all_branches if branch.id != branch_id]
         return delete_name
 
     @classmethod

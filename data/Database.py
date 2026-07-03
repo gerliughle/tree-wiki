@@ -159,24 +159,24 @@ class Database:
         cls.__users.insert_one(user_dict)  # mutes dict with _id
         return User.build(user_dict)
 
-    @classmethod
-    def add_branch(cls, branch_dict, branch_map):
-        cls.connect()
-        cls.__branches.insert_one(branch_dict)
-        return Branch.build(branch_dict, branch_map)
-
-    @classmethod
-    def edit_branch(cls, branch_id, branch_edits):
-        cls.connect()
-        cls.__branches.update_one(
-            {"_id": branch_id},
-            {"$set": branch_edits}
-        )
-        local_branch = TreeEngine.lookup_branch(branch_id)
-        for key, value in branch_edits.items():
-            setattr(local_branch, key, value)
-
-        return local_branch
+    # @classmethod
+    # def add_branch(cls, branch_dict, branch_map):
+    #     cls.connect()
+    #     cls.__branches.insert_one(branch_dict)
+    #     return Branch.build(branch_dict, branch_map)
+    #
+    # @classmethod
+    # def edit_branch(cls, branch_id, branch_edits):
+    #     cls.connect()
+    #     cls.__branches.update_one(
+    #         {"_id": branch_id},
+    #         {"$set": branch_edits}
+    #     )
+    #     local_branch = TreeEngine.lookup_branch(branch_id)
+    #     for key, value in branch_edits.items():
+    #         setattr(local_branch, key, value)
+    #
+    #     return local_branch
 
     @classmethod
     def save_branch(cls, branch_dict, branch_map):
@@ -210,6 +210,8 @@ class Database:
             {"parent_id": branch.id},
             {"$set": {"parent_id": branch.parent_id}}
         )
+
+        cls.__leaves.delete_many({"branch_id": branch.id})
 
         if children:
             for child in children:
