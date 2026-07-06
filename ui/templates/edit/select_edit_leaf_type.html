@@ -3,7 +3,7 @@
 {% block content %}
     <div class="container col-md-4 col-8">
 
-        <form method="POST" action="/edit_leaf">
+        <form method="POST" action="/edit_leaf" class="mb-4">
             <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
             <h3 class="my-2">Select an inherited leaf to overwrite.</h3>
 
@@ -21,9 +21,9 @@
             </div>
         </form>
 
-        <form method="POST" action="/edit_leaf">
+        <form method="POST" action="/edit_leaf" class="mb-4">
             <h3 class="my-2">Select a leaf from {{ branch.name }} to edit.</h3>
-        <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
+            <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
 
             <select class="form-select my-1" aria-label="Select branch leaf" name="leaf_id" required>
                 <option selected value="">Select category</option>
@@ -38,14 +38,24 @@
                 </div>
             </div>
         </form>
-        <form method="POST" action="/create_subcat_leaf">
-            <h3 class="my-2">Create a new subcategory at this level.</h3>
 
-            <div class="form-floating w-100">
-                <input name="new_subcategory" class="form-control" id="new_subcategory"
-                       placeholder="New Subcategory" required>
-                <label for="new_subcategory">Enter new Subcategory name</label>
+        <form method="POST" action="/edit_leaf" class="mb-4">
+            <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
+            <h3 class="mb-2">Create a new subcategory for this branch.</h3>
+            <div class="text-info mb-2">Caution! This creates a new line of inheritance. Branches that are children to
+                this one, new or existing, will begin inheriting these leaves. Only create a new subcategory if it is
+                either highly relevant to a specific group of trees (ex: Decandling pines) or a highly specified aspect
+                of a species that is unlikely to have many children.
             </div>
+
+
+            <select class="form-select mb-2" aria-label="Select category" name="category_name" required>
+                <option selected value="">Select category</option>
+                {% for category in all_categories %}
+                    <option value="{{ category }}">{{ category }}</option>
+                {% endfor %}
+            </select>
+
             <div class="row">
                 <div class="col 1">
                     <button type="submit" class="btn btn-primary">Continue</button>
