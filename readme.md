@@ -64,6 +64,7 @@ Then other to-dos:
 
 Bugs and fixes:
 * killswitch evaluation needs work
+* show season on leaf editing page
 
 
 been skipping any validations but it is important:

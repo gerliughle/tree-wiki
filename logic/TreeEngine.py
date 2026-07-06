@@ -2,11 +2,22 @@ from logic.Branch import Branch
 from logic.Leaf import Leaf
 from bson import ObjectId
 
+
 class TreeEngine:
     all_branches = []
     all_leaves = []
     branch_map = None
     leaf_map = None
+    CATEGORIES = [
+        "Environment",
+        "Potting",
+        "Pruning",
+        "Watering",
+        "Fertilizing",
+        "Pests and Diseases",
+        "Wiring",
+        "Propagation"
+    ]
 
     @classmethod
     def __init__(cls):
@@ -26,7 +37,6 @@ class TreeEngine:
                 print(f"Found match for '{branch.name}'")
                 return branch
         return None
-
 
     @classmethod
     def get_leaves_for_branch(cls, branch_id):
@@ -63,9 +73,9 @@ class TreeEngine:
     def get_care_guide(cls, branch_id):
         """ Main care guide builder. Gets leaves, checks inheritances to build new list. """
 
-        subcategory_list = set() # subcategories that already have a leaf
+        subcategory_list = set()  # subcategories that already have a leaf
         breadcrumbs = []
-        care_guide = [] # list of all leaves in a care guide. Returned.
+        care_guide = []  # list of all leaves in a care guide. Returned.
         category_list = []
 
         current_branch = cls.lookup_branch(branch_id)
@@ -92,8 +102,8 @@ class TreeEngine:
     @classmethod
     def get_inherited_leaves(cls, branch_id):
 
-        subcategory_list = set() # subcategories that already have a leaf
-        inherited_leaves = [] # list of inherited leaves only
+        subcategory_list = set()  # subcategories that already have a leaf
+        inherited_leaves = []  # list of inherited leaves only
         category_list = []
 
         branch = cls.lookup_branch(branch_id)
@@ -110,7 +120,7 @@ class TreeEngine:
                     # print(f"Added {leaf.subcategory} to leaf guide.")
 
             current_branch = cls.lookup_branch(current_branch.parent_id)
-        for leaf in inherited_leaves: # remove current leaves
+        for leaf in inherited_leaves:  # remove current leaves
             if leaf.branch_id == branch_id:
                 inherited_leaves.remove(leaf)
 
@@ -126,7 +136,6 @@ class TreeEngine:
                 children_list.append(branch)
                 print(f"Child found: {branch.name}")
         return children_list
-
 
     # @classmethod
     # def add_branch(cls, branch_dict):
@@ -177,6 +186,7 @@ class TreeEngine:
         from data.Database import Database
         leaf = Database.save_leaf(leaf_dict, cls.leaf_map)
 
+        # this check if leaf exists in all_leaves already, in case of edit vs creation
         match_index = next((i for i, all_leaf in enumerate(cls.all_leaves) if all_leaf.id == leaf.id), None)
         if match_index is not None:
             cls.all_leaves[match_index] = leaf

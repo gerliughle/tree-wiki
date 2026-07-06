@@ -135,8 +135,8 @@ class EditRoutes:
         return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
 
     @staticmethod
-    @__app.route('/leaf_editor', methods=['POST'])
-    def leaf_editor():
+    @__app.route('/select_edit_leaf_type', methods=['POST'])
+    def select_edit_leaf_type():
         branch_id = ""
         if "select_branch_id" in request.form:
             branch_id = ObjectId(request.form["select_branch_id"])
@@ -149,32 +149,43 @@ class EditRoutes:
         page_context = {
             "branch":branch,
             "branch_leaves":branch_leaves,
-            "inherited_leaves":inherited_leaves
+            "inherited_leaves":inherited_leaves,
+            "all_categories": TreeEngine.CATEGORIES
         }
-        return render_template('edit/leaf_editor.html', **page_context)
+        return render_template('edit/select_edit_leaf_type.html', **page_context)
 
 
     @staticmethod
     @__app.route('/edit_leaf', methods=['POST'])
     def edit_leaf():
-        leaf_id = "" # The branch i am cloning from
-        target_branch_id = "" # The branch i am creating a leaf for
+        """ Leaf editing router
 
+        Either clone, edit, or create new.
+        leaf: clone source, edit source, or None
+        source_branch: branch th leaf is sourced from, or being edited, or None.
+        target_branch: branch_id for this leaf. this is selected in step 1. if this matches source, you're editing
+        category_name: if creating a new subcat, this will exist. there will be no leaf_id or source branch.
+        """
+
+        leaf = None # The branch i am cloning from
+        target_branch = None # The branch i am creating a leaf for
+        source_branch = None
+        category_name = None
 
         if "target_branch_id" in request.form:
             target_branch_id = ObjectId(request.form["target_branch_id"])
-        target_branch = TreeEngine.lookup_branch(target_branch_id)
+            target_branch = TreeEngine.lookup_branch(target_branch_id)
 
         if "leaf_id" in request.form:
             leaf_id = ObjectId(request.form["leaf_id"])
-        leaf = TreeEngine.lookup_leaf(leaf_id)
-        source_branch_id = leaf.branch_id
-        source_branch = TreeEngine.lookup_branch(source_branch_id)
-        print(f"{source_branch=}, {target_branch=}")
-        if source_branch.id == target_branch.id:
-            print("Source and target match")
+            leaf = TreeEngine.lookup_leaf(leaf_id)
+            source_branch_id = leaf.branch_id
+            source_branch = TreeEngine.lookup_branch(source_branch_id)
 
-        return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch, target_branch=target_branch)
+        if "category_name" in request.form:
+            category_name = request.form["category_name"]
+
+        return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch, target_branch=target_branch, category_name=category_name)
 
     @staticmethod
     @__app.route('/do_edit_leaf', methods=['POST'])
