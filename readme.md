@@ -28,6 +28,7 @@ Done:
 * if i delete a branch, i also need to delete all its leaves.
 * breadcrumbs are broken
 * need to make it so inherited leaves are NOT the same as matching ones
+* show season on leaf editing page
 
 Flask Routes:
 * index.html
@@ -64,7 +65,7 @@ Then other to-dos:
 
 Bugs and fixes:
 * killswitch evaluation needs work
-* show season on leaf editing page
+
 
 
 been skipping any validations but it is important:
@@ -74,3 +75,9 @@ been skipping any validations but it is important:
 * avoiding matching subcat for leaves
 
 
+next up: tree view
+
+this should be a component that can be included anywhere. 
+would make sense to be able to separate it out as a possible breadcrumb/children replacement
+so have upper/lower sort of thing
+could have stats like # of leaves and stuff. 
