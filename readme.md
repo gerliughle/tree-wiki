@@ -55,16 +55,20 @@ Branch page To-Do:
 Then other to-dos:
 * Editing Data system
 * Homepage
-* Integrate edit links into page design (add child, clone branch, etc)
+* Create edit page version of branch (add child, clone branch, etc)
 * Tree View
-* About page/legend
+* About page/legend/guide/phase description
+* Thoughts on non-bonsai applicability. Season = category, phase = filter
 * Tooltips
 * input validation
+* Data entry
+* Non admin edit/suggestion
 * Temp Selector system
 
 
 Bugs and fixes:
 * killswitch evaluation needs work
+* show season on leaf editing page
 
 
 
