@@ -130,6 +130,11 @@ class WebUI:
         print(f"Care guide length: {len(care_guide)}")
         print(f"Filtered care guide length: {len(filtered_care_guide)}")
 
+        mode = None
+        if "mode" in request.args:
+            mode = request.args["mode"]
+            page_context["mode"] = "edit"
+
         return render_template("index.html", **page_context)
 
     @staticmethod

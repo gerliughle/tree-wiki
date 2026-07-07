@@ -2,6 +2,12 @@
 
 {% block title %}{{ branch.name }} Care Guide{% endblock %}
 {% block content %}
+    {% if mode=="edit" %}
+        <div class="container sticky-top col-6">
+            <div class="p-4"></div>
+            <div class="alert alert-danger mt-3" role="alert"><strong>EDIT MODE</strong> is active.</div>
+        </div>
+    {% endif %}
     <!-- Hero -->
     <div class="container col-xxl-8 px-4 py-5">
         <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
@@ -33,18 +39,33 @@
                 <p class="lead">
                     {{ branch.description }}
                 </p>
-            {% if children|length > 0 %}
-                Children:
-                <ul>
-                    {% for child in children %}
+                {% if children|length > 0 %}
+                    Children:
+                    <ul>
+                        {% for child in children %}
 
-                        <li>
-                            <a href="/show_branch?branch={{ child._id }}" class="link-danger link-underline
+                            <li>
+                                <a href="/show_branch?branch={{ child._id }}" class="link-danger link-underline
                             link-underline-opacity-0 link-underline-opacity-50-hover link-underline-danger">{{ child.name }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if mode=="edit" %}
+                    <div class="mb-3">
+                        <form action="/edit_branch" method="post">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-info" name="select_branch_id" value="{{ branch.id }}"
+                                        type="submit">Edit Branch
+                                </button>
+                                <button class="btn btn-outline-danger" name="select_branch_id" value="{{ branch.id }}"
+                                        type="submit" formaction="/check_delete_branch">Delete Branch
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                {% endif %}
 
             </div>
         </div>
