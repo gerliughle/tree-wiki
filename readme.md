@@ -28,14 +28,12 @@ Done:
 * if i delete a branch, i also need to delete all its leaves.
 * breadcrumbs are broken
 * need to make it so inherited leaves are NOT the same as matching ones
+* Editing Data system
 * show season on leaf editing page
+* Create edit page version of branch (add child, clone branch, etc)
+* Create subcategory setup to allow multiple shared leaves in one subcategory for different phases.
+* 
 
-Flask Routes:
-* index.html
-* Login
-* Create Branch
-* Edit Branch
-* Delete Branch
 
 Templates:
 * index.html >> should be branch.html
@@ -46,16 +44,16 @@ Templates:
 
 
 Branch page To-Do:
-* Create subcategory setup to allow multiple shared leaves in one subcategory
-* for different phases.
+
 * redesign to be less round and floaty. a bit more table-y would be more functional
 * Make category order consistent
 * I removed season filtering, but could be added if it expands column view to be more usable.
 
 Then other to-dos:
-* Editing Data system
+
 * Homepage
-* Create edit page version of branch (add child, clone branch, etc)
+* Admin page access.. ensure edit mode/pages are protected.
+* Have edit mode be a UserState variable, not page
 * Tree View
 * About page/legend/guide/phase description
 * Thoughts on non-bonsai applicability. Season = category, phase = filter

@@ -30,6 +30,9 @@
                             <li><a class="dropdown-item" href="/select_delete_branch">Delete Branch</a></li>
                         </ul>
                     <li class="nav-item"><a class="nav-link" href="/select_edit_leaf">Leaf Editor</a></li>
+                    {% if branch is defined %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('show_branch', branch= branch.id, mode='edit') }}">Edit Mode</a></li>
+                    {% endif %}
                 {% endif %}
             </ul>
 
