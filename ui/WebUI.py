@@ -159,10 +159,21 @@ class WebUI:
         return render_template("index.html", **page_context)
 
     @staticmethod
+    @__app.route('/tree_view')
+    def tree_view():
+        tree_dict = TreeEngine.get_tree()
+        
+
+        return render_template("print/tree_view.html", tree_dict=tree_dict)
+
+    @staticmethod
     @__app.route('/print_tree')
     def print_tree():
         """ Will eventually be replaced. For now, allows selection of any branch."""
         all_branches = WebUI.engine.get_branches()
+
+        #should i send list for each depth?
+
         return render_template("print/print_tree.html", branches=all_branches)
 
     @classmethod

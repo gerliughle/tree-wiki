@@ -1,3 +1,5 @@
+from multiprocessing.process import parent_process
+
 from logic.Branch import Branch
 from logic.Leaf import Leaf
 from bson import ObjectId
@@ -137,19 +139,26 @@ class TreeEngine:
                 print(f"Child found: {branch.name}")
         return children_list
 
-    # @classmethod
-    # def add_branch(cls, branch_dict):
-    #     from data.Database import Database
-    #     branch = Database.add_branch(branch_dict, cls.branch_map)
-    #     cls.all_branches.append(branch)
-    #     return branch
+    @classmethod
+    def get_tree(cls):
 
-    # @classmethod
-    # def edit_branch(cls, branch_id, branch_edits):
-    #     from data.Database import Database
-    #     edited_branch = Database.edit_branch(branch_id, branch_edits)
-    #     # cls.all_branches[edited_branch.id] = edited_branch # I don't think this is necessary. I update the obj direct.
-    #     return edited_branch
+        tree_builder = {}
+        tree_map = []
+
+        # keymap:
+        # branch_id: {"node": branch, "children": []}
+
+        #
+
+        for branch in cls.all_branches: # creates node dict entries with empty child lists
+            tree_builder[str(branch.id)] = {"node": branch, "children": []}
+
+        for branch in cls.all_branches:
+            if branch.parent_id is None: # puts roots into the actual map.
+                tree_map.append(tree_builder[str(branch.id)])
+            else:
+                tree_builder[str(branch.parent_id)]["children"].append(tree_builder[str(branch.id)])
+        return tree_map
 
     @classmethod
     def save_branch(cls, branch_dict):
