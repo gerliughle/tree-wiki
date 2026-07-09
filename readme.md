@@ -57,6 +57,7 @@ Then other to-dos:
 * Have edit mode be a UserState variable, not page
 * Have phases be UserState variable
 * Homepage
+* Increase secret key security?
 * Tree View. Started, but ugly
 * About page/legend/guide/phase description
 * Thoughts on non-bonsai applicability. Season = category, phase = filter
