@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, g, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager
 from flask_session import Session # FIXME why is this red
 from logic.Branch import Branch
@@ -31,13 +31,6 @@ class WebUI:
         """ Flask-login required. Uses Str id, returns either User obj or None. """
         return UserManager.lookup_user_id(user_id)
 
-    # @classmethod
-    # def get_user(cls):
-    #     """ Returns user if there is an active session. """
-    #     if "user" in session:
-    #         return session["user"]
-    #     return None
-
     @classmethod
     def get_all_branches(cls):
         """ Returns all branches """
@@ -55,24 +48,6 @@ class WebUI:
     @classmethod
     def get_leaf_map(cls):
         return cls.engine.leaf_map
-
-    # @staticmethod
-    # @__app.before_request
-    # def assign_user():
-    #     """ Assigns user on page click """
-    #     current_user_id = session.get("user_id")
-    #
-    #     if current_user_id:
-    #         print("Current user found in session.")
-    #         g.current_user = WebUI.usermanager.lookup_user(ObjectId(current_user_id))
-    #     else:
-    #         print("No user found in session.")
-    #         g.current_user = None
-    #
-    # @staticmethod
-    # @__app.context_processor
-    # def inject_user():
-    #     return dict(current_user=getattr(g, "current_user", None))
 
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
