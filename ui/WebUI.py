@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_login import LoginManager
+from flask import Flask, render_template, request, redirect, url_for, session
+from flask_login import LoginManager, current_user
 from flask_session import Session # FIXME why is this red
 from logic.Branch import Branch
 from logic.Leaf import Leaf
@@ -111,10 +111,13 @@ class WebUI:
         print(f"Care guide length: {len(care_guide)}")
         print(f"Filtered care guide length: {len(filtered_care_guide)}")
 
-        mode = None
-        if "mode" in request.args:
-            mode = request.args["mode"]
-            page_context["mode"] = "edit"
+        # Sets or removes edit mode for session
+        if request.args.get("mode") == "exit":
+            session["mode"] = None
+        if request.args.get("mode") == "edit" or session.get("mode") == "edit":
+            if current_user.is_authenticated and current_user.role == "admin":
+                page_context["is_edit_mode"] = True
+                session["mode"] = "edit"
 
         return render_template("index.html", **page_context)
 

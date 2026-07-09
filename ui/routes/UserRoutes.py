@@ -44,7 +44,6 @@ class UserRoutes:
                 print("Password hashed.")
                 login_user(user)
                 print("User logged in.")
-                # i need to make a dict, add to database, then i can pull from database and build.
             else:
                 print("User already exists.")
                 return render_template("error.html") # FIXME redirect back to register with error

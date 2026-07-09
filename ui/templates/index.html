@@ -2,10 +2,14 @@
 
 {% block title %}{{ branch.name }} Care Guide{% endblock %}
 {% block content %}
-    {% if mode=="edit" %}
+    {% if is_edit_mode and current_user.role == 'admin' %}
         <div class="container sticky-top col-6">
             <div class="p-4"></div>
-            <div class="alert alert-danger mt-3" role="alert"><strong>EDIT MODE</strong> is active.</div>
+            <div class="alert alert-warning d-flex justify-content-between align-content-center mt-3" role="alert">
+                <span><strong>EDIT MODE</strong> is active.</span>
+                <a class="btn btn-outline-danger btn-sm"
+                   href="{{ url_for('show_branch', branch= branch.id, mode='exit') }}">Exit</a>
+            </div>
         </div>
     {% endif %}
     <!-- Hero -->
@@ -51,7 +55,7 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-                {% if mode=="edit" %}
+                {% if is_edit_mode and current_user.role == 'admin' %}
                     <div class="mb-3">
                         <form action="/edit_branch" method="post">
                             <div class="btn- mb-1" role="group">
@@ -112,7 +116,7 @@
             </form>
         </div>
 
-        {% if mode=="edit" %}
+        {% if is_edit_mode and current_user.role == 'admin' %}
             <div class="card shadow-sm mb-2">
                 <div class="card-body">
                     <form method="POST" action="/edit_leaf" class="mb-4">
@@ -128,7 +132,8 @@
                         </div>
 
 
-                        <select class="form-select mb-2 w-auto" aria-label="Select category" name="category_name" required>
+                        <select class="form-select mb-2 w-auto" aria-label="Select category" name="category_name"
+                                required>
                             <option selected value="">Select category</option>
                             {% for category in category_list %}
                                 <option value="{{ category }}">{{ category }}</option>
