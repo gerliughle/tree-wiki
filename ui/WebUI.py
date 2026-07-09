@@ -1,38 +1,42 @@
 from flask import Flask, render_template, request, session, g, redirect, url_for
-from flask_session import Session
+from flask_login import LoginManager
+from flask_session import Session # FIXME why is this red
 from logic.Branch import Branch
 from logic.Leaf import Leaf
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
-from ui.UserState import UserState
 from bson import ObjectId
 
 class WebUI:
     __app = Flask(__name__)
+    login_manager = LoginManager()
+    login_manager.init_app(__app)
     __all_branches = None
     __all_leaves = None
     APP_NAME = "bonsaitree"
-    # ALLOWED_PATHS = [
-    #     "/login",
-    #     "/do_login",
-    # ]
 
     @classmethod
     def init(cls):
         cls.engine = TreeEngine()
-        cls.usermanager = UserManager()
+        # cls.usermanager = UserManager()
 
     @classmethod
     def get_app(cls):
         """ Ensures only one Flask app. """
         return cls.__app
 
-    @classmethod
-    def get_user(cls):
-        """ Returns user if there is an active session. """
-        if "user" in session:
-            return session["user"]
-        return None
+    @staticmethod
+    @login_manager.user_loader
+    def load_user(user_id):
+        """ Flask-login required. Uses Str id, returns either User obj or None. """
+        return UserManager.lookup_user_id(user_id)
+
+    # @classmethod
+    # def get_user(cls):
+    #     """ Returns user if there is an active session. """
+    #     if "user" in session:
+    #         return session["user"]
+    #     return None
 
     @classmethod
     def get_all_branches(cls):
@@ -52,23 +56,23 @@ class WebUI:
     def get_leaf_map(cls):
         return cls.engine.leaf_map
 
-    @staticmethod
-    @__app.before_request
-    def assign_user():
-        """ Assigns user on page click """
-        current_user_id = session.get("user_id")
-
-        if current_user_id:
-            print("Current user found in session.")
-            g.current_user = WebUI.usermanager.lookup_user(ObjectId(current_user_id))
-        else:
-            print("No user found in session.")
-            g.current_user = None
-
-    @staticmethod
-    @__app.context_processor
-    def inject_user():
-        return dict(current_user=getattr(g, "current_user", None))
+    # @staticmethod
+    # @__app.before_request
+    # def assign_user():
+    #     """ Assigns user on page click """
+    #     current_user_id = session.get("user_id")
+    #
+    #     if current_user_id:
+    #         print("Current user found in session.")
+    #         g.current_user = WebUI.usermanager.lookup_user(ObjectId(current_user_id))
+    #     else:
+    #         print("No user found in session.")
+    #         g.current_user = None
+    #
+    # @staticmethod
+    # @__app.context_processor
+    # def inject_user():
+    #     return dict(current_user=getattr(g, "current_user", None))
 
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
@@ -154,8 +158,6 @@ class WebUI:
     @__app.route('/tree_view')
     def tree_view():
         tree_dict = TreeEngine.get_tree()
-
-
         return render_template("print/tree_view.html", tree_dict=tree_dict)
 
     @staticmethod
@@ -177,3 +179,4 @@ class WebUI:
         cls.__app.secret_key = "my_secret_key"
         Session(cls.__app)
         cls.__app.run(host="0.0.0.0")
+

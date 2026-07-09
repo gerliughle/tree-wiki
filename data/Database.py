@@ -159,6 +159,16 @@ class Database:
         cls.__users.insert_one(user_dict)  # mutes dict with _id
         return User.build(user_dict)
 
+    @classmethod
+    def lookup_user(cls, attr, value):
+        cls.connect()
+        user_doc = cls.__users.find_one({attr: value})
+        if user_doc:
+            return User.build(user_doc)
+        else:
+            return None
+
+
     # @classmethod
     # def add_branch(cls, branch_dict, branch_map):
     #     cls.connect()
@@ -283,6 +293,7 @@ class Database:
                     "$unset": {"text": "", "phases": ""}
                 }
             )
+
 
     @classmethod
     def migration_error_check(cls):

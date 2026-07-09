@@ -51,8 +51,9 @@ Branch page To-Do:
 
 Then other to-dos:
 
-* Homepage
 * Update login system to flask-login
+* * Homepage
+* Dark Mode
 * Admin page access.. ensure edit mode/pages are protected.
 * Have edit mode be a UserState variable, not page
 * Have phases be UserState variable
@@ -61,9 +62,14 @@ Then other to-dos:
 * Thoughts on non-bonsai applicability. Season = category, phase = filter
 * Tooltips
 * input validation
+* user emails
+* change password (require fresh login)
+* forget password
 * Data entry
 * Non admin edit/suggestion
 * Temp Selector system
+* Alternate User Id to allow for id changing.. see flask-login
+
 
 Bugs and fixes:
 * killswitch evaluation needs work

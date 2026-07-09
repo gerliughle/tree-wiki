@@ -2,30 +2,38 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 
-<div class="container justify-content-center col-md-4 col-10 my-5 py-5">
-    <form method="POST" action="/do_login">
-        <h5 class="mb-3">Please sign in:</h5>
+    <div class="container justify-content-center col-md-4 col-10 my-5 py-5">
+        <form method="POST" action="/login">
+            <h5 class="mb-3">Please sign in:</h5>
 
-        <div class="flex-column mb-3">
+            <div class="flex-column mb-3">
 
-            <div class="form-floating w-100">
-                <input name="username" class="form-control rounded-bottom-0" id="username" placeholder="username" required>
-                <label for="username">Username</label>
+                <div class="form-floating w-100">
+                    <input name="username" class="form-control rounded-bottom-0" id="username" placeholder="username"
+                           required>
+                    <label for="username">Username</label>
+                </div>
+
+                <div class="form-floating w-100">
+                    <input type="password" name="password" class="form-control rounded-top-0 border-top-0" id="password"
+                           placeholder="Password" required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me">
+                    <label class="form-check-label" for="remember_me">Remember Me</label>
+                </div>
+
             </div>
 
-            <div class="form-floating w-100">
-                <input type="password" name="password" class="form-control rounded-top-0 border-top-0" id="password" placeholder="Password" required>
-                <label for="password">Password</label>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary flex-grow-1" type="submit" name="login_action" value="login">Sign in
+                </button>
+                <button class="btn btn-outline-secondary" type="submit" name="login_action" value="register">Register
+                </button>
             </div>
-
-        </div>
-
-        <div class="d-flex gap-2">
-            <button class="btn btn-primary flex-grow-1" type="submit" name="login_action" value="login">Sign in</button>
-            <button class="btn btn-outline-secondary" type="submit" name="login_action" value="register">Register</button>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
 
 {% endblock %}

@@ -1,9 +1,13 @@
-from ui.WebUI import WebUI
 from logic.UserManager import UserManager
+from ui.WebUI import WebUI
+# from logic.UserManager import UserManager
 from logic.User import User
 from flask import render_template, request, redirect, url_for
+from flask_login import LoginManager, login_required, login_user, logout_user
+
 
 class UserRoutes:
+    login_manager = LoginManager()
     __app = WebUI.get_app()
 
     @staticmethod
@@ -12,37 +16,30 @@ class UserRoutes:
         return render_template("user/login.html")
 
     @staticmethod
-    @__app.route('/do_login', methods=['POST'])
+    @__app.route('/login', methods=['POST'])
     def do_login():
         from data.Database import Database
 
-        # FIXME will need to verify inputs using a function or bootstrap.
-        username = ""
-        password = ""
-        login_action = ""
+        # FIXME will need to verify inputs using a function or bootstrap or something.
 
-        if "username" in request.form:
-            username = request.form["username"].strip().lower()
-        if "password" in request.form:
-            password = request.form["password"].strip()
-        if "login_action" in request.form:
-            login_action = request.form["login_action"]
+        username = request.form.get("username").strip().lower()
+        password = request.form.get("password").strip()
+        remember = True if request.form.get("remember_me") else False
+        login_action = request.form.get("login_action")
 
-        user = UserManager.read_user(username)
+        user = UserManager.lookup_user_name(username)
+
         if login_action == "login":
-            print(f"Processing login for {username}.")
-            if user:
-                if user.verify_password(password):
+            print(f"Processing login request for {username}.")
+            if user and user.verify_password(password):
                     print(f"Password verified. Logging in {user.username}")
-                    UserManager.login(user)
-                else:
-                    print("Invalid password.")
-                    return render_template("error.html")
+                    print(f"{remember=}")
+                    login_user(user, remember=remember)
             else:
-                print("No user found, error.")
-                return render_template("error.html")
+                print("Login failed.")
+                return render_template("error.html") # FIXME redirect back to login with error
         elif login_action == "register":
-            print("Processing registration.")
+            print(f"Processing registration request for {username}.")
             if not user:
                 pw_hash = User.hash_password(password)
                 print("Password hashed.")
@@ -53,12 +50,19 @@ class UserRoutes:
                 # i need to make a dict, add to database, then i can pull from database and build.
             else:
                 print("User already exists.")
-                return render_template("error.html")
+                return render_template("error.html") # FIXME redirect back to register with error
         return redirect(url_for("homepage"))
 
 
+    # @staticmethod
+    # @__app.route('/logout')
+    # def logout():
+    #     UserManager.logout()
+    #     return redirect(url_for("homepage"))
+
     @staticmethod
-    @__app.route('/logout')
+    @__app.route("/logout")
+    @login_required
     def logout():
-        UserManager.logout()
+        logout_user()
         return redirect(url_for("homepage"))
