@@ -1,6 +1,5 @@
 from logic.UserManager import UserManager
 from ui.WebUI import WebUI
-# from logic.UserManager import UserManager
 from logic.User import User
 from flask import render_template, request, redirect, url_for
 from flask_login import LoginManager, login_required, login_user, logout_user
@@ -43,22 +42,13 @@ class UserRoutes:
             if not user:
                 pw_hash = User.hash_password(password)
                 print("Password hashed.")
-                user = UserManager.add_user(username, pw_hash)
-                print("User added.")
-                UserManager.login(user)
+                login_user(user)
                 print("User logged in.")
                 # i need to make a dict, add to database, then i can pull from database and build.
             else:
                 print("User already exists.")
                 return render_template("error.html") # FIXME redirect back to register with error
         return redirect(url_for("homepage"))
-
-
-    # @staticmethod
-    # @__app.route('/logout')
-    # def logout():
-    #     UserManager.logout()
-    #     return redirect(url_for("homepage"))
 
     @staticmethod
     @__app.route("/logout")
