@@ -1,8 +1,9 @@
 <div class="card shadow-sm mb-2 px-2">
     <div class="card-title d-flex justify-content-between align-items-center">
         <h3 class="h3 mb-0 m-2 bg">{{ category }}</h3>
-        <button class="btn btn-sm btn-secondary" data-bs-toggle="collapse"
-                href="#collapse_{{ category }}" aria-expanded="true" aria-controls="collapse">&#8964;
+        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
+                href="#collapse_{{ category }}" aria-expanded="true" aria-controls="collapse"><img
+                src="../../static/assets/caret-up-fill.svg" alt="&#8964;"/>
         </button>
     </div>
     <div class="collapse show" id="collapse_{{ category }}">
@@ -30,44 +31,18 @@
         {% endfor %}
         {% if seasons.value == true %}
             <div class="row row-cols-1 row-cols-lg-4 g-2">
-                <!-- SPRING -->
-                <div class="col">
-                    <div class="h6 rounded text-center mb-0 bg-primary bg-opacity-25 p-3">Spring</div>
-                    {% for leaf in care_guide %}
-                        {% if leaf.seasons|length < 4 and "Spring" in leaf.seasons and leaf.category == category %}
-                            {% include "components/leaf.html" %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <!-- SUMMER -->
-                <div class="col">
-                    <div class="h6 rounded text-center mb-0 bg-primary bg-opacity-25 p-3">Summer</div>
-                    {% for leaf in care_guide %}
-                        {% if leaf.seasons|length < 4 and "Summer" in leaf.seasons and leaf.category == category %}
-                            {% include "components/leaf.html" %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
-                <!-- FALL -->
-                <div class="col">
-                    <div class="h6 rounded text-center mb-0 bg-primary bg-opacity-25 p-3">Fall</div>
-                    {% for leaf in care_guide %}
-                        {% if leaf.seasons|length < 4 and "Fall" in leaf.seasons and leaf.category == category %}
-                            {% include "components/leaf.html" %}
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                <!-- Season column loop -->
+                {% for season in all_seasons %}
+                    <div class="col">
+                        <div class="h6 rounded text-center mb-0 bg-secondary bg-opacity-25 px-3 py-1">{{ season }}</div>
+                        {% for leaf in care_guide %}
+                            {% if leaf.seasons|length < 4 and season in leaf.seasons and leaf.category == category %}
+                                {% include "components/leaf.html" %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
 
-                <!-- WINTER -->
-                <div class="col">
-                    <div class="h6 rounded text-center mb-0 bg-primary bg-opacity-25 p-3">Winter</div>
-                    {% for leaf in care_guide %}
-                        {% if leaf.seasons|length < 4 and "Winter" in leaf.seasons and leaf.category == category %}
-                            {% include "components/leaf.html" %}
-                        {% endif %}
-                    {% endfor %}
-
-                </div>
             </div>
         {% endif %}
     </div>

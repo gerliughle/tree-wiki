@@ -98,14 +98,15 @@ class WebUI:
                 print(f"len(filtered_care_guide) = {len(filtered_care_guide)}")
 
         children = TreeEngine.get_children_of_branch(branch.id)
-
+        all_seasons = ["Spring", "Summer", "Fall", "Winter"]
         page_context = {
             "branch": branch,
             "care_guide": filtered_care_guide,
             "breadcrumbs": breadcrumbs,
             "category_list": TreeEngine.CATEGORIES,
             "phases": phases,
-            "children": children
+            "children": children,
+            "all_seasons": all_seasons
         }
         print(f"{branch.name=}")
         print(f"Care guide length: {len(care_guide)}")
