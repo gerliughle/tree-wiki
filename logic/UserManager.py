@@ -1,47 +1,66 @@
 from flask import session, g
+from flask_login import LoginManager
+from logic.User import User
 from bson import ObjectId
 
 class UserManager:
-    __all_users = []
+    # __all_users = []
 
-    @classmethod
-    def __init__(cls):
+    @staticmethod
+    def lookup_user_id(user_id):
+        """ Takes id as str, then passes to db to look up. """
         from data.Database import Database
-        cls.all_users = Database.read_users()
-        print(f"Users loaded: {len(cls.all_users)}")
-
-    @classmethod
-    def lookup_user(cls, user_id):
-        for user in cls.all_users:
-            if user.id == user_id:
-                return user
-        return None
-
-    @classmethod
-    def get_all_users(cls):
-        return cls.all_users
-
-    @classmethod
-    def read_user(cls, username):
-        for user in cls.all_users:
-            if username == user.username:
-                print("Username match.")
-                return user
+        user_id = ObjectId(user_id)
+        user = Database.lookup_user("_id", user_id)
+        if user:
+            return user
         else:
-            print("No username match.")
             return None
 
     @classmethod
-    def login(cls, user):
-        session["user_id"] = str(user.id)
-
-    @staticmethod
-    def logout():
-        session.pop("user_id", None)
-
-    @classmethod
-    def add_user(cls, username, pw_hash):
+    def lookup_user_name(cls, username):
+        """Login verification lookup."""
         from data.Database import Database
-        user = Database.add_user(username, pw_hash)
-        cls.all_users.append(user)
-        return user
+        user = Database.lookup_user("username", username)
+        if user:
+            return user
+        else:
+            return None
+    # @classmethod
+    # def read_user(cls, username):
+    #     for user in cls.all_users:
+    #         if username == user.username:
+    #             print("Username match.")
+    #             return user
+    #     else:
+    #         print("No username match.")
+    #         return None
+
+    # @classmethod
+    # def __init__(cls):
+    #     from data.Database import Database
+    #     cls.all_users = Database.read_users()
+    #     print(f"Users loaded: {len(cls.all_users)}")
+
+
+
+    # @classmethod
+    # def get_all_users(cls):
+    #     return cls.all_users
+
+
+
+    # @classmethod
+    # def login(cls, user):
+    #     session["user_id"] = str(user.id)
+    #
+    # @staticmethod
+    # def logout():
+    #     session.pop("user_id", None)
+
+    # @classmethod
+    # def add_user(cls, username, pw_hash):
+    #     from data.Database import Database
+    #     user = Database.add_user(username, pw_hash)
+    #     cls.all_users.append(user)
+    #     return user
