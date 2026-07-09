@@ -74,18 +74,20 @@ class WebUI:
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
         if "branch" in request.args:
-            try:
-                branch_id = ObjectId(request.args["branch"])
-            except:
-                return render_template("error.html")
+            branch_id = ObjectId(request.args["branch"])
+            branch = WebUI.engine.lookup_branch(branch_id)
+            branch_id = branch.id
         else:
-            return render_template("error.html")
+            branch_name = "Japanese Maple"
+            branch = WebUI.engine.lookup_branch_by_name(branch_name)
+            branch_id = branch.id
         print(f"{branch_id=}")
-        branch = WebUI.engine.lookup_branch(branch_id)
+
         if branch:
             care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
         else:
-            return render_template("error.html")
+            return render_template("error.html") #FIXME no error routing
+
         phases = []
         if "1st" in request.args:
             phases.append("1st")
@@ -122,7 +124,7 @@ class WebUI:
             "branch": branch,
             "care_guide": filtered_care_guide,
             "breadcrumbs": breadcrumbs,
-            "category_list": category_list,
+            "category_list": TreeEngine.CATEGORIES,
             "phases": phases,
             "children": children
         }
@@ -143,31 +145,16 @@ class WebUI:
     @__app.route('/index.php')
     @__app.route('/')
     def homepage():
-        """ Sets Flask routes to homepage. """
+        """ Redirects to show branch. Can replace with a home page one day. """
+        return redirect(url_for('show_branch'))
 
-        default_branch = "Japanese Maple"
-        branch = WebUI.engine.lookup_branch_by_name(default_branch)
-        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch.id)
-        phases = ["1st", "2nd", "3rd+"]
-        children = TreeEngine.get_children_of_branch(branch.id)
-        page_context = {
-            "branch": branch,
-            "care_guide": care_guide,
-            "breadcrumbs": breadcrumbs,
-            "category_list": category_list,
-            "phases": phases,
-            "children": children
-        }
-        print(f"{branch.name=}")
-        print(f"Care guide length: {len(care_guide)}")
 
-        return render_template("index.html", **page_context)
 
     @staticmethod
     @__app.route('/tree_view')
     def tree_view():
         tree_dict = TreeEngine.get_tree()
-        
+
 
         return render_template("print/tree_view.html", tree_dict=tree_dict)
 

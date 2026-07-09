@@ -10,12 +10,12 @@
                         <input type="hidden" name="leaf_id" value="{{ leaf.id }}">
                         <div class="btn-group btn-group-sm" role="group">
                             {% if branch.id == leaf.branch_id %}
-                                <button type="submit" class="btn btn-outline-info py-0 px-1">Edit</button>
+                                <button type="submit" class="btn btn-info py-0 px-1">Edit</button>
                                 <button type="submit" formaction="/check_delete_leaf"
                                         class="btn btn-outline-danger py-0 px-1">Delete
                                 </button>
                             {% else %}
-                                <button type="submit" class="btn btn-outline-info py-0 px-1">Clone</button>
+                                <button type="submit" class="btn btn-info py-0 px-1">Clone</button>
 
                             {% endif %}
                         </div>
