@@ -54,14 +54,20 @@
                 {% if mode=="edit" %}
                     <div class="mb-3">
                         <form action="/edit_branch" method="post">
-                            <div class="btn-group" role="group">
-                                <button class="btn btn-outline-info" name="select_branch_id" value="{{ branch.id }}"
+                            <div class="btn- mb-1" role="group">
+                                <button class="btn btn-info" name="select_branch_id" value="{{ branch.id }}"
                                         type="submit">Edit Branch
                                 </button>
                                 <button class="btn btn-outline-danger" name="select_branch_id" value="{{ branch.id }}"
                                         type="submit" formaction="/check_delete_branch">Delete Branch
                                 </button>
                             </div>
+                            <div>
+                                <button class="btn btn-success" name="select_branch_id" value="{{ branch.id }}"
+                                        type="submit" formaction="/create_branch">Create Child Branch
+                                </button>
+                            </div>
+
 
                         </form>
                     </div>
@@ -74,9 +80,10 @@
 
     <div class="container my-2"> <!-- page body container -->
         <!-- Filter Form -->
-        <form method="GET" action="/show_branch">
-            <input type="hidden" name="branch" value="{{ branch.id }}"/>
-            <div class="card shadow-sm mb-2">
+        <div class="card shadow-sm mb-2">
+            <form method="GET" action="/show_branch">
+                <input type="hidden" name="branch" value="{{ branch.id }}"/>
+
                 <div class="card-header d-flex justify-content-start align-items-center">
                     <h4 class="h5 mb-0 p-2">Filters:</h4>
                     <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
@@ -102,12 +109,49 @@
                     </div>
                     <button type="submit" class="btn btn-outline-primary btn-sm">Apply</button>
                 </div>
+            </form>
+        </div>
+
+        {% if mode=="edit" %}
+            <div class="card shadow-sm mb-2">
+                <div class="card-body">
+                    <form method="POST" action="/edit_leaf" class="mb-4">
+                        <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
+                        <h5 class="mb-2">Create a new subcategory for this branch.</h5>
+                        <div class="text-info mb-2">Caution! This creates a new line of inheritance. Branches that are
+                            children to
+                            this one, new or existing, will begin inheriting these leaves. Only create a new subcategory
+                            if it is
+                            either highly relevant to a specific group of trees (ex: Decandling pines) or a highly
+                            specified aspect
+                            of a species that is unlikely to have many children.
+                        </div>
+
+
+                        <select class="form-select mb-2 w-auto" aria-label="Select category" name="category_name" required>
+                            <option selected value="">Select category</option>
+                            {% for category in category_list %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <div class="row">
+                            <div class="col 1">
+                                <button type="submit" class="btn btn-primary">Create</button>
+                                <a href="/">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </form>
+
+        {% endif %}
 
         <!--Category container -->
         {% for category in category_list %}
-            {% include 'components/category.html' %}
+            {% if care_guide|selectattr('category','equalto', category)|list %}
+                {% include 'components/category.html' %}
+            {% endif %}
         {% endfor %}
 
     </div>

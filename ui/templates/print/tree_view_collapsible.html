@@ -64,7 +64,7 @@
             display: none;
         }
 
-        .tree summary:focus {
+        .tree summary:focus{
             outline: none;
         }
 
@@ -83,8 +83,8 @@
         {#    height: calc(2 * var(--radius));#}
         {#    border-radius: 50%;#}
         {#    background: blue#}
-        {
-        #}#}
+        {#}#}
+
 
 
     </style>
@@ -103,15 +103,19 @@
 
             {% macro render_node(tree_node) %} <!-- takes a single node entry from tree map -->
                 <li>
-
-                    <span><a class="btn btn-info btn-sm mb-1"
-                                  href="/show_branch?branch={{ tree_node.node.id }}">{{ tree_node.node.name }}</a></span>
                     {% if tree_node.children %}
-                        <ul>
-                            {% for child in tree_node.children %}
-                                {{ render_node(child) }}
-                            {% endfor %}
-                        </ul>
+                        <details open>
+                            <summary><span>{{ tree_node.node.name }}</span></summary>
+
+                            <ul>
+                                {% for child in tree_node.children %}
+                                    {{ render_node(child) }}
+                                {% endfor %}
+                            </ul>
+
+                        </details>
+                    {% else %}
+                        <span>{{ tree_node.node.name }}</span>
                     {% endif %}
                 </li>
             {% endmacro %}

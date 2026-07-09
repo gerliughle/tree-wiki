@@ -5,12 +5,24 @@
     <div class="container my-2 col-md-4 col-6 d-flex-vertical">
         <form method="POST" action="/do_create_branch">
             <h3 class="col-lg-8">Create a new branch</h3>
+            {% if branch is not none %}
+            <select class="form-select" aria-label="Select parent branch" name="parent_branch_id" required>
+                <option value="">Select parent branch</option>
+                <option selected value="{{ branch.id }}">{{ branch.name }}</option>
+                {% for branch_choice in branches if branch_choice.id != branch.id %}
+                    <option value="{{ branch_choice.id }}">{{ branch_choice.name }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+
+
             <select class="form-select" aria-label="Select parent branch" name="parent_branch_id" required>
                 <option selected value="">Select parent branch</option>
                 {% for branch in branches %}
                     <option value="{{ branch.id }}">{{ branch.name }}</option>
                 {% endfor %}
             </select>
+        {% endif %}
             <div class="form-floating w-100">
                 <input name="branch_name" class="form-control" id="branch_name" placeholder="Branch Name" required>
                 <label for="branch_name">Enter Branch name</label>

@@ -23,10 +23,15 @@ class EditRoutes:
     __app = WebUI.get_app()
 
     @staticmethod
-    @__app.route('/create_branch')
+    @__app.route('/create_branch', methods=['POST'])
     def create_branch():
+        branch = None
         all_branches = WebUI.get_all_branches()
-        return render_template("edit/create_branch.html", branches=all_branches)
+        branch_id = request.form.get("select_branch_id")
+        if branch_id:
+            branch = TreeEngine.lookup_branch(ObjectId(branch_id))
+
+        return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
 
     @staticmethod
     @__app.route('/do_create_branch', methods=['POST'])

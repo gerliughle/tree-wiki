@@ -32,7 +32,7 @@ Done:
 * show season on leaf editing page
 * Create edit page version of branch (add child, clone branch, etc)
 * Create subcategory setup to allow multiple shared leaves in one subcategory for different phases.
-* 
+* Constant category order/list
 
 
 Templates:
@@ -52,9 +52,11 @@ Branch page To-Do:
 Then other to-dos:
 
 * Homepage
+* Update login system to flask-login
 * Admin page access.. ensure edit mode/pages are protected.
 * Have edit mode be a UserState variable, not page
-* Tree View
+* Have phases be UserState variable
+* Tree View. Started, but ugly
 * About page/legend/guide/phase description
 * Thoughts on non-bonsai applicability. Season = category, phase = filter
 * Tooltips
@@ -62,7 +64,6 @@ Then other to-dos:
 * Data entry
 * Non admin edit/suggestion
 * Temp Selector system
-
 
 Bugs and fixes:
 * killswitch evaluation needs work
