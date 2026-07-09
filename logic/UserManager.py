@@ -42,13 +42,9 @@ class UserManager:
     #     cls.all_users = Database.read_users()
     #     print(f"Users loaded: {len(cls.all_users)}")
 
-
-
     # @classmethod
     # def get_all_users(cls):
     #     return cls.all_users
-
-
 
     # @classmethod
     # def login(cls, user):
