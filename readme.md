@@ -53,6 +53,9 @@ Branch page To-Do:
 Then other to-dos:
 
 * Dark Mode
+* Dark mode - svg color tweaks
+* Dark/Light Mode - color palette adjustments
+* Category Collapse - arrow direction change
 * Admin page access.. ensure edit mode/pages are protected.
 * Have edit mode be a UserState variable, not page
 * Have phases be UserState variable
