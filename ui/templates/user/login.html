@@ -2,7 +2,7 @@
 {% block title %}Login{% endblock %}
 {% block content %}
 
-    <div class="container justify-content-center col-md-4 col-10 my-5 py-5">
+    <div class="container justify-content-center col-lg-4 col-sm-6 col-8 my-5 py-5">
         <form method="POST" action="/login">
             <h5 class="mb-3">Please sign in:</h5>
 
@@ -14,7 +14,7 @@
                     <label for="username">Username</label>
                 </div>
 
-                <div class="form-floating w-100">
+                <div class="form-floating w-100 mb-2">
                     <input type="password" name="password" class="form-control rounded-top-0 border-top-0" id="password"
                            placeholder="Password" required>
                     <label for="password">Password</label>
@@ -23,7 +23,6 @@
                     <input class="form-check-input" type="checkbox" id="remember_me" name="remember_me">
                     <label class="form-check-label" for="remember_me">Remember Me</label>
                 </div>
-
             </div>
 
             <div class="d-flex gap-2">

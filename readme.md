@@ -33,6 +33,7 @@ Done:
 * Create edit page version of branch (add child, clone branch, etc)
 * Create subcategory setup to allow multiple shared leaves in one subcategory for different phases.
 * Constant category order/list
+* Update login system to flask-login
 
 
 Templates:
@@ -51,12 +52,11 @@ Branch page To-Do:
 
 Then other to-dos:
 
-* Update login system to flask-login
-* * Homepage
 * Dark Mode
 * Admin page access.. ensure edit mode/pages are protected.
 * Have edit mode be a UserState variable, not page
 * Have phases be UserState variable
+* Homepage
 * Tree View. Started, but ugly
 * About page/legend/guide/phase description
 * Thoughts on non-bonsai applicability. Season = category, phase = filter
