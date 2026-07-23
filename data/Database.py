@@ -1,9 +1,11 @@
+from flask_login import current_user
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from pymongo import ReturnDocument
 import os
 from configparser import ConfigParser
 from bson import ObjectId
+from datetime import datetime, timezone
 
 from data import StaticData
 from data.StaticData import get_all_branches, get_all_leaves
@@ -18,6 +20,7 @@ class Database:
     __branches = None
     __leaves = None
     __users = None
+    __audit_log = None
 
     APP_NAME = "bonsaitree"
 
@@ -48,6 +51,7 @@ class Database:
             cls.__branches = cls.__database.Branches
             cls.__leaves = cls.__database.Leaves
             cls.__users = cls.__database.Users
+            cls.__audit_log = cls.__database.AuditLog
 
     @classmethod
     def rebuild_data(cls):
@@ -55,11 +59,11 @@ class Database:
         cls.connect()
 
         print("This will restore data to original dummy data.")
-        print("Are you sure you want to continue? This is permanent. Y/N: ")
+        print("Are you sure you want to continue? This is permanent. Mongo Backup and Restore is preferred. Y/N: ")
         user_input = input().lower()
         if user_input != "y":
             "Exiting."
-            return
+            exit()
         print("Restoring data.")
 
         # Remake collections
@@ -131,6 +135,11 @@ class Database:
         return users
 
     @classmethod
+    def read_audit(cls):
+        cls.connect()
+        return cls.__audit_log
+
+    @classmethod
     def read_static_data(cls):
         """ Reads StaticData, and calls build methods to create objects.
 
@@ -168,7 +177,6 @@ class Database:
         else:
             return None
 
-
     # @classmethod
     # def add_branch(cls, branch_dict, branch_map):
     #     cls.connect()
@@ -189,6 +197,19 @@ class Database:
     #     return local_branch
 
     @classmethod
+    def update_log(cls, payload):
+        """ Updates the audit log """
+        cls.connect()
+        log = cls.__audit_log.insert_one(payload)
+        timestamp = payload.get("timestamp")
+
+        if timestamp:
+            formatted_date = timestamp.strftime("%Y-%m-%d")
+            formatted_time = timestamp.strftime("%H:%M:%S")
+            print(f"Log Updated at {formatted_date} - {formatted_time}")
+
+
+    @classmethod
     def save_branch(cls, branch_dict, branch_map):
         """ This either saves or creates a new branch. """
         cls.connect()
@@ -199,38 +220,75 @@ class Database:
         if branch_dict.get("_id", False):
             query_filter["_id"] = branch_dict["_id"]
             branch_dict.pop("_id")
+            task = "Edit Branch"
         else:
             query_filter["_id"] = ObjectId()
+            task = "Create Branch"
 
         update_payload = {
             "$set": branch_dict
         }
 
         new_branch_doc = cls.__branches.find_one_and_update(query_filter,
-                                                          update_payload,
-                                                          upsert=True,
-                                                          return_document=ReturnDocument.AFTER)
+                                                            update_payload,
+                                                            upsert=True,
+                                                            return_document=ReturnDocument.AFTER)
+
+        log_payload = {
+            "timestamp": datetime.now(timezone.utc),
+            "user_id": current_user.id,
+            "username": current_user.username,
+            "target_id": new_branch_doc["_id"],
+            "target_name": new_branch_doc["name"],
+            "task": task,
+            "edit": branch_dict
+        }
+        print(f"{log_payload=}")
+        cls.update_log(log_payload)
 
         return Branch.build(new_branch_doc, branch_map)
+
+
 
     @classmethod
     def delete_branch(cls, branch, children):
         cls.connect()
+
+        # Update db, set children's parents to branch's parent
         cls.__branches.update_many(
             {"parent_id": branch.id},
             {"$set": {"parent_id": branch.parent_id}}
         )
 
+        # Delete all the leaves from the branch
         cls.__leaves.delete_many({"branch_id": branch.id})
 
+        # Update the in-memory objects from user session.
         if children:
             for child in children:
                 setattr(child, "parent_id", branch.parent_id)
 
+        # Delete the branch and provide a delete_doc
         delete_doc = cls.__branches.delete_one({"_id": branch.id})
 
         if delete_doc.acknowledged:
             print("Deleted branch")
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc),
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "target_id": branch.id,
+                "target_name": branch.name,
+                "task": "Delete Branch",
+                "edit": {
+                    # "deleted_branch_id": branch.id,
+                    # "deleted_branch_name": branch.name,
+                    # "new_parent_id": branch.parent_id
+                    "impacted_children": children
+                }
+            }
+            print(f"{log_payload=}")
+            cls.update_log(log_payload)
         else:
             print("Did not complete branch deletion.")
 
@@ -259,6 +317,19 @@ class Database:
                                                         update_payload,
                                                         upsert=True,
                                                         return_document=ReturnDocument.AFTER)
+
+        log_payload = {
+            "timestamp": datetime.now(timezone.utc),
+            "user_id": current_user.id,
+            "username": current_user.username,
+            "target_id": new_leaf_doc["_id"],
+            "target_name": new_leaf_doc["subcategory"],
+            "task": "Create/Edit Leaf",
+            "edit": leaf_dict
+        }
+        print(f"{log_payload=}")
+        cls.update_log(log_payload)
+
         return Leaf.build(new_leaf_doc, leaf_map)
 
     @classmethod
@@ -267,6 +338,20 @@ class Database:
         delete_doc = cls.__leaves.delete_one({"_id": leaf.id})
         if delete_doc.acknowledged:
             print("Deleted leaf")
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc),
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "target_id": leaf.id,
+                "target_name": leaf.subcategory,
+                "task": "Delete Leaf",
+                "edit": {
+                    "deleted_leaf_id": leaf.id,
+                    "deleted_leaf_entries": leaf.entries
+                }
+            }
+            print(f"{log_payload=}")
+            cls.update_log(log_payload)
         else:
             print("Did not complete leaf deletion.")
 
@@ -293,7 +378,6 @@ class Database:
                     "$unset": {"text": "", "phases": ""}
                 }
             )
-
 
     @classmethod
     def migration_error_check(cls):

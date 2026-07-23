@@ -2,3 +2,45 @@ body {
     padding-top: 75px;
 }
 
+nav.navbar .navbar-brand svg,
+nav.navbar .navbar-brand svg path {
+    fill: #a52834 !important;
+}
+
+
+.sun_icon {
+    display: none !important;
+}
+
+/* 1. Light Mode (Default state) */
+.sun_icon {
+    display: none !important;
+}
+.moon_icon {
+    display: inline-block !important;
+}
+
+/* 2. Dark Mode (When html has data-bs-theme="dark") */
+html[data-bs-theme="dark"] .moon_icon {
+    display: none !important;
+}
+
+html[data-bs-theme="dark"] .sun_icon {
+    display: inline-block !important;
+}
+
+/* --- 1. DEFAULT STATE: When Open (aria-expanded="true") --- */
+button[aria-expanded="true"] .arrow-open {
+    display: inline-block !important;
+}
+button[aria-expanded="true"] .arrow-closed {
+    display: none !important;
+}
+
+/* --- 2. COLLAPSED STATE: When Closed (aria-expanded="false") --- */
+button[aria-expanded="false"] .arrow-open {
+    display: none !important;
+}
+button[aria-expanded="false"] .arrow-closed {
+    display: inline-block !important;
+}

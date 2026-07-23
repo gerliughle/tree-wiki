@@ -1,8 +1,8 @@
 <div class="d-flex flex-column my-2">
     <div class="card leaf-card">
         <div class="card-body d-flex flex-column">
-            <div class="card-header">
-                <span class="h5 card-title me-2 align-content-baseline">{{ leaf.subcategory }}</span>
+            <div class="card-header pb-0">
+                <span class="h5 card-title m-2 align-content-baseline ms-0">{{ leaf.subcategory }}</span>
                 {% if is_edit_mode and current_user.role == 'admin' %}
                     <form method="POST" action="/edit_leaf">
                         <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
@@ -11,7 +11,7 @@
                         <div class="btn-group btn-group-sm" role="group">
                             {% if branch.id == leaf.branch_id %}
                                 <button type="submit" class="btn btn-outline-info py-0 px-1">Edit</button>
-                                <button type="submit" formaction="/check_delete_leaf"
+                                <button type="submit" formaction="/check_delete_leaf"   
                                         class="btn btn-outline-danger py-0 px-1">Delete
                                 </button>
                             {% else %}
