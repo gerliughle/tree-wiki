@@ -1,10 +1,21 @@
 <div class="card shadow-sm mb-2 px-2">
     <div class="card-title d-flex justify-content-between align-items-center">
         <h3 class="h3 mb-0 m-2 bg">{{ category }}</h3>
-        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse"
-                href="#collapse_{{ category }}" aria-expanded="true" aria-controls="collapse"><img
-                src="../../static/assets/caret-up-fill.svg" alt="&#8964;"/>
-        </button>
+        <button class="btn btn-sm btn-outline-tertiary text-body-secondary d-inline-flex align-items-center justify-content-center"
+        data-bs-toggle="collapse"
+        href="#collapse_{{ category }}"
+        aria-expanded="true">
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+         class="bi bi-caret-down-fill arrow-open" viewBox="0 0 16 16">
+        <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+    </svg>
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+         class="bi bi-caret-right-fill arrow-closed" viewBox="0 0 16 16">
+        <path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"/>
+    </svg>
+</button>
     </div>
     <div class="collapse show" id="collapse_{{ category }}">
         <!-- spanned cards -->
@@ -34,7 +45,7 @@
                 <!-- Season column loop -->
                 {% for season in all_seasons %}
                     <div class="col">
-                        <div class="h6 rounded text-center mb-0 bg-secondary bg-opacity-25 px-3 py-1">{{ season }}</div>
+                        <div class="h6 rounded text-center mb-0 bg-secondary bg-opacity-25 px-3 py-2">{{ season }}</div>
                         {% for leaf in care_guide %}
                             {% if leaf.seasons|length < 4 and season in leaf.seasons and leaf.category == category %}
                                 {% include "components/leaf.html" %}

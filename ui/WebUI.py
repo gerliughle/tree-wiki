@@ -60,7 +60,6 @@ class WebUI:
             branch_name = "Japanese Maple"
             branch = WebUI.engine.lookup_branch_by_name(branch_name)
             branch_id = branch.id
-        print(f"{branch_id=}")
 
         if branch:
             care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
@@ -95,7 +94,6 @@ class WebUI:
                 }
 
                 filtered_care_guide.append(filtered_leaf)
-                print(f"len(filtered_care_guide) = {len(filtered_care_guide)}")
 
         children = TreeEngine.get_children_of_branch(branch.id)
         all_seasons = ["Spring", "Summer", "Fall", "Winter"]

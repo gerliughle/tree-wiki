@@ -1,7 +1,6 @@
-from multiprocessing.process import parent_process
-
-from logic.Branch import Branch
-from logic.Leaf import Leaf
+# from multiprocessing.process import parent_process
+# from logic.Branch import Branch
+# from logic.Leaf import Leaf
 from bson import ObjectId
 
 
@@ -10,6 +9,7 @@ class TreeEngine:
     all_leaves = []
     branch_map = None
     leaf_map = None
+
     CATEGORIES = [
         "Environment",
         "Potting",
@@ -122,6 +122,7 @@ class TreeEngine:
                     # print(f"Added {leaf.subcategory} to leaf guide.")
 
             current_branch = cls.lookup_branch(current_branch.parent_id)
+
         for leaf in inherited_leaves:  # remove current leaves
             if leaf.branch_id == branch_id:
                 inherited_leaves.remove(leaf)
@@ -144,11 +145,6 @@ class TreeEngine:
 
         tree_builder = {}
         tree_map = []
-
-        # keymap:
-        # branch_id: {"node": branch, "children": []}
-
-        #
 
         for branch in cls.all_branches: # creates node dict entries with empty child lists
             tree_builder[str(branch.id)] = {"node": branch, "children": []}

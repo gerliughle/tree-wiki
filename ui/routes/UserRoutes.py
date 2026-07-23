@@ -1,6 +1,7 @@
 from logic.UserManager import UserManager
 from ui.WebUI import WebUI
 from logic.User import User
+from logic.UserManager import UserManager
 from flask import render_template, request, redirect, url_for
 from flask_login import LoginManager, login_required, login_user, logout_user
 
@@ -55,3 +56,10 @@ class UserRoutes:
     def logout():
         logout_user()
         return redirect(url_for("homepage"))
+
+    @staticmethod
+    @__app.route("/manage_users")
+    @login_required
+    @UserManager.role_required("admin")
+    def manage_users():
+        return render_template("user/manage_users.html")

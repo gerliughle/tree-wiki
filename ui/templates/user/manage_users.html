@@ -1,9 +1,10 @@
 {% extends "template.html" %}
-{% block title %}Create/Edit Leaf{% endblock %}
+{% block title %}Manage Users{% endblock %}
 {% block content %}
 
+
     <div class="container my-2 col-md-8 col-10 d-flex-vertical">
-        <form method="POST" action="/do_edit_leaf">
+        <form method="POST" action="">
 
             {% if category_name is none and source_branch.id != target_branch.id %}
                 <!-- if making a NEW leaf that is inherited/vs actually editing. -->

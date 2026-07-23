@@ -1,28 +1,17 @@
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
+from logic.UserManager import UserManager
 from flask import render_template, request, session, redirect, url_for
 from flask_login import current_user, login_required
 from bson import ObjectId
-
-
-# Routes needed:
-# Admin routes:
-# - Create Leaf
-# - Edit Leaf
-# - Duplicate leaf to new branch
-
-# User routes:
-# - Provide suggestion on branch
-# - Provide suggestion on leaf
-
-# Also need to implement where this is on site. Admins have an edit page in menu?
-# Suggestion button somewhere
 
 
 class EditRoutes:
     __app = WebUI.get_app()
 
     @staticmethod
+    @login_required
+    @UserManager.role_required("admin", "editor")
     @__app.route('/create_branch', methods=['POST'])
     def create_branch():
         branch = None
@@ -35,6 +24,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/do_create_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def do_create_branch():
         """ FIXME needs lots of form validation, checking dupes, etc. """
         branch_name = ""
@@ -70,12 +61,16 @@ class EditRoutes:
     # Trace the branch id's that are passed.
     @staticmethod
     @__app.route('/select_edit_branch')
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def select_edit_branch():
         all_branches = WebUI.get_all_branches()
         return render_template("edit/select_edit_branch.html", branches=all_branches)
 
     @staticmethod
     @__app.route('/edit_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def edit_branch():
         all_branches = WebUI.get_all_branches()
         branch_id = ObjectId(request.form["select_branch_id"])
@@ -86,6 +81,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/do_edit_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def do_edit_branch():
         """ FIXME needs lots of form validation, checking dupes, etc.
 
@@ -105,18 +102,21 @@ class EditRoutes:
                 branch_edits["parent_id"] = ObjectId(request.form["select_branch_id"])
 
         branch_author = session.get("user_id")
-        print(f"Testing flask_login. {branch_author=}")
         updated_branch = TreeEngine.save_branch(branch_edits)
         return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
 
     @staticmethod
     @__app.route('/select_delete_branch')
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def delete_branch():
         all_branches = WebUI.get_all_branches()
         return render_template("edit/select_delete_branch.html", branches=all_branches)
 
     @staticmethod
     @__app.route('/check_delete_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def check_delete_branch():
         delete_branch = ""
         if "select_branch_id" in request.form:
@@ -126,6 +126,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/do_delete_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def do_delete_branch():
         delete_name = ""
         if "branch_id" in request.form:
@@ -135,12 +137,16 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/select_edit_leaf')
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def select_edit_leaf():
         all_branches = WebUI.get_all_branches()
         return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
 
     @staticmethod
     @__app.route('/select_edit_leaf_type', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def select_edit_leaf_type():
         branch_id = ""
         if "select_branch_id" in request.form:
@@ -162,6 +168,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/edit_leaf', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def edit_leaf():
         """ Leaf editing router
 
@@ -194,6 +202,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/do_edit_leaf', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def do_edit_leaf():
         """ FIXME more validation """
         branch_id = ""
@@ -243,6 +253,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/check_delete_leaf', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def check_delete_leaf():
         delete_leaf = ""
         if "leaf_id" in request.form:
@@ -256,6 +268,8 @@ class EditRoutes:
 
     @staticmethod
     @__app.route('/do_delete_leaf', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
     def do_delete_leaf():
         delete_leaf_id = ""
         if "leaf_id" in request.form:
