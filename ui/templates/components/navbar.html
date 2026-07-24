@@ -24,7 +24,6 @@
                     <a class="nav-link active" aria-current="page" href="/tree_view">Tree View</a>
                 </li>
 
-
                 {% if current_user.role in ["admin", "editor"] %}
                     <!--
                     <li class="nav-item dropdown">
@@ -48,6 +47,9 @@
                 {% if current_user.role == "admin" %}
                     <li class="nav-item">
                         <a class="nav-link" href="/manage_users">Manage Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin_dashboard">Admin Dashboard</a>
                     </li>
                 {% endif %}
             </ul>

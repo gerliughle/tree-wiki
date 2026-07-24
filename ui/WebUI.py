@@ -150,6 +150,7 @@ class WebUI:
     def run(cls):
         from ui.routes.EditRoutes import EditRoutes
         from ui.routes.UserRoutes import UserRoutes
+        from ui.routes.AdminRoutes import AdminRoutes
 
         cls.__app.config["SESSION_TYPE"] = "filesystem"
         cls.__app.secret_key = "my_secret_key"
