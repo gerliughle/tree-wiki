@@ -1,0 +1,54 @@
+{% extends "template.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+
+    <div class="container my-2 col-10 d-flex-vertical">
+        {% if current_user.role == "admin" %}
+            <h2>Audit Log</h2>
+            <table class="table table-hover table-sm">
+                <tr>
+                    <th></th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Task</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Target</th>
+                    <th scope="col">Log</th>
+                </tr>
+                {% for log in audit_log %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>{{ log["timestamp"] }}</td>
+                        <td>{{ log["task"] }}</td>
+
+                        <td>
+                            <form method="POST" action="/edit_user">
+                                <input type="hidden" name="user_selection" value="{{ log.username }}">
+                                <button class="btn" type="submit">{{ log["username"] }}</button>
+                            </form>
+                        </td>
+
+                        <td>
+                            {% if "Branch" in log["task"] %}
+                                <a class="btn" href="/show_branch?branch={{ log.target_id }}">{{ log["target_name"] }}</a>
+                            {% elif "User" in log["task"] %}
+                                <form method="POST" action="/edit_user">
+                                <input type="hidden" name="user_selection" value="{{ log.target_name }}">
+                                    <button class="btn" type="submit">{{ log["target_name"] }}</button>
+                                </form>
+
+                            {% endif %}
+                            </td>
+                    <td>{{ log["edit"] }}</td>
+
+                    </tr>
+                {% endfor %}
+
+            </table>
+
+        {% else %}
+            <h3>Access Denied.</h3>
+            <span><a href="/ui/static">Return Home</a></span>
+        {% endif %}
+    </div>
+
+{% endblock %}

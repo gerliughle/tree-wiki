@@ -252,6 +252,11 @@ class Database:
             formatted_time = timestamp.strftime("%H:%M:%S")
             print(f"Log Updated at {formatted_date} - {formatted_time}")
 
+    @classmethod
+    def get_audit_log(cls):
+        audit_dict = list(cls.__audit_log.find())
+        return audit_dict
+
 
     @classmethod
     def save_branch(cls, branch_dict, branch_map):

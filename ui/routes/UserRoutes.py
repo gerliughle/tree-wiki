@@ -115,5 +115,13 @@ class UserRoutes:
             return redirect(url_for("homepage"))
         return render_template("error.html")
 
+    @staticmethod
+    @__app.route('/admin_dashboard')
+    def admin_dashboard():
+        audit_log = UserManager.get_audit_log() # I would probably want to sequence by 25 rows. I should only pull that each time
+        # I can take in a range based on the page, as a form or link.
+        # For now do page/table design then do that.
+        return render_template("user/admin_dashboard.html", audit_log=audit_log)
+
 
 

@@ -1,9 +1,7 @@
 from bson import ObjectId
 from functools import wraps
-
 from flask import render_template, abort
 from flask_login import current_user
-
 class UserManager:
 
     __all_users = []
@@ -68,3 +66,10 @@ class UserManager:
         username = user.username
         Database.delete_user(user)
         return username
+
+    @classmethod
+    def get_audit_log(cls):
+        from data.Database import Database
+        log = Database.get_audit_log()
+        return log
+
