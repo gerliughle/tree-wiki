@@ -55,10 +55,8 @@ class UserManager:
     @classmethod
     def save_user(cls, user_dict):
         from data.Database import Database
-        user_dict["role"] = "user"
-
-        if user_dict.get("is_active", False):
-            user_dict["is_active"] = True
+        user_dict.setdefault("role", "user")
+        user_dict.setdefault("is_active", True)
         user = Database.save_user(user_dict)
         return user
 

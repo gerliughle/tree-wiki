@@ -113,7 +113,7 @@ class WebUI:
         if request.args.get("mode") == "exit":
             session["mode"] = None
         if request.args.get("mode") == "edit" or session.get("mode") == "edit":
-            if current_user.is_authenticated and current_user.role == "admin":
+            if current_user.is_authenticated and current_user.role in ["admin", "editor"]:
                 page_context["is_edit_mode"] = True
                 session["mode"] = "edit"
 
