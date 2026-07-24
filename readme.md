@@ -53,7 +53,8 @@ Branch page To-Do:
 
 Then other to-dos:
 
-
+* Auditing Dashboard
+* Deleted users: need solution for their owned branches/leaves
 * Dark mode - svg color tweaks
 * Responsive design for no pic
 * User edit mode - change role, disable, delete users. maybe that's only allowed for even another role

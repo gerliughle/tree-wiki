@@ -102,7 +102,7 @@ class UserRoutes:
         if user and user.username != "josh":
             user_edits = {"_id": user.id}
             if role_change and role_change != "":
-                user_edits["role_change"] = role_change
+                user_edits["role"] = role_change
             elif disable_account:
                 user_edits["is_active"] = False
             elif enable_account:
