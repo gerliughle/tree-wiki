@@ -133,11 +133,9 @@ class TreeEngine:
     def get_children_of_branch(cls, branch_id):
         children_list = []
         current_branch = cls.lookup_branch(branch_id)
-        print(f"Finding children for {current_branch.name}")
         for branch in cls.all_branches:
             if branch_id == branch.parent_id:
                 children_list.append(branch)
-                print(f"Child found: {branch.name}")
         return children_list
 
     @classmethod

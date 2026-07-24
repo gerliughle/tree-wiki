@@ -6,6 +6,13 @@ from flask_login import current_user
 
 class UserManager:
 
+    __all_users = []
+
+    @classmethod
+    def __init__(cls):
+        from data.Database import Database
+        cls.__all_users = Database.read_users()
+        print(f"Users loaded: {len(cls.__all_users)}")
 
     @staticmethod
     def role_required(*roles):
@@ -19,8 +26,6 @@ class UserManager:
                 return f(*args, **kwargs)
             return decorated_function
         return decorator
-
-
 
     @staticmethod
     def lookup_user_id(user_id):
@@ -42,3 +47,26 @@ class UserManager:
             return user
         else:
             return None
+
+    @classmethod
+    def get_users(cls):
+        return cls.__all_users
+
+    @classmethod
+    def save_user(cls, user_dict):
+        from data.Database import Database
+        user_dict["role"] = "user"
+
+        if user_dict.get("is_active", False):
+            user_dict["is_active"] = True
+        user = Database.save_user(user_dict)
+        return user
+
+    @classmethod
+    def delete_user(cls, user_id):
+        from data.Database import Database
+        user_id = ObjectId(user_id)
+        user = cls.lookup_user_id(user_id)
+        username = user.username
+        Database.delete_user(user)
+        return username
