@@ -2,7 +2,7 @@
 
 {% block title %}{{ branch.name }} Care Guide{% endblock %}
 {% block content %}
-    {% if is_edit_mode and current_user.role == 'admin' %}
+    {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
         <div class="container sticky-top col-6">
             <div class="p-4"></div>
             <div class="alert alert-warning d-flex justify-content-between align-content-center mt-3" role="alert">
@@ -55,7 +55,7 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
-                {% if is_edit_mode and current_user.role == 'admin' %}
+                {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
                     <div class="mb-3">
                         <form action="/edit_branch" method="post">
                             <div class="btn- mb-1" role="group">
@@ -116,7 +116,7 @@
             </form>
         </div>
 
-        {% if is_edit_mode and current_user.role == 'admin' %}
+        {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
             <div class="card shadow-sm mb-2">
                 <div class="card-body">
                     <form method="POST" action="/edit_leaf" class="mb-4">

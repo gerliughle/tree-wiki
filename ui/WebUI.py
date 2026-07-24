@@ -18,7 +18,7 @@ class WebUI:
     @classmethod
     def init(cls):
         cls.engine = TreeEngine()
-        # cls.usermanager = UserManager()
+        cls.usermanager = UserManager()
 
     @classmethod
     def get_app(cls):
@@ -107,7 +107,6 @@ class WebUI:
             "all_seasons": all_seasons
         }
         print(f"{branch.name=}")
-        print(f"Care guide length: {len(care_guide)}")
         print(f"Filtered care guide length: {len(filtered_care_guide)}")
 
         # Sets or removes edit mode for session

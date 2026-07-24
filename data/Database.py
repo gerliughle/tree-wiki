@@ -131,7 +131,8 @@ class Database:
     @classmethod
     def read_users(cls):
         cls.connect()
-        users = [User.build(user) for user in cls.__users.find()]
+        user_dict = list(cls.__users.find())
+        users = [User.build(user) for user in user_dict]
         return users
 
     @classmethod
@@ -158,15 +159,76 @@ class Database:
         return branches, leaves, branch_map, leaf_map
 
     @classmethod
-    def add_user(cls, username, pw_hash):
+    def save_user(cls, user_dict):
         cls.connect()
-        user_dict = {
-            "username": username,
-            "pw_hash": pw_hash,
-            "role": "user"
+        print(f"Debug. {user_dict=}")
+        # Dict either has ID, and I edit, or no ID, and I create.
+        query_filter = {}
+        if user_dict.get("_id", False):
+            query_filter["_id"] = user_dict["_id"]
+            user_dict.pop("_id")
+            editor_id = current_user.id
+            editor_username = current_user.username
+            task = "Edit User"
+        else:
+            new_id = ObjectId()
+            query_filter["_id"] = new_id
+            task = "Register User"
+            editor_id = new_id
+            editor_username = user_dict["username"]
+
+        if not user_dict.get("role", False):
+            user_dict["role"] = "user"
+
+        update_payload = {
+            "$set": user_dict
         }
-        cls.__users.insert_one(user_dict)  # mutes dict with _id
-        return User.build(user_dict)
+
+        new_user_doc = cls.__users.find_one_and_update(query_filter,
+                                                       update_payload,
+                                                       upsert=True,
+                                                       return_document=ReturnDocument.AFTER)
+
+        log_user_dict = user_dict.copy()
+        log_user_dict.pop("pw_hash", None)
+
+        log_payload = {
+            "timestamp": datetime.now(timezone.utc),
+            "user_id": editor_id,
+            "username": editor_username,
+            "target_id": new_user_doc["_id"],
+            "target_name": new_user_doc["username"],
+            "task": task,
+            "edit": log_user_dict
+        }
+        print(f"{log_payload=}")
+        cls.update_log(log_payload)
+
+        return User.build(new_user_doc)
+
+    @classmethod
+    def delete_user(cls, user):
+        cls.connect()
+
+        delete_doc = cls.__users.delete_one({"_id": user.id})
+        if delete_doc.acknowledged:
+            print("Deleted user")
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc),
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "target_id": user.id,
+                "target_name": user.username,
+                "task": "Delete User",
+                "edit": {
+                    "deleted_user_id": user.id,
+                    "deleted_username": user.username
+                }
+            }
+            print(f"{log_payload=}")
+            cls.update_log(log_payload)
+        else:
+            print("Did not complete user deletion.")
 
     @classmethod
     def lookup_user(cls, attr, value):
@@ -177,24 +239,6 @@ class Database:
         else:
             return None
 
-    # @classmethod
-    # def add_branch(cls, branch_dict, branch_map):
-    #     cls.connect()
-    #     cls.__branches.insert_one(branch_dict)
-    #     return Branch.build(branch_dict, branch_map)
-    #
-    # @classmethod
-    # def edit_branch(cls, branch_id, branch_edits):
-    #     cls.connect()
-    #     cls.__branches.update_one(
-    #         {"_id": branch_id},
-    #         {"$set": branch_edits}
-    #     )
-    #     local_branch = TreeEngine.lookup_branch(branch_id)
-    #     for key, value in branch_edits.items():
-    #         setattr(local_branch, key, value)
-    #
-    #     return local_branch
 
     @classmethod
     def update_log(cls, payload):
@@ -243,7 +287,7 @@ class Database:
             "task": task,
             "edit": branch_dict
         }
-        print(f"{log_payload=}")
+        # print(f"{log_payload=}")
         cls.update_log(log_payload)
 
         return Branch.build(new_branch_doc, branch_map)
@@ -287,7 +331,7 @@ class Database:
                     "impacted_children": children
                 }
             }
-            print(f"{log_payload=}")
+            # print(f"{log_payload=}")
             cls.update_log(log_payload)
         else:
             print("Did not complete branch deletion.")

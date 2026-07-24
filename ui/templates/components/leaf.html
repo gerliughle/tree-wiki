@@ -3,7 +3,7 @@
         <div class="card-body d-flex flex-column">
             <div class="card-header pb-0">
                 <span class="h5 card-title m-2 align-content-baseline ms-0">{{ leaf.subcategory }}</span>
-                {% if is_edit_mode and current_user.role == 'admin' %}
+                {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
                     <form method="POST" action="/edit_leaf">
                         <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
                         <input type="hidden" name="branch_id" value="{{ branch.id }}">
