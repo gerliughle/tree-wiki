@@ -1,0 +1,59 @@
+{% extends "template.html" %}
+{% block title %}Confirm Revert Change{% endblock %}
+{% block content %}
+    <div class="container col-md-8 col-10">
+
+        <form method="POST" action="/do_revert_change">
+            <input type="hidden" name="revert_id" value="{{ revert_id }}">
+            <h3 class="my-2">Are you sure you want to revert?</h3>
+
+            <span class="mb-2">Restore to the Original "{{ revert_entry["target_name"] }}"
+                entry, reverting the Edit by "{{ revert_entry["username"] }}" ?</span>
+
+            <div class="container-fluid d-inline-flex mb-2">
+                <div class="container col-6">
+                    <table class="table table-hover">
+                        <tr>
+                            <th colspan="2">Original</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Content</th>
+                        </tr>
+                        {% for edit in revert_entry["edit"]["before"] %}
+                            <tr>
+                                <td>{{ edit }}</td>
+                                <td>{{ revert_entry["edit"]["before"][edit] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="container col-6">
+                    <table class="table table-hover">
+                        <tr>
+                            <th colspan="2">Edit</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Category</th>
+                            <th scope="col">Content</th>
+                        </tr>
+                        {% for edit in revert_entry["edit"]["after"] %}
+                            <tr>
+                                <td>{{ edit }}</td>
+                                <td>{{ revert_entry["edit"]["after"][edit] }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Revert</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

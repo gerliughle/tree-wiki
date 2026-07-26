@@ -59,15 +59,6 @@ class UserManager:
         return user
 
     @classmethod
-    def delete_user(cls, user_id):
-        from data.Database import Database
-        user_id = ObjectId(user_id)
-        user = cls.lookup_user_id(user_id)
-        username = user.username
-        Database.delete_user(user)
-        return username
-
-    @classmethod
     def get_audit_log(cls):
         from data.Database import Database
         log = Database.get_audit_log()

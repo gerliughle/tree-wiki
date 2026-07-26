@@ -12,12 +12,13 @@
                     <th scope="col">Task</th>
                     <th scope="col">User</th>
                     <th scope="col">Target</th>
+                    <th scope="col">Revert Change</th>
                     <th scope="col">Log</th>
                 </tr>
-                {% for log in audit_log %}
+                {% for log in audit_log|reverse %}
                     <tr>
-                        <th scope="row">{{ loop.index }}</th>
-                        <td>{{ log["timestamp"] }}</td>
+                        <th scope="row"></th>
+                        <td>{{ log["timestamp"].strftime('%m/%d/%Y %H:%M:%S') }}</td>
                         <td>{{ log["task"] }}</td>
 
                         <td>
@@ -38,11 +39,20 @@
 
                             {% endif %}
                             </td>
-                    <td>{{ log["edit"] }}</td>
+                    <td>
+                        {% if "Branch" in log["task"] or "Leaf" in log["task"] %}
+                        <form method="POST" action="/revert_change">
+                            <input type="hidden" name="revert_id" value="{{ log["_id"] }}">
+                            <button class="btn btn-outline-warning" type="submit">Revert</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ log["edit"] }}
+                    </td>
 
                     </tr>
                 {% endfor %}
-
             </table>
 
         {% else %}

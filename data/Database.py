@@ -207,30 +207,6 @@ class Database:
         return User.build(new_user_doc)
 
     @classmethod
-    def delete_user(cls, user):
-        cls.connect()
-
-        delete_doc = cls.__users.delete_one({"_id": user.id})
-        if delete_doc.acknowledged:
-            print("Deleted user")
-            log_payload = {
-                "timestamp": datetime.now(timezone.utc),
-                "user_id": current_user.id,
-                "username": current_user.username,
-                "target_id": user.id,
-                "target_name": user.username,
-                "task": "Delete User",
-                "edit": {
-                    "deleted_user_id": user.id,
-                    "deleted_username": user.username
-                }
-            }
-            print(f"{log_payload=}")
-            cls.update_log(log_payload)
-        else:
-            print("Did not complete user deletion.")
-
-    @classmethod
     def lookup_user(cls, attr, value):
         cls.connect()
         user_doc = cls.__users.find_one({attr: value})
@@ -257,6 +233,11 @@ class Database:
         audit_dict = list(cls.__audit_log.find())
         return audit_dict
 
+    @classmethod
+    def get_audit_entry(cls, entry_id):
+        audit_entry = cls.__audit_log.find_one({"_id": ObjectId(entry_id)})
+        return audit_entry
+
 
     @classmethod
     def save_branch(cls, branch_dict, branch_map):
@@ -265,11 +246,14 @@ class Database:
 
         # I receive a dict wtih either no id, and the dict to create
         # or, an id and changes.
+        branch = False
         query_filter = {}
         if branch_dict.get("_id", False):
-            query_filter["_id"] = branch_dict["_id"]
+            branch_id = branch_dict["_id"]
+            query_filter["_id"] = branch_id
             branch_dict.pop("_id")
             task = "Edit Branch"
+            branch = TreeEngine.lookup_branch(branch_id)
         else:
             query_filter["_id"] = ObjectId()
             task = "Create Branch"
@@ -290,8 +274,15 @@ class Database:
             "target_id": new_branch_doc["_id"],
             "target_name": new_branch_doc["name"],
             "task": task,
-            "edit": branch_dict
+            "edit": {
+                "after":branch_dict,
+                "before":{}
+            }
         }
+        if branch:
+            for edit in branch_dict:
+                log_payload["edit"]["before"][edit] = (getattr(branch, edit))
+
         # print(f"{log_payload=}")
         cls.update_log(log_payload)
 

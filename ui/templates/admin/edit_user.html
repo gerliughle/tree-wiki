@@ -22,33 +22,28 @@
                 <div class="row mb-4">
                     <div class="col 1">
                         <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="/">Cancel</a>
+                        <a href="/ui/static">Cancel</a>
                     </div>
                 </div>
                 <div class="row my-2">
-                    {% if user.is_active %}
-                        <div class="btn-" role="group">
-                        <button class="btn btn-outline-warning" name="disable_account" value="disable_account"
-                                type="submit">Disable Account
-                        </button>
-                    {% else %}
-                        <div class="btn-" role="group">
-                        <button class="btn btn-outline-success" name="enable_account" value="enable_account"
-                                type="submit">Re-Enable Account
-                        </button>
-                    {% endif %}
-                    <button class="btn btn-outline-danger" name="delete_account" value="delete_account"
-                            type="submit">Delete Account
-                    </button>
+                    <div class="btn-" role="group">
+                        {% if user.is_active %}
+                            <button class="btn btn-outline-warning" name="disable_account" value="disable_account"
+                                    type="submit">Disable Account
+                            </button>
+                        {% else %}
+                            <button class="btn btn-outline-success" name="enable_account" value="enable_account"
+                                    type="submit">Re-Enable Account
+                            </button>
+                        {% endif %}
                     </div>
-
-                    </div>
+                </div>
 
 
             </form>
         {% else %}
             <h3>Access Denied.</h3>
-            <span><a href="/">Return Home</a></span>
+            <span><a href="/ui/static">Return Home</a></span>
         {% endif %}
     </div>
 

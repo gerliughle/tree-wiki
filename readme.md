@@ -38,13 +38,6 @@ Done:
 * Have edit mode be a session variable, not page
 * Admin page access.. ensure edit mode/pages are protected.
 
-Templates:
-* index.html >> should be branch.html
-* template.html
-* navbar.html
-* category.html
-* leaf.html
-
 
 Branch page To-Do:
 
@@ -55,6 +48,12 @@ Then other to-dos:
 
 * Auditing Dashboard
 * Deleted users: need solution for their owned branches/leaves
+* * Should probably not allow for deleting users, and just disable the account. I could store the username and replace it with "disabled"
+* * Part of the reason for this is if they make malicious edits. I would want to have options for that, but if they edit existing
+* * leaves, it would be better to revert their edits rather than deleting everything they've ever edited. 
+* * So would need to find audit entries from the same target_id. Or store the original before it was changed right in the audit
+* * Which i sort of have now. I should probably replace deleting leaves/branches with disabling them to so i can undelete. 
+* Edit page default text should be old text.
 * Dark mode - svg color tweaks
 * Responsive design for no pic
 * User edit mode - change role, disable, delete users. maybe that's only allowed for even another role
