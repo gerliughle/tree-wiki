@@ -47,7 +47,6 @@ class UserRoutes:
                     "pw_hash": pw_hash
                 }
                 new_user = UserManager.save_user(user_dict)
-                # FIXME
                 login_user(new_user)
                 print("New User registered and logged in.")
             else:

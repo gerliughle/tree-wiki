@@ -46,14 +46,20 @@ class AdminRoutes:
         role_change = request.form.get("role_change")
         disable_account = request.form.get("disable_account")
         enable_account = request.form.get("enable_account")
+        new_pw_hash = User.hash_password(request.form.get("password"))
+
         if user and user.username != "josh":
             user_edits = {"_id": user.id}
             if role_change and role_change != "":
                 user_edits["role"] = role_change
+            elif role_change == "":
+                user_edits["role"] = user.role
             elif disable_account:
                 user_edits["is_active"] = False
             elif enable_account:
                 user_edits["is_active"] = True
+            elif new_pw_hash:
+                user_edits["pw_hash"] = new_pw_hash
             updated_user = UserManager.save_user(user_edits)
             print(f"Updated user: {updated_user}")
             return redirect(url_for("homepage"))
