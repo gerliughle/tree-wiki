@@ -40,8 +40,7 @@ class WebUI:
         cls.__app.secret_key = secret_key
         Session(cls.__app)
 
-
-        cls.__app.config["SESSION_COOKIE_SECURE"] = True
+        cls.__app.config["SESSION_COOKIE_SECURE"] = not cls.__app.debug
         cls.__app.config["SESSION_COOKIE_HTTPONLY"] = True
         cls.__app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
