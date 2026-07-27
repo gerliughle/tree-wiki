@@ -169,3 +169,7 @@ class WebUI:
         cls.__app.secret_key = secret_key
         Session(cls.__app)
         cls.__app.run(host="0.0.0.0")
+
+if __name__ == "__main__":
+    WebUI.init()
+    WebUI.run()
