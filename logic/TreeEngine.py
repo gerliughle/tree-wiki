@@ -33,17 +33,14 @@ class TreeEngine:
     def lookup_branch_by_name(cls, name):
         """ Return the Branch object by name. This is not an efficient technique. """
         name = name.strip().lower()
-        print(f"{name=}")
         for branch in cls.branch_map.values():
             if branch.name.lower() == name:
-                print(f"Found match for '{branch.name}'")
                 return branch
         return None
 
     @classmethod
     def get_leaves_for_branch(cls, branch_id):
         """ Return leaves that are for branch_id.
-
         Database is all_branches, all_leaves, branch_map, leaf_map"""
         leaf_matches = []
         for leaf in cls.all_leaves:

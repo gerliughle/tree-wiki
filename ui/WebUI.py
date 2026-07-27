@@ -128,8 +128,10 @@ class WebUI:
             "children": children,
             "all_seasons": all_seasons
         }
-        print(f"{branch.name=}")
-        print(f"Filtered care guide length: {len(filtered_care_guide)}")
+        if current_user.is_authenticated:
+            print(f"Request for '{branch.name}' by '{current_user.username}'. Care Guide contains {len(filtered_care_guide)} entries.")
+        else:
+            print(f"Request for '{branch.name}' by anonymous user. Care Guide contains {len(filtered_care_guide)} entries.")
 
         # Sets or removes edit mode for session
         if request.args.get("mode") == "exit":
