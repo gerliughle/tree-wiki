@@ -22,6 +22,26 @@ class WebUI:
         cls.engine = TreeEngine()
         cls.usermanager = UserManager()
 
+        from ui.routes.EditRoutes import EditRoutes
+        from ui.routes.UserRoutes import UserRoutes
+        from ui.routes.AdminRoutes import AdminRoutes
+
+        home_path = os.environ['HOME']
+        path = os.path.join(home_path, cls.APP_NAME)
+        file = os.path.join(path, f"{cls.APP_NAME}.ini")
+        if not os.path.exists(file):
+            raise FileNotFoundError(f'{file} not found.')
+
+        config_parser = ConfigParser()
+        config_parser.read(file)
+        secret_key = config_parser.get("App", "secret_key")
+
+        cls.__app.config["SESSION_TYPE"] = "filesystem"
+        cls.__app.secret_key = secret_key
+        Session(cls.__app)
+
+        return cls.__app
+
     @classmethod
     def get_app(cls):
         """ Ensures only one Flask app. """
@@ -150,24 +170,7 @@ class WebUI:
 
     @classmethod
     def run(cls):
-        from ui.routes.EditRoutes import EditRoutes
-        from ui.routes.UserRoutes import UserRoutes
-        from ui.routes.AdminRoutes import AdminRoutes
 
-
-        home_path = os.environ['HOME']
-        path = os.path.join(home_path, cls.APP_NAME)
-        file = os.path.join(path, f"{cls.APP_NAME}.ini")
-        if not os.path.exists(file):
-            raise FileNotFoundError(f'{file} not found.')
-
-        config_parser = ConfigParser()
-        config_parser.read(file)
-        secret_key = config_parser.get("App", "secret_key")
-
-        cls.__app.config["SESSION_TYPE"] = "filesystem"
-        cls.__app.secret_key = secret_key
-        Session(cls.__app)
         cls.__app.run(host="0.0.0.0")
 
 if __name__ == "__main__":
