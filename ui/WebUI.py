@@ -6,6 +6,8 @@ from logic.Leaf import Leaf
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
 from bson import ObjectId
+import os
+from configparser import ConfigParser
 
 class WebUI:
     __app = Flask(__name__)
@@ -152,8 +154,18 @@ class WebUI:
         from ui.routes.UserRoutes import UserRoutes
         from ui.routes.AdminRoutes import AdminRoutes
 
+
+        home_path = os.environ['HOME']
+        path = os.path.join(home_path, cls.APP_NAME)
+        file = os.path.join(path, f"{cls.APP_NAME}.ini")
+        if not os.path.exists(file):
+            raise FileNotFoundError(f'{file} not found.')
+
+        config_parser = ConfigParser()
+        config_parser.read(file)
+        secret_key = config_parser.get("App", "secret_key")
+
         cls.__app.config["SESSION_TYPE"] = "filesystem"
-        cls.__app.secret_key = "my_secret_key"
+        cls.__app.secret_key = secret_key
         Session(cls.__app)
         cls.__app.run(host="0.0.0.0")
-

@@ -27,13 +27,7 @@ class Database:
     @classmethod
     def connect(cls):
         if cls.__connection is None:
-            if "USERPROFILE" in os.environ:
-                home_path = os.environ['USERPROFILE']
-            elif "HOME" in os.environ:
-                home_path = os.environ['HOME']
-            else:
-                raise Exception("Environmental variable USERPROFILE or HOME not set.")
-
+            home_path = os.environ['HOME']
             path = os.path.join(home_path, cls.APP_NAME)
             file = os.path.join(path, f"{cls.APP_NAME}.ini")
             if not os.path.exists(file):
