@@ -23,10 +23,11 @@ env/
 .env
 .local
 
-
 # secrets
 data/database_backup.sh
 data/database_restore.sh
 data/StaticData.py
+flask_session
+ui/flask_session
 
 cloudflared-linux-arm64.deb
