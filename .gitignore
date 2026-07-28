@@ -28,3 +28,5 @@ env/
 data/database_backup.sh
 data/database_restore.sh
 data/StaticData.py
+
+cloudflared-linux-arm64.deb
