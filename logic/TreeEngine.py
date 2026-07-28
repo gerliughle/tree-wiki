@@ -30,12 +30,31 @@ class TreeEngine:
         print(f"Leaves loaded: {len(cls.all_leaves)}")
 
     @classmethod
+    def get_leaves(cls):
+        return cls.all_leaves
+
+    @classmethod
+    def get_branches(cls):
+        return cls.all_branches
+
+    @classmethod
+    def get_client(cls):
+        from data.Database import Database
+        return Database.get_client()
+
+    @classmethod
     def lookup_branch_by_name(cls, name):
         """ Return the Branch object by name. This is not an efficient technique. """
         name = name.strip().lower()
         for branch in cls.branch_map.values():
             if branch.name.lower() == name:
                 return branch
+        return None
+
+    @classmethod
+    def lookup_branch(cls, branch_id):
+        if branch_id in cls.branch_map:
+            return cls.branch_map[branch_id]
         return None
 
     @classmethod
@@ -47,20 +66,6 @@ class TreeEngine:
             if leaf.branch_id == branch_id:
                 leaf_matches.append(leaf)
         return leaf_matches
-
-    @classmethod
-    def get_leaves(cls):
-        return cls.all_leaves
-
-    @classmethod
-    def get_branches(cls):
-        return cls.all_branches
-
-    @classmethod
-    def lookup_branch(cls, branch_id):
-        if branch_id in cls.branch_map:
-            return cls.branch_map[branch_id]
-        return None
 
     @classmethod
     def lookup_leaf(cls, leaf_id):

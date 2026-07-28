@@ -36,7 +36,10 @@ class WebUI:
         config_parser.read(file)
         secret_key = config_parser.get("App", "secret_key")
 
-        cls.__app.config["SESSION_TYPE"] = "filesystem"
+        cls.__app.config["SESSION_TYPE"] = "mongodb" # Put sessions on mongo, not file storage
+        cls.__app.config["SESSION_MONGODB"] = TreeEngine.get_client()  # Your PyMongo client connection
+        cls.__app.config["SESSION_MONGODB_DB"] = "BonsaiTree"  # Your database name
+        cls.__app.config["SESSION_MONGODB_COLLECT"] = "sessions"  # Collection to store session docs
         cls.__app.secret_key = secret_key
         Session(cls.__app)
 

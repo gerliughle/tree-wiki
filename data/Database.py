@@ -48,6 +48,10 @@ class Database:
             cls.__audit_log = cls.__database.AuditLog
 
     @classmethod
+    def get_client(cls):
+        return cls.__connection
+
+    @classmethod
     def rebuild_data(cls):
         """ Returns data to original hard coded sample data, as a backup. """
         cls.connect()
