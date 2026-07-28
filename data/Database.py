@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from bson import ObjectId
 from datetime import datetime, timezone
 
-from data import StaticData
+# from data import StaticData
 from data.StaticData import get_all_branches, get_all_leaves
 from logic.Branch import Branch
 from logic.Leaf import Leaf
@@ -50,66 +50,66 @@ class Database:
     @classmethod
     def get_client(cls):
         return cls.__connection
-
-    @classmethod
-    def rebuild_data(cls):
-        """ Returns data to original hard coded sample data, as a backup. """
-        cls.connect()
-
-        print("This will restore data to original dummy data.")
-        print("Are you sure you want to continue? This is permanent. Mongo Backup and Restore is preferred. Y/N: ")
-        user_input = input().lower()
-        if user_input != "y":
-            "Exiting."
-            exit()
-        print("Restoring data.")
-
-        # Remake collections
-        cls.__branches = cls.__database.Branches
-        cls.__branches.drop()
-        cls.__branches = cls.__database.Branches
-        cls.__leaves.drop()
-        cls.__leaves = cls.__database.Leaves
-        cls.__users.drop()
-        cls.__users = cls.__database.Users
-
-        # The static data should upload dictionaries without id's.
-
-        # Users go first, so I can save josh's id and apply it to all entries.
-        all_users = StaticData.get_all_users()
-        admin_id = cls.__users.insert_one(all_users[0])
-        cls.__users.insert_one(all_users[1])
-
-        # This gets all the branch dicts from StaticData.
-        # As it uploads, it takes that branch's _id and sets it as parent
-        # for the next branch. It collects the id's into a list to be
-        # referenced when adding leaves.
-        all_branches = StaticData.get_all_branches()
-        parent_id = None
-        id_list = []
-        for branch in all_branches:
-            branch['parent_id'] = parent_id
-            branch['author_id'] = admin_id.inserted_id
-            current_branch = cls.__branches.insert_one(branch)
-            parent_id = current_branch.inserted_id
-            id_list.append(current_branch.inserted_id)
-
-        # This is more manual based on # of leaves per branch.
-        all_leaves = StaticData.get_all_leaves()
-        for leaf in all_leaves:
-            leaf['author_id'] = admin_id.inserted_id
-        for i in range(3):  # 3 trunk leaves
-            all_leaves[i]['branch_id'] = id_list[0]
-            cls.__leaves.insert_one(all_leaves[i])
-        # 0 broadleaf leaves
-        for i in range(3, 5):  # 2 deciduous broadleaf leaves
-            all_leaves[i]['branch_id'] = id_list[2]
-            cls.__leaves.insert_one(all_leaves[i])
-        all_leaves[5]['branch_id'] = id_list[3]
-        cls.__leaves.insert_one(all_leaves[5])
-        for i in range(6, 10):  # 4 JM leaves
-            all_leaves[i]['branch_id'] = id_list[4]
-            cls.__leaves.insert_one(all_leaves[i])
+    #
+    # @classmethod
+    # def rebuild_data(cls):
+    #     """ Returns data to original hard coded sample data, as a backup. """
+    #     cls.connect()
+    #
+    #     print("This will restore data to original dummy data.")
+    #     print("Are you sure you want to continue? This is permanent. Mongo Backup and Restore is preferred. Y/N: ")
+    #     user_input = input().lower()
+    #     if user_input != "y":
+    #         "Exiting."
+    #         exit()
+    #     print("Restoring data.")
+    #
+    #     # Remake collections
+    #     cls.__branches = cls.__database.Branches
+    #     cls.__branches.drop()
+    #     cls.__branches = cls.__database.Branches
+    #     cls.__leaves.drop()
+    #     cls.__leaves = cls.__database.Leaves
+    #     cls.__users.drop()
+    #     cls.__users = cls.__database.Users
+    #
+    #     # The static data should upload dictionaries without id's.
+    #
+    #     # Users go first, so I can save josh's id and apply it to all entries.
+    #     all_users = StaticData.get_all_users()
+    #     admin_id = cls.__users.insert_one(all_users[0])
+    #     cls.__users.insert_one(all_users[1])
+    #
+    #     # This gets all the branch dicts from StaticData.
+    #     # As it uploads, it takes that branch's _id and sets it as parent
+    #     # for the next branch. It collects the id's into a list to be
+    #     # referenced when adding leaves.
+    #     all_branches = StaticData.get_all_branches()
+    #     parent_id = None
+    #     id_list = []
+    #     for branch in all_branches:
+    #         branch['parent_id'] = parent_id
+    #         branch['author_id'] = admin_id.inserted_id
+    #         current_branch = cls.__branches.insert_one(branch)
+    #         parent_id = current_branch.inserted_id
+    #         id_list.append(current_branch.inserted_id)
+    #
+    #     # This is more manual based on # of leaves per branch.
+    #     all_leaves = StaticData.get_all_leaves()
+    #     for leaf in all_leaves:
+    #         leaf['author_id'] = admin_id.inserted_id
+    #     for i in range(3):  # 3 trunk leaves
+    #         all_leaves[i]['branch_id'] = id_list[0]
+    #         cls.__leaves.insert_one(all_leaves[i])
+    #     # 0 broadleaf leaves
+    #     for i in range(3, 5):  # 2 deciduous broadleaf leaves
+    #         all_leaves[i]['branch_id'] = id_list[2]
+    #         cls.__leaves.insert_one(all_leaves[i])
+    #     all_leaves[5]['branch_id'] = id_list[3]
+    #     cls.__leaves.insert_one(all_leaves[5])
+    #     for i in range(6, 10):  # 4 JM leaves
+    #         all_leaves[i]['branch_id'] = id_list[4]
+    #         cls.__leaves.insert_one(all_leaves[i])
 
     @classmethod
     def read_data(cls):
