@@ -22,7 +22,9 @@ env/
 # Local configuration/secrets (if you ever use .env files)
 .env
 .local
+
+
+# secrets
 data/database_backup.sh
 data/database_restore.sh
-
-flask_session/
+data/StaticData.py
