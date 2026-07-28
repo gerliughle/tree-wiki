@@ -1,8 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_login import LoginManager, current_user
 from flask_session import Session # FIXME why is this red
-from logic.Branch import Branch
-from logic.Leaf import Leaf
+
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
 from bson import ObjectId
@@ -35,15 +34,16 @@ class WebUI:
         config_parser = ConfigParser()
         config_parser.read(file)
         secret_key = config_parser.get("App", "secret_key")
+        env = config_parser.get("App", "environment", fallback="development")
 
-        cls.__app.config["SESSION_TYPE"] = "mongodb" # Put sessions on mongo, not file storage
-        cls.__app.config["SESSION_MONGODB"] = TreeEngine.get_client()  # Your PyMongo client connection
-        cls.__app.config["SESSION_MONGODB_DB"] = "BonsaiTree"  # Your database name
-        cls.__app.config["SESSION_MONGODB_COLLECT"] = "sessions"  # Collection to store session docs
+        cls.__app.config["SESSION_TYPE"] = "mongodb"
+        cls.__app.config["SESSION_MONGODB"] = TreeEngine.get_client()
+        cls.__app.config["SESSION_MONGODB_DB"] = "BonsaiTree"
+        cls.__app.config["SESSION_MONGODB_COLLECT"] = "sessions"
         cls.__app.secret_key = secret_key
         Session(cls.__app)
 
-        cls.__app.config["SESSION_COOKIE_SECURE"] = not cls.__app.debug
+        cls.__app.config["SESSION_COOKIE_SECURE"] = env == "production"
         cls.__app.config["SESSION_COOKIE_HTTPONLY"] = True
         cls.__app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
@@ -179,9 +179,4 @@ class WebUI:
 
     @classmethod
     def run(cls):
-
         cls.__app.run(host="0.0.0.0")
-
-if __name__ == "__main__":
-    WebUI.init()
-    WebUI.run()
