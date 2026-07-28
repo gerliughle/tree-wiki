@@ -8,7 +8,7 @@ from bson import ObjectId
 from datetime import datetime, timezone
 
 # from data import StaticData
-from data.StaticData import get_all_branches, get_all_leaves
+# from data.StaticData import get_all_branches, get_all_leaves
 from logic.Branch import Branch
 from logic.Leaf import Leaf
 from logic.User import User
@@ -138,23 +138,23 @@ class Database:
         cls.connect()
         return cls.__audit_log
 
-    @classmethod
-    def read_static_data(cls):
-        """ Reads StaticData, and calls build methods to create objects.
-
-        I think it gets a list of dicts, converts to objs while passing a map.
-
-        It may be broken now, with id management."""
-
-        branch_map = {}
-        branch_dicts = get_all_branches()
-        branches = [Branch.build(branch, branch_map) for branch in branch_dicts]
-
-        leaf_map = {}
-        leaf_dicts = get_all_leaves()
-        leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
-
-        return branches, leaves, branch_map, leaf_map
+    # @classmethod
+    # def read_static_data(cls):
+    #     """ Reads StaticData, and calls build methods to create objects.
+    #
+    #     I think it gets a list of dicts, converts to objs while passing a map.
+    #
+    #     It may be broken now, with id management."""
+    #
+    #     branch_map = {}
+    #     branch_dicts = get_all_branches()
+    #     branches = [Branch.build(branch, branch_map) for branch in branch_dicts]
+    #
+    #     leaf_map = {}
+    #     leaf_dicts = get_all_leaves()
+    #     leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
+    #
+    #     return branches, leaves, branch_map, leaf_map
 
     @classmethod
     def save_user(cls, user_dict):
