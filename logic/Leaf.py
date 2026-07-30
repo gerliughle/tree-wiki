@@ -2,6 +2,7 @@
 class Leaf:
     def __init__(self,
                  _id,
+                 is_active,
                  author_id,
                  branch_id,
                  category,
@@ -10,6 +11,7 @@ class Leaf:
                  entries,
                  leaf_map):
         self._id = _id
+        self.is_active = is_active
         self.author_id = author_id
         self.branch_id = branch_id
         self.category = category
@@ -23,6 +25,7 @@ class Leaf:
         """ Builds object from dict and adds to map. """
         return Leaf(
             leaf_dict["_id"],
+            leaf_dict["is_active"],
             leaf_dict["author_id"],
             leaf_dict["branch_id"],
             leaf_dict["category"],
@@ -35,6 +38,7 @@ class Leaf:
     def to_dict(self):
         return {
             "_id": self._id,
+            "is_active": self.is_active,
             "author_id": self.author_id,
             "branch_id": self.branch_id,
             "category": self.category,

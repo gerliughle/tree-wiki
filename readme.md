@@ -2,6 +2,20 @@ Building bonsai knowledge repository, built on a tree-based data structure.
 Each new branch has a parent, automatically inheriting all of its data. This happens through leaves, which are attached to branches. New leaves can overwrite the data on inherited leaves, otherwise the parent's will be displayed. This allows specific info to build on foundational knowledge, avoiding repitition, providing context, and allowing both best practicies and specifics. 
 
 
+Structure:
+* Logic programmed in Python
+* Developed using Flask Python Server
+* Login, Cookies, Sessions use Flask-login
+* Password Security uses bcrypt
+* HTML control with Jinja templates
+* CSS design framework from Bootstrap
+* Database is cloud-based, NoSQL dictionary using MongoDB Atlas
+* Web Server is Raspberry PI running on Ubuntu Server
+* Server secured with Uncomplicated Firewall (ufw) and passwordless login
+* Production server uses Gunicorn
+* Front-end routing/https uses Cloudflared tunnel
+* Domain name from CloudFlare
+
 Done:
 * Branch Class
 * Leaf Class
@@ -39,31 +53,35 @@ Done:
 * Admin page access.. ensure edit mode/pages are protected.
 * Disabling users
 * Audit logs, before/after states
-
-
-Branch page To-Do:
-
-
-* I removed season filtering, but could be added if it expands column view to be more usable.
+* Fixed gunicorn worker count, it was not updating edits consistently. With lots of users, this will need a solution.
+* Add is_active property to leaves/branches to have a disable option vs delete
+* Enable www routing
+* Created update_class method to add properties, fix blanks, etc. 
+* Increase secret key security
+* Responsive design for no picture
 
 Then other to-dos:
 
-* Auditing Dashboard
-* * replace deleting leaves/branches with disabling them to so i can undelete.
+
+* Add disable features for branches/leaves:
+  * Add routes/buttons/page designs. Only enable delete for admins
+  * Update pull logic to skip disabled stuff
+  * Check care guide/parenting logic for disabled items
+* Set up git for prod/main
 * Finish reverting, before/after states. Look for tricky situations.. parents, children attached leaves, etc
+* Leaf collapse button
 * change password (require fresh login)
 * forget password
 * Alternate User Id to allow for id changing.. see flask-login
 * Edit page default text should be old text.
 * Dark mode - svg color tweaks
-* Responsive design for no picture
+
 * User edit mode - change role, disable, delete users. maybe that's only allowed for even another role
 * Dark/Light Mode - color palette adjustments
 * Category Collapse - arrow direction change
 * Ensure you're using jinja escapes appropriately
 * Have phases be UserState variable
 * Homepage
-* Increase secret key security?
 * Tree View. Started, but ugly
 * About page/legend/guide/phase description
 * Thoughts on non-bonsai applicability. Season = category, phase = filter
@@ -75,7 +93,6 @@ Then other to-dos:
 * Find pictures somehow
 * Non admin edit/suggestion
 * Temp Selector system
-
 
 been skipping any validations but it is important:
 * checking for any form errors

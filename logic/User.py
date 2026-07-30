@@ -2,10 +2,10 @@ import bcrypt
 from flask_login import UserMixin
 
 class User(UserMixin):
-    __username = ""
-    __pw_hash = ""
-    __role = ""
-    __is_active = True
+    # __username = ""
+    # __pw_hash = ""
+    # __role = ""
+    # __is_active = True
 
     def __init__(self, _id, username, pw_hash, role, is_active):
         self._id = _id

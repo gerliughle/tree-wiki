@@ -1,8 +1,11 @@
+import os
+
 
 class Branch:
 
     def __init__(self,
                  _id,
+                 is_active,
                  author_id,
                  name,
                  description,
@@ -10,6 +13,7 @@ class Branch:
                  parent_id,
                  branch_map):
         self._id = _id
+        self.is_active = is_active
         self.author_id = author_id
         self.name = name
         self.description = description
@@ -22,6 +26,7 @@ class Branch:
         """ Build a branch, add to map. """
         return Branch(
             branch_dict["_id"],
+            branch_dict["is_active"],
             branch_dict['author_id'],
             branch_dict['name'],
             branch_dict['description'],
@@ -33,6 +38,7 @@ class Branch:
     def to_dict(self):
         return {
             '_id': self._id,
+            'is_active': self.is_active,
             'author_id': self.author_id,
             'name': self.name,
             'description': self.description,
@@ -44,6 +50,10 @@ class Branch:
     def id(self):
         return self._id
 
-
     def __str__(self):
         return f"Branch object: {self.name}. Id: {self._id}"
+
+    @property
+    def has_image(self):
+        file_path = os.path.join("static","assets","branch_img",self.image)
+        return os.path.exists(file_path)

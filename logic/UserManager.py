@@ -2,6 +2,7 @@ from bson import ObjectId
 from functools import wraps
 from flask import render_template, abort
 from flask_login import current_user
+
 class UserManager:
 
     __all_users = []

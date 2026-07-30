@@ -3,6 +3,7 @@ from flask_login import LoginManager, current_user
 from flask_session import Session # FIXME why is this red
 
 from logic.TreeEngine import TreeEngine
+from logic.Branch import Branch
 from logic.UserManager import UserManager
 from bson import ObjectId
 import os
@@ -12,8 +13,6 @@ class WebUI:
     __app = Flask(__name__)
     login_manager = LoginManager()
     login_manager.init_app(__app)
-    __all_branches = None
-    __all_leaves = None
     APP_NAME = "bonsaitree"
 
     @classmethod
@@ -60,24 +59,6 @@ class WebUI:
         """ Flask-login required. Uses Str id, returns either User obj or None. """
         return UserManager.lookup_user_id(user_id)
 
-    @classmethod
-    def get_all_branches(cls):
-        """ Returns all branches """
-        return cls.engine.all_branches
-
-    @classmethod
-    def get_branch_map(cls):
-        return cls.engine.branch_map
-
-    @classmethod
-    def get_all_leaves(cls):
-        """ Returns all leaves """
-        return cls.engine.all_leaves
-
-    @classmethod
-    def get_leaf_map(cls):
-        return cls.engine.leaf_map
-
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
@@ -123,7 +104,7 @@ class WebUI:
                 }
 
                 filtered_care_guide.append(filtered_leaf)
-
+        branch_has_image = branch.has_image
         children = TreeEngine.get_children_of_branch(branch.id)
         all_seasons = ["Spring", "Summer", "Fall", "Winter"]
         page_context = {
@@ -133,7 +114,8 @@ class WebUI:
             "category_list": TreeEngine.CATEGORIES,
             "phases": phases,
             "children": children,
-            "all_seasons": all_seasons
+            "all_seasons": all_seasons,
+            "branch_has_image": branch_has_image
         }
         if current_user.is_authenticated:
             print(f"Request for '{branch.name}' by '{current_user.username}'. Care Guide contains {len(filtered_care_guide)} entries.")

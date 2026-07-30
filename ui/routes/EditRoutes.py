@@ -1,7 +1,7 @@
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
-from flask import render_template, request, session, redirect, url_for
+from flask import render_template, request, redirect, url_for
 from flask_login import current_user, login_required
 from bson import ObjectId
 
@@ -15,7 +15,7 @@ class EditRoutes:
     @__app.route('/create_branch', methods=['POST'])
     def create_branch():
         branch = None
-        all_branches = WebUI.get_all_branches()
+        all_branches = TreeEngine.get_branches()
         branch_id = request.form.get("select_branch_id")
         if branch_id:
             branch = TreeEngine.lookup_branch(ObjectId(branch_id))
@@ -41,11 +41,12 @@ class EditRoutes:
             parent_branch_id = ObjectId(request.form["parent_branch_id"])
         else:
             print("No branch id")
-        branch_author = session.get("user_id")
+        branch_author = current_user.id
         if branch_name == "" or branch_description == "" or parent_branch_id == "":
             return render_template("error.html")
         branch_dict = {
             "author_id": branch_author,
+            "is_active": True,
             "name": branch_name,
             "description": branch_description,
             "image": branch_image,
@@ -64,7 +65,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def select_edit_branch():
-        all_branches = WebUI.get_all_branches()
+        all_branches = TreeEngine.get_branches()
         return render_template("edit/select_edit_branch.html", branches=all_branches)
 
     @staticmethod
@@ -72,7 +73,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def edit_branch():
-        all_branches = WebUI.get_all_branches()
+        all_branches = TreeEngine.get_branches()
         branch_id = ObjectId(request.form["select_branch_id"])
         print(f"{branch_id=}")
         branch = TreeEngine.lookup_branch(branch_id)
@@ -101,7 +102,8 @@ class EditRoutes:
             if request.form["select_branch_id"] != "":
                 branch_edits["parent_id"] = ObjectId(request.form["select_branch_id"])
 
-        branch_author = session.get("user_id")
+        branch_author = current_user.id
+        branch_edits["author_id"] = branch_author
         updated_branch = TreeEngine.save_branch(branch_edits)
         return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
 
@@ -110,7 +112,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def delete_branch():
-        all_branches = WebUI.get_all_branches()
+        all_branches = TreeEngine.get_branches()
         return render_template("edit/select_delete_branch.html", branches=all_branches)
 
     @staticmethod
@@ -140,7 +142,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def select_edit_leaf():
-        all_branches = WebUI.get_all_branches()
+        all_branches = TreeEngine.get_branches()
         return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
 
     @staticmethod
@@ -216,7 +218,7 @@ class EditRoutes:
             category = request.form["category"]
         if "subcategory" in request.form:
             subcategory = request.form["subcategory"]
-        author_id = session.get("user_id") # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
+        author_id = current_user.id # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
         season_list = ['Spring', 'Summer', 'Fall', 'Winter']
         seasons = []
         for season in season_list:
@@ -236,6 +238,7 @@ class EditRoutes:
                 entries.append(entry)
         leaf_dict = {
             "author_id": author_id,
+            "is_active": True,
             "branch_id": branch_id,
             "category": category,
             "subcategory": subcategory,

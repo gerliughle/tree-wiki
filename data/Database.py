@@ -13,6 +13,7 @@ from logic.Branch import Branch
 from logic.Leaf import Leaf
 from logic.User import User
 from logic.TreeEngine import TreeEngine
+from logic.UserManager import UserManager
 
 
 class Database:
@@ -50,6 +51,7 @@ class Database:
     @classmethod
     def get_client(cls):
         return cls.__connection
+
     #
     # @classmethod
     # def rebuild_data(cls):
@@ -213,7 +215,6 @@ class Database:
         else:
             return None
 
-
     @classmethod
     def update_log(cls, payload):
         """ Updates the audit log """
@@ -235,7 +236,6 @@ class Database:
     def get_audit_entry(cls, entry_id):
         audit_entry = cls.__audit_log.find_one({"_id": ObjectId(entry_id)})
         return audit_entry
-
 
     @classmethod
     def save_branch(cls, branch_dict, branch_map):
@@ -273,8 +273,8 @@ class Database:
             "target_name": new_branch_doc["name"],
             "task": task,
             "edit": {
-                "after":branch_dict,
-                "before":{}
+                "after": branch_dict,
+                "before": {}
             }
         }
         if branch:
@@ -285,8 +285,6 @@ class Database:
         cls.update_log(log_payload)
 
         return Branch.build(new_branch_doc, branch_map)
-
-
 
     @classmethod
     def delete_branch(cls, branch, children):
@@ -345,6 +343,7 @@ class Database:
         update_payload = {
             "$set": {
                 "author_id": leaf_dict["author_id"],
+                "is_active": leaf_dict["is_active"],
                 "branch_id": leaf_dict["branch_id"],
                 "seasons": leaf_dict["seasons"],
                 "entries": leaf_dict["entries"]
@@ -416,6 +415,33 @@ class Database:
                     "$unset": {"text": "", "phases": ""}
                 }
             )
+
+    @classmethod
+    def update_class(cls, class_db, property_dict):
+        cls.connect()
+
+        for prop, default_value in property_dict.items():
+            class_db.update_many(
+                {
+                    "$or": [
+                        {prop: {"$exists": False}},
+                        {prop: None},
+                        {prop: ""}
+                    ]
+                },
+                {"$set": {prop: default_value}}
+
+            )
+
+    @classmethod
+    def add_authorship(cls):
+        cls.connect()
+        user = UserManager.lookup_user_name("josh")
+        user_id = user.id
+        property_dict = {"author_id": user_id}
+
+        cls.update_class(cls.__leaves, property_dict)
+        cls.update_class(cls.__branches, property_dict)
 
     @classmethod
     def migration_error_check(cls):
