@@ -59,17 +59,19 @@ Done:
 * Created update_class method to add properties, fix blanks, etc. 
 * Increase secret key security
 * Responsive design for no picture
+* Set up git for dev/main
+* Add routes/buttons/page designs. Only enable delete for admins
 
-Then other to-dos:
 
-
+To-Do:
 * Add disable features for branches/leaves:
-  * Add routes/buttons/page designs. Only enable delete for admins
+* Dashboard not providing name for leaf tragets
   * Update pull logic to skip disabled stuff
   * Check care guide/parenting logic for disabled items
-* Set up git for prod/main
+  * How do i disable leaves that have no-phase killswitches?
 * Finish reverting, before/after states. Look for tricky situations.. parents, children attached leaves, etc
 * Leaf collapse button
+* Admin Log - pagination
 * change password (require fresh login)
 * forget password
 * Alternate User Id to allow for id changing.. see flask-login

@@ -11,9 +11,15 @@
                         <div class="btn-group btn-group-sm" role="group">
                             {% if branch.id == leaf.branch_id %}
                                 <button type="submit" class="btn btn-outline-info py-0 px-1">Edit</button>
-                                <button type="submit" formaction="/check_delete_leaf"   
+                                <button type="submit" formaction="/check_disable_leaf"
+                                        class="btn btn-outline-warning py-0 px-1">Disable
+                                </button>
+                                {% if current_user.role=='admin' %}
+                                <button type="submit" formaction="/check_delete_leaf"
                                         class="btn btn-outline-danger py-0 px-1">Delete
                                 </button>
+                                    {% endif %}
+
                             {% else %}
                                 <button type="submit" class="btn btn-outline-info py-0 px-1">Clone</button>
 

@@ -119,11 +119,11 @@ class Database:
         cls.connect()
 
         branch_map = {}
-        branches_dict = list(cls.__branches.find())
+        branches_dict = list(cls.__branches.find({"is_active": True}))
         branches = [Branch.build(branch, branch_map) for branch in branches_dict]
 
         leaf_map = {}
-        leaf_dicts = list(cls.__leaves.find())
+        leaf_dicts = list(cls.__leaves.find({"is_active": True}))
         leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
 
         return branches, leaves, branch_map, leaf_map
@@ -329,6 +329,32 @@ class Database:
             print("Did not complete branch deletion.")
 
     @classmethod
+    def disable_branch(cls, branch):
+        cls.connect()
+        disabled_branch = cls.__branches.update_one(
+            {"_id": branch.id},
+            {"$set": {"is_active": False}}
+        )
+
+        if disabled_branch:
+            print("Disabled branch")
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc),
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "target_id": branch.id,
+                "target_name": branch.name,
+                "task": "Disable Branch",
+                "edit": {
+                    "before": {"is_active": True},
+                    "after": {"is_active": False}
+                }
+            }
+            cls.update_log(log_payload)
+        else:
+            print("Did not disable branch.")
+
+    @classmethod
     def save_leaf(cls, leaf_dict, leaf_map):
         """ This uses a filter to see if there is a leaf with the same branch, cat and subcat. If not, it adds, if so, it edits. """
         cls.connect()
@@ -391,6 +417,32 @@ class Database:
             cls.update_log(log_payload)
         else:
             print("Did not complete leaf deletion.")
+
+    @classmethod
+    def disable_leaf(cls, leaf): # FIXME can be simplified with branch/leaf
+        cls.connect()
+        disabled_leaf = cls.__leaves.update_one(
+            {"_id": leaf.id},
+            {"$set": {"is_active": False}}
+        )
+
+        if disabled_leaf:
+            print("Disabled leaf")
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc),
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "target_id": leaf.id,
+                "target_name": leaf.subcategory,
+                "task": "Disable Leaf",
+                "edit": {
+                    "before": {"is_active": True},
+                    "after": {"is_active": False}
+                }
+            }
+            cls.update_log(log_payload)
+        else:
+            print("Did not disable leaf.")
 
     @classmethod
     def rebuild_leaves(cls):

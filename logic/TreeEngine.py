@@ -186,6 +186,17 @@ class TreeEngine:
         return delete_name
 
     @classmethod
+    def disable_branch(cls, branch_id):
+        from data.Database import Database
+        branch_id = ObjectId(branch_id)
+        disable_branch = cls.lookup_branch(branch_id)
+        disable_name = disable_branch.name
+
+        Database.disable_branch(disable_branch)
+        cls.all_branches = [branch for branch in cls.all_branches if branch.id != branch_id]
+        return disable_name
+
+    @classmethod
     def save_leaf(cls, leaf_dict):
         from data.Database import Database
         leaf = Database.save_leaf(leaf_dict, cls.leaf_map)
@@ -206,3 +217,10 @@ class TreeEngine:
         delete_leaf = cls.lookup_leaf(ObjectId(leaf_id))
         Database.delete_leaf(delete_leaf)
         cls.all_leaves.remove(delete_leaf)
+
+    @classmethod
+    def disable_leaf(cls, leaf_id):
+        from data.Database import Database
+        disable_leaf = cls.lookup_leaf(ObjectId(leaf_id))
+        Database.disable_leaf(disable_leaf)
+        cls.all_leaves.remove(disable_leaf)

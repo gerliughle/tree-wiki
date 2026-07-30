@@ -30,26 +30,28 @@
 
                         <td>
                             {% if "Branch" in log["task"] %}
-                                <a class="btn" href="/show_branch?branch={{ log.target_id }}">{{ log["target_name"] }}</a>
+                                <a class="btn"
+                                   href="/show_branch?branch={{ log.target_id }}">{{ log["target_name"] }}</a>
                             {% elif "User" in log["task"] %}
                                 <form method="POST" action="/edit_user">
-                                <input type="hidden" name="user_selection" value="{{ log.target_name }}">
+                                    <input type="hidden" name="user_selection" value="{{ log.target_name }}">
                                     <button class="btn" type="submit">{{ log["target_name"] }}</button>
                                 </form>
-
+                            {% elif "Leaf" in log["task"] %}
+                                '{{ log["target_name"] }}' Leaf
                             {% endif %}
-                            </td>
-                    <td>
-                        {% if "Branch" in log["task"] or "Leaf" in log["task"] %}
-                        <form method="POST" action="/revert_change">
-                            <input type="hidden" name="revert_id" value="{{ log["_id"] }}">
-                            <button class="btn btn-outline-warning" type="submit">Revert</button>
-                        </form>
-                        {% endif %}
-                    </td>
-                    <td>
-                        {{ log["edit"] }}
-                    </td>
+                        </td>
+                        <td>
+                            {% if "Branch" in log["task"] or "Leaf" in log["task"] %}
+                                <form method="POST" action="/revert_change">
+                                    <input type="hidden" name="revert_id" value="{{ log["_id"] }}">
+                                    <button class="btn btn-outline-warning" type="submit">Revert</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ log["edit"] }}
+                        </td>
 
                     </tr>
                 {% endfor %}

@@ -1,0 +1,21 @@
+{% extends "template.html" %}
+{% block title %}Confirm Leaf Disable{% endblock %}
+{% block content %}
+    <div class="container col-md-4 col-8">
+
+        <form method="POST" action="/do_disable_leaf">
+            <input type="hidden" name="leaf_id" value="{{ disable_leaf.id }}">
+            <h3 class="my-2">Are you sure you want to disable the {{ disable_leaf.category }} - {{ disable_leaf.subcategory }} Leaf from {{ branch.name }}?</h3>
+            <span class="text-info">Warning, you cannot undo this.</span>
+
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-warning">Disable</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

@@ -110,7 +110,7 @@ class EditRoutes:
     @staticmethod
     @__app.route('/select_delete_branch')
     @login_required
-    @UserManager.role_required("admin", "editor")
+    @UserManager.role_required("admin")
     def delete_branch():
         all_branches = TreeEngine.get_branches()
         return render_template("edit/select_delete_branch.html", branches=all_branches)
@@ -118,7 +118,7 @@ class EditRoutes:
     @staticmethod
     @__app.route('/check_delete_branch', methods=['POST'])
     @login_required
-    @UserManager.role_required("admin", "editor")
+    @UserManager.role_required("admin")
     def check_delete_branch():
         delete_branch = ""
         if "select_branch_id" in request.form:
@@ -129,13 +129,35 @@ class EditRoutes:
     @staticmethod
     @__app.route('/do_delete_branch', methods=['POST'])
     @login_required
-    @UserManager.role_required("admin", "editor")
+    @UserManager.role_required("admin")
     def do_delete_branch():
         delete_name = ""
         if "branch_id" in request.form:
             delete_branch_id = ObjectId(request.form["branch_id"])
             delete_name = TreeEngine.delete_branch(delete_branch_id)
         return render_template("edit/confirm_branch_deleted.html", delete_name=delete_name)
+
+    @staticmethod
+    @__app.route('/check_disable_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
+    def check_disable_branch():
+        disable_branch = ""
+        if "select_branch_id" in request.form:
+            disable_branch = TreeEngine.lookup_branch(ObjectId(request.form["select_branch_id"]))
+        print(f"Disable branch name: {disable_branch.name=}")
+        return render_template("edit/check_disable_branch.html", disable_branch=disable_branch)
+
+    @staticmethod
+    @__app.route('/do_disable_branch', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
+    def do_disable_branch():
+        disable_name = ""
+        if "branch_id" in request.form:
+            disable_branch_id = ObjectId(request.form["branch_id"])
+            disable_name = TreeEngine.disable_branch(disable_branch_id)
+        return render_template("edit/confirm_branch_disabled.html", disable_name=disable_name)
 
     @staticmethod
     @__app.route('/select_edit_leaf')
@@ -257,7 +279,7 @@ class EditRoutes:
     @staticmethod
     @__app.route('/check_delete_leaf', methods=['POST'])
     @login_required
-    @UserManager.role_required("admin", "editor")
+    @UserManager.role_required("admin")
     def check_delete_leaf():
         delete_leaf = ""
         if "leaf_id" in request.form:
@@ -272,7 +294,7 @@ class EditRoutes:
     @staticmethod
     @__app.route('/do_delete_leaf', methods=['POST'])
     @login_required
-    @UserManager.role_required("admin", "editor")
+    @UserManager.role_required("admin")
     def do_delete_leaf():
         delete_leaf_id = ""
         if "leaf_id" in request.form:
@@ -282,3 +304,32 @@ class EditRoutes:
         TreeEngine.delete_leaf(delete_leaf_id)
 
         return render_template("edit/confirm_leaf_deleted.html", branch=branch)
+
+    @staticmethod
+    @__app.route('/check_disable_leaf', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
+    def check_disable_leaf():
+        disable_leaf = ""
+        if "leaf_id" in request.form:
+            disable_leaf = TreeEngine.lookup_leaf(ObjectId(request.form["leaf_id"]))
+        if disable_leaf:
+            print("Disable leaf selected")
+        else:
+            print("No leaf found to delete.")
+        branch = TreeEngine.lookup_branch(disable_leaf.branch_id)
+        return render_template("edit/check_disable_leaf.html", disable_leaf=disable_leaf, branch=branch)
+
+    @staticmethod
+    @__app.route('/do_disable_leaf', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin", "editor")
+    def do_disable_leaf():
+        disable_leaf_id = ""
+        if "leaf_id" in request.form:
+            disable_leaf_id = ObjectId(request.form["leaf_id"])
+        disable_leaf = TreeEngine.lookup_leaf(disable_leaf_id)
+        branch = TreeEngine.lookup_branch(disable_leaf.branch_id)
+        TreeEngine.disable_leaf(disable_leaf_id)
+
+        return render_template("edit/confirm_leaf_disabled.html", branch=branch)
