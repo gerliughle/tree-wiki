@@ -65,10 +65,12 @@ Done:
 
 To-Do:
 * Add disable features for branches/leaves:
-* Dashboard not providing name for leaf tragets
   * Update pull logic to skip disabled stuff
   * Check care guide/parenting logic for disabled items
   * How do i disable leaves that have no-phase killswitches?
+  * How do i delete branches with children? So many edge cases. 
+  * Add disable button to dashboard for new accounts, revert for everything else
+  * Re-enable for disabled things
 * Finish reverting, before/after states. Look for tricky situations.. parents, children attached leaves, etc
 * Leaf collapse button
 * Admin Log - pagination
@@ -77,7 +79,6 @@ To-Do:
 * Alternate User Id to allow for id changing.. see flask-login
 * Edit page default text should be old text.
 * Dark mode - svg color tweaks
-
 * User edit mode - change role, disable, delete users. maybe that's only allowed for even another role
 * Dark/Light Mode - color palette adjustments
 * Category Collapse - arrow direction change
