@@ -1,6 +1,7 @@
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
+from logic.AdminManager import AdminManager
 from flask import render_template, request, redirect, url_for
 from flask_login import current_user, login_required
 from bson import ObjectId
@@ -55,11 +56,6 @@ class EditRoutes:
         branch = TreeEngine.save_branch(branch_dict)
         return render_template("edit/confirm_branch_created.html", branch=branch)
 
-
-
-    # FIXME URGENT: There is something borked. I think it's editing the wrong branch, and maybe
-    # mixing the parent branch with the edit branch.
-    # Trace the branch id's that are passed.
     @staticmethod
     @__app.route('/select_edit_branch')
     @login_required
@@ -156,7 +152,7 @@ class EditRoutes:
         disable_name = ""
         if "branch_id" in request.form:
             disable_branch_id = ObjectId(request.form["branch_id"])
-            disable_name = TreeEngine.disable_branch(disable_branch_id)
+            disable_name = TreeEngine.disable_enable_branch(disable_branch_id, active=False)
         return render_template("edit/confirm_branch_disabled.html", disable_name=disable_name)
 
     @staticmethod
@@ -189,7 +185,6 @@ class EditRoutes:
         }
         return render_template('edit/select_edit_leaf_type.html', **page_context)
 
-
     @staticmethod
     @__app.route('/edit_leaf', methods=['POST'])
     @login_required
@@ -199,7 +194,7 @@ class EditRoutes:
 
         Either clone, edit, or create new.
         leaf: clone source, edit source, or None
-        source_branch: branch th leaf is sourced from, or being edited, or None.
+        source_branch: branch the leaf is sourced from, or being edited, or None.
         target_branch: branch_id for this leaf. this is selected in step 1. if this matches source, you're editing
         category_name: if creating a new subcat, this will exist. there will be no leaf_id or source branch.
         """
@@ -229,11 +224,16 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_edit_leaf():
-        """ FIXME more validation """
+        """ FIXME more validation
+
+        leaf_id is added if it is existing. Then in save_leaf, it uses that to determine different approach.
+        It seems like this could be improved to only send changed data instead of all of it, but needs form update."""
+
         branch_id = ""
         category = ""
         subcategory = ""
 
+        leaf_id = ObjectId(request.form.get("leaf_id"))
         if "branch_id" in request.form:
             branch_id = ObjectId(request.form["branch_id"])
         if "category" in request.form:
@@ -267,6 +267,8 @@ class EditRoutes:
             "seasons": seasons,
             "entries": entries
         }
+        if leaf_id:
+            leaf_dict["_id"] = leaf_id
         leaf = TreeEngine.save_leaf(leaf_dict)
         if leaf:
             print(f"leaf created. Id: {leaf.id}")
@@ -330,6 +332,38 @@ class EditRoutes:
             disable_leaf_id = ObjectId(request.form["leaf_id"])
         disable_leaf = TreeEngine.lookup_leaf(disable_leaf_id)
         branch = TreeEngine.lookup_branch(disable_leaf.branch_id)
-        TreeEngine.disable_leaf(disable_leaf_id)
+        TreeEngine.disable_enable_leaf(disable_leaf_id, active=False)
 
         return render_template("edit/confirm_leaf_disabled.html", branch=branch)
+
+    @staticmethod
+    @__app.route('/log_action', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin")
+    def log_action():
+        """ Takes the action and log_id from admin log. Route to relevant next step. """
+        target_type = ""
+        active = True
+        log_id = request.form.get("log_id")
+        log = AdminManager.get_audit_entry(ObjectId(log_id))
+        target_id = ObjectId(log["target_id"])
+        if "Branch" in log["task"]:
+            target_type = "branch"
+        elif "Leaf" in log["task"]:
+            target_type = "leaf"
+        elif "User" in log["task"]:
+            target_type = "user"
+        action = request.form.get("action")
+        if action == "log_enable":
+            active = True
+        elif action == "log_disable":
+            active = False
+        if target_type == "branch":
+                TreeEngine.disable_enable_branch(target_id, active)
+
+        elif action == "log_delete":
+            if target_type == "branch":
+                delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
+                return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
+        return redirect(url_for("admin_dashboard"))
+

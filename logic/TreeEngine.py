@@ -101,7 +101,7 @@ class TreeEngine:
         return care_guide, breadcrumbs, category_list
 
     @classmethod
-    def get_inherited_leaves(cls, branch_id): # FIXME doesn't work in disabled
+    def get_inherited_leaves(cls, branch_id):
 
         subcategory_list = set()  # subcategories that already have a leaf
         inherited_leaves = []  # list of inherited leaves only
@@ -133,12 +133,12 @@ class TreeEngine:
         children_list = []
         current_branch = cls.lookup_branch(branch_id)
         for branch in cls.active_branches:
-            if branch_id == branch.parent_id: # FIXME doesn't work with disabled
+            if branch_id == branch.parent_id:
                 children_list.append(branch)
         return children_list
 
     @classmethod
-    def get_tree(cls): # FIXME doesn't work with disabled
+    def get_tree(cls):
 
         tree_builder = {}
         tree_map = []
@@ -184,22 +184,26 @@ class TreeEngine:
         return delete_name
 
     @classmethod
-    def disable_branch(cls, branch_id):
+    def disable_enable_branch(cls, branch_id, active=True):
         from data.Database import Database
         branch_id = ObjectId(branch_id)
-        disable_branch = cls.lookup_branch(branch_id)
-        disable_name = disable_branch.name
-
-        Database.disable_branch(disable_branch)
-        cls.active_branches = [branch for branch in cls.active_branches if branch.id != branch_id] # resets all_branches
-        return disable_name
+        branch = cls.lookup_branch(branch_id)
+        branch_dict = {"_id": branch_id,
+                       "is_active": active}
+        Database.save_branch(branch_dict, cls.branch_map)
+        branch.is_active = active
+        if active and branch not in cls.active_branches:
+            cls.active_branches.append(branch)
+        else:
+            cls.active_branches = [branch for branch in cls.active_branches if branch.id != branch_id] # resets all_branches
+        return branch.name
 
     @classmethod
     def save_leaf(cls, leaf_dict):
         from data.Database import Database
         leaf = Database.save_leaf(leaf_dict, cls.leaf_map)
 
-        # this check if leaf exists in all_leaves already, in case of edit vs creation
+        # this check if leaf exists in all_leaves already, in case of edit vs creation.
         match_index = next((i for i, all_leaf in enumerate(cls.active_leaves) if all_leaf.id == leaf.id), None)
         if match_index is not None:
             cls.active_leaves[match_index] = leaf
@@ -216,9 +220,17 @@ class TreeEngine:
         Database.delete_leaf(delete_leaf)
         cls.active_leaves.remove(delete_leaf)
 
+
     @classmethod
-    def disable_leaf(cls, leaf_id):
+    def disable_enable_leaf(cls, leaf_id, active=True):
         from data.Database import Database
-        disable_leaf = cls.lookup_leaf(ObjectId(leaf_id))
-        Database.disable_leaf(disable_leaf)
-        cls.active_leaves.remove(disable_leaf)
+        leaf_id = ObjectId(leaf_id)
+        leaf = cls.lookup_branch(leaf_id)
+        leaf_dict = {"_id": leaf_id,
+                       "is_active": active}
+        Database.save_leaf(leaf_dict, cls.leaf_map)
+        leaf.is_active = active
+        if active and leaf not in cls.active_leaves:
+            cls.active_leaves.append(leaf)
+        else:
+            cls.active_leaves = [leaf for leaf in cls.active_leaves if leaf.id != leaf_id] #

@@ -244,15 +244,22 @@ class Database:
         """ This either saves or creates a new branch. """
         cls.connect()
 
-        # I receive a dict wtih either no id, and the dict to create
-        # or, an id and changes.
+        # I receive a dict with either no id and the dict to create or an existing id and edits.
+        # or an id and a disable/enable request
         branch = False
         query_filter = {}
+        task = ""
         if branch_dict.get("_id", False):
             branch_id = branch_dict["_id"]
             query_filter["_id"] = branch_id
             branch_dict.pop("_id")
-            task = "Edit Branch"
+            if "is_active" in branch_dict:
+                if branch_dict["is_active"] is True:
+                    task = "Enable Branch"
+                elif branch_dict["is_active"] is False:
+                    task = "Disable Branch"
+            else:
+                task = "Edit Branch"
             branch = TreeEngine.lookup_branch(branch_id)
         else:
             query_filter["_id"] = ObjectId()
@@ -287,6 +294,33 @@ class Database:
         cls.update_log(log_payload)
 
         return Branch.build(new_branch_doc, branch_map)
+    #
+    # @classmethod
+    # def disable_branch(cls, branch):
+    #     cls.connect()
+    #     disabled_branch = cls.__branches.update_one(
+    #         {"_id": branch.id},
+    #         {"$set": {"is_active": False}}
+    #     )
+    #
+    #     if disabled_branch:
+    #         print("Disabled branch")
+    #         log_payload = {
+    #             "timestamp": datetime.now(timezone.utc),
+    #             "user_id": current_user.id,
+    #             "username": current_user.username,
+    #             "target_id": branch.id,
+    #             "target_name": branch.name,
+    #             "task": "Disable Branch",
+    #             "edit": {
+    #                 "before": {"is_active": True},
+    #                 "after": {"is_active": False}
+    #             }
+    #         }
+    #         cls.update_log(log_payload)
+    #         branch.is_active = False  # update local Object
+    #     else:
+    #         print("Did not disable branch.")
 
     @classmethod
     def delete_branch(cls, branch, children):
@@ -330,54 +364,36 @@ class Database:
         else:
             print("Did not complete branch deletion.")
 
-    @classmethod
-    def disable_branch(cls, branch):
-        cls.connect()
-        disabled_branch = cls.__branches.update_one(
-            {"_id": branch.id},
-            {"$set": {"is_active": False}}
-        )
-
-        if disabled_branch:
-            print("Disabled branch")
-            log_payload = {
-                "timestamp": datetime.now(timezone.utc),
-                "user_id": current_user.id,
-                "username": current_user.username,
-                "target_id": branch.id,
-                "target_name": branch.name,
-                "task": "Disable Branch",
-                "edit": {
-                    "before": {"is_active": True},
-                    "after": {"is_active": False}
-                }
-            }
-            cls.update_log(log_payload)
-            branch.is_active = False # update local Object
-        else:
-            print("Did not disable branch.")
-
 
     @classmethod
     def save_leaf(cls, leaf_dict, leaf_map):
         """ This uses a filter to see if there is a leaf with the same branch, cat and subcat. If not, it adds, if so, it edits. """
         cls.connect()
+        query_filter = {}
+        task = ""
+        leaf = False
 
-        query_filter = {
-            "branch_id": leaf_dict["branch_id"],
-            "category": leaf_dict["category"],
-            "subcategory": leaf_dict["subcategory"],
-        }
+        if leaf_dict.get("_id", False):
+            leaf_id = leaf_dict["_id"]
+            query_filter["_id"] = leaf_id
+            leaf_dict.pop("_id")
+            if "is_active" in leaf_dict:
+                if leaf_dict["is_active"] is True:
+                    task = "Enable Leaf"
+                elif leaf_dict["is_active"] is False:
+                    task = "Disable Leaf"
+            else:
+                task = "Edit Leaf"
+            leaf = TreeEngine.lookup_leaf(leaf_id)
+
+        else:
+            query_filter["_id"] = ObjectId()
+            task = "Create Leaf"
+
 
         # Replaces everything else.
         update_payload = {
-            "$set": {
-                "author_id": leaf_dict["author_id"],
-                "is_active": leaf_dict["is_active"],
-                "branch_id": leaf_dict["branch_id"],
-                "seasons": leaf_dict["seasons"],
-                "entries": leaf_dict["entries"]
-            }
+            "$set": leaf_dict
         }
 
         new_leaf_doc = cls.__leaves.find_one_and_update(query_filter,
@@ -391,10 +407,16 @@ class Database:
             "username": current_user.username,
             "target_id": new_leaf_doc["_id"],
             "target_name": new_leaf_doc["subcategory"],
-            "task": "Create/Edit Leaf",
-            "edit": leaf_dict
+            "task": task,
+            "edit": {"before": {},
+                     "after": leaf_dict}
         }
+        if leaf:
+            for edit in leaf_dict:
+                log_payload["edit"]["before"][edit] = (getattr(leaf, edit))
+
         print(f"{log_payload=}")
+
         cls.update_log(log_payload)
 
         return Leaf.build(new_leaf_doc, leaf_map)

@@ -17,6 +17,8 @@
                     entries, with the intention that they would apply to different phases of growth. </span>
 
             {% elif category_name is none and source_branch.id == target_branch.id %}
+                <!-- Editing existing. Passing on leaf_id -->
+                <input type="hidden" name="leaf_id" value="{{ leaf.id }}"/>
                 <h3 class="col-lg-8">Editing existing leaf. </h3>
                 <h5>'{{ leaf.category }}: {{ leaf.subcategory }}' Leaf
                     for {{ target_branch.name }}.</h5>

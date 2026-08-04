@@ -12,12 +12,12 @@
                     <th scope="col">Task</th>
                     <th scope="col">User</th>
                     <th scope="col">Target</th>
-                    <th scope="col">Revert Change</th>
+                    <th scope="col">Action</th>
                     <th scope="col">Log</th>
                 </tr>
                 {% for log in audit_log|reverse %}
                     <tr>
-                        <th scope="row"></th>
+                        <th scope="row">{{ loop.index }}</th>
                         <td>{{ log["timestamp"].strftime('%m/%d/%Y %H:%M:%S') }}</td>
                         <td>{{ log["task"] }}</td>
 
@@ -32,22 +32,37 @@
                             {% if "Branch" in log["task"] %}
                                 <a class="btn"
                                    href="/show_branch?branch={{ log.target_id }}">{{ log["target_name"] }}</a>
+                            {% elif "Leaf" in log["task"] %}
+                                '{{ log["target_name"] }}' Leaf
                             {% elif "User" in log["task"] %}
                                 <form method="POST" action="/edit_user">
                                     <input type="hidden" name="user_selection" value="{{ log.target_name }}">
                                     <button class="btn" type="submit">{{ log["target_name"] }}</button>
                                 </form>
-                            {% elif "Leaf" in log["task"] %}
-                                '{{ log["target_name"] }}' Leaf
                             {% endif %}
                         </td>
                         <td>
-                            {% if "Branch" in log["task"] or "Leaf" in log["task"] %}
-                                <form method="POST" action="/revert_change">
-                                    <input type="hidden" name="revert_id" value="{{ log["_id"] }}">
-                                    <button class="btn btn-outline-warning" type="submit">Revert</button>
-                                </form>
-                            {% endif %}
+                            <form method="POST" action="/log_action">
+                                <input type="hidden" name="log_id" value="{{ log["_id"] }}">
+                                {% if "Create" in log["task"] or "Register" in log["task"] or "Enable" in log["task"] %}
+                                    <button class="btn btn-sm btn-outline-warning" type="submit"
+                                            name="action" value="log_disable">Dsbl
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" name="action"
+                                            value="log_delete">
+                                        Dlt
+                                    </button>
+                                {% elif "Disable" in log["task"] %}
+                                    <button class="btn btn-sm btn-outline-success" type="submit"
+                                            name="action" value="log_enable">Enbl
+                                    </button>
+                                {% elif "Edit" in log["task"] %}
+                                    <button class="btn btn-sm btn-outline-info" type="submit" name="action"
+                                            value="log_revert">
+                                        Rvt
+                                    </button>
+                                {% endif %}
+                            </form>
                         </td>
                         <td>
                             {{ log["edit"] }}
