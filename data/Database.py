@@ -119,14 +119,16 @@ class Database:
         cls.connect()
 
         branch_map = {}
-        branches_dict = list(cls.__branches.find({"is_active": True}))
+        branches_dict = list(cls.__branches.find())
         branches = [Branch.build(branch, branch_map) for branch in branches_dict]
+        active_branches = [branch for branch in branches if branch.is_active]
 
         leaf_map = {}
         leaf_dicts = list(cls.__leaves.find({"is_active": True}))
         leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
+        active_leaves = [leaf for leaf in leaves if leaf.is_active]
 
-        return branches, leaves, branch_map, leaf_map
+        return branches, active_branches, branch_map, leaves, active_leaves, leaf_map
 
     @classmethod
     def read_users(cls):
@@ -351,8 +353,10 @@ class Database:
                 }
             }
             cls.update_log(log_payload)
+            branch.is_active = False # update local Object
         else:
             print("Did not disable branch.")
+
 
     @classmethod
     def save_leaf(cls, leaf_dict, leaf_map):

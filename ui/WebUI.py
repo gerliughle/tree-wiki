@@ -105,6 +105,7 @@ class WebUI:
 
                 filtered_care_guide.append(filtered_leaf)
         branch_has_image = branch.has_image
+        print(f"{branch.name} has image: {branch_has_image}")
         children = TreeEngine.get_children_of_branch(branch.id)
         all_seasons = ["Spring", "Summer", "Fall", "Winter"]
         page_context = {

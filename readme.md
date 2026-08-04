@@ -61,18 +61,24 @@ Done:
 * Responsive design for no picture
 * Set up git for dev/main
 * Add routes/buttons/page designs. Only enable delete for admins
+* * Add disable features for branches/leaves:
+  * Update pull logic to skip disabled stuff - pretty sure is done
+  * Updated branch parent_id to check is_active. If so, checks up the chain.
+  * Updated read_data to pull all/active branches and leaves. This keeps disabled branches in memory for gap filling
 
 
 To-Do:
 * Add disable features for branches/leaves:
-  * Update pull logic to skip disabled stuff
-  * Check care guide/parenting logic for disabled items
-  * How do i disable leaves that have no-phase killswitches?
-  * How do i delete branches with children? So many edge cases. 
-  * Add disable button to dashboard for new accounts, revert for everything else
-  * Re-enable for disabled things
+    * How do i disable leaves that have no-phase killswitches?
+    * How do i disable branches with children? Delete resets their parent. If disable.. # I think this is fixed with new logic
+      * if child = disabled, get children of THAT branch and add them? 
+    * def get_care_guid # i think this is fixed iwth new logic
+      * for breadcrumbs, for setting next round, if parent is disabled, use THAT parent? 
+    * Add disable button to dashboard for new accounts, revert for everything else
+    * Re-enable for disabled things
 * Finish reverting, before/after states. Look for tricky situations.. parents, children attached leaves, etc
 * Leaf collapse button
+* Fix leaf breadcrumb.. not entire crumb but leaf-chain-specifically
 * Admin Log - pagination
 * change password (require fresh login)
 * forget password

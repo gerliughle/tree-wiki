@@ -5,7 +5,9 @@ from bson import ObjectId
 
 class TreeEngine:
     all_branches = []
+    active_branches = []
     all_leaves = []
+    active_leaves = []
     branch_map = None
     leaf_map = None
 
@@ -24,17 +26,18 @@ class TreeEngine:
     def __init__(cls):
         """ Generate the branch and leaf objects. """
         from data.Database import Database
-        cls.all_branches, cls.all_leaves, cls.branch_map, cls.leaf_map = Database.read_data()
-        print(f"Branches loaded: {len(cls.all_branches)}")
-        print(f"Leaves loaded: {len(cls.all_leaves)}")
+        cls.active_branches, cls.active_branches, cls.branch_map, cls.active_leaves, cls.active_leaves, cls.leaf_map \
+            = Database.read_data()
+        print(f"Branches loaded: {len(cls.active_branches)}")
+        print(f"Leaves loaded: {len(cls.active_leaves)}")
 
     @classmethod
     def get_leaves(cls):
-        return cls.all_leaves
+        return cls.active_leaves
 
     @classmethod
     def get_branches(cls):
-        return cls.all_branches
+        return cls.active_branches
 
     @classmethod
     def get_client(cls):
@@ -61,7 +64,7 @@ class TreeEngine:
         """ Return leaves that are for branch_id.
         Database is all_branches, all_leaves, branch_map, leaf_map"""
         leaf_matches = []
-        for leaf in cls.all_leaves:
+        for leaf in cls.active_leaves:
             if leaf.branch_id == branch_id:
                 leaf_matches.append(leaf)
         return leaf_matches
@@ -85,25 +88,20 @@ class TreeEngine:
 
         while current_branch is not None:
             breadcrumbs.insert(0, current_branch)
-            # print(f"Checking {current_branch.name}")
-            current_leaves = cls.get_leaves_for_branch(current_branch._id)
+            current_leaves = cls.get_leaves_for_branch(current_branch.id)
 
             for leaf in current_leaves:
                 if leaf.subcategory not in subcategory_list:
                     subcategory_list.add(leaf.subcategory)
                     care_guide.append(leaf)
-                    # print(f"Added {leaf.subcategory} to leaf guide.")
                 if leaf.category not in category_list:
                     category_list.append(leaf.category)
-                else:
-                    # print(f"Not using {current_branch.name} {leaf.subcategory}. Subcategory already used.")
-                    pass
+            current_branch = cls.lookup_branch(current_branch.parent_id) # Untested
 
-            current_branch = cls.lookup_branch(current_branch.parent_id)
         return care_guide, breadcrumbs, category_list
 
     @classmethod
-    def get_inherited_leaves(cls, branch_id):
+    def get_inherited_leaves(cls, branch_id): # FIXME doesn't work in disabled
 
         subcategory_list = set()  # subcategories that already have a leaf
         inherited_leaves = []  # list of inherited leaves only
@@ -134,21 +132,21 @@ class TreeEngine:
     def get_children_of_branch(cls, branch_id):
         children_list = []
         current_branch = cls.lookup_branch(branch_id)
-        for branch in cls.all_branches:
-            if branch_id == branch.parent_id:
+        for branch in cls.active_branches:
+            if branch_id == branch.parent_id: # FIXME doesn't work with disabled
                 children_list.append(branch)
         return children_list
 
     @classmethod
-    def get_tree(cls):
+    def get_tree(cls): # FIXME doesn't work with disabled
 
         tree_builder = {}
         tree_map = []
 
-        for branch in cls.all_branches: # creates node dict entries with empty child lists
+        for branch in cls.active_branches: # creates node dict entries with empty child lists
             tree_builder[str(branch.id)] = {"node": branch, "children": []}
 
-        for branch in cls.all_branches:
+        for branch in cls.active_branches:
             if branch.parent_id is None: # puts roots into the actual map.
                 tree_map.append(tree_builder[str(branch.id)])
             else:
@@ -160,12 +158,12 @@ class TreeEngine:
         from data.Database import Database
         branch = Database.save_branch(branch_dict, cls.branch_map)
 
-        match_index = next((i for i, all_branch in enumerate(cls.all_branches) if all_branch.id == branch.id), None)
+        match_index = next((i for i, all_branch in enumerate(cls.active_branches) if all_branch.id == branch.id), None)
         if match_index is not None:
-            cls.all_branches[match_index] = branch
+            cls.active_branches[match_index] = branch
             print("Branch edited")
         else:
-            cls.all_branches.append(branch)
+            cls.active_branches.append(branch)
             print("Branch Created")
 
         return branch
@@ -181,8 +179,8 @@ class TreeEngine:
 
         Database.delete_branch(delete_branch, children)
 
-        cls.all_leaves = [leaf for leaf in cls.all_leaves if leaf.branch_id != branch_id]
-        cls.all_branches = [branch for branch in cls.all_branches if branch.id != branch_id]
+        cls.active_leaves = [leaf for leaf in cls.active_leaves if leaf.branch_id != branch_id]
+        cls.active_branches = [branch for branch in cls.active_branches if branch.id != branch_id]
         return delete_name
 
     @classmethod
@@ -193,7 +191,7 @@ class TreeEngine:
         disable_name = disable_branch.name
 
         Database.disable_branch(disable_branch)
-        cls.all_branches = [branch for branch in cls.all_branches if branch.id != branch_id]
+        cls.active_branches = [branch for branch in cls.active_branches if branch.id != branch_id] # resets all_branches
         return disable_name
 
     @classmethod
@@ -202,12 +200,12 @@ class TreeEngine:
         leaf = Database.save_leaf(leaf_dict, cls.leaf_map)
 
         # this check if leaf exists in all_leaves already, in case of edit vs creation
-        match_index = next((i for i, all_leaf in enumerate(cls.all_leaves) if all_leaf.id == leaf.id), None)
+        match_index = next((i for i, all_leaf in enumerate(cls.active_leaves) if all_leaf.id == leaf.id), None)
         if match_index is not None:
-            cls.all_leaves[match_index] = leaf
+            cls.active_leaves[match_index] = leaf
             print("Leaf edited")
         else:
-            cls.all_leaves.append(leaf)
+            cls.active_leaves.append(leaf)
             print("Leaf Created")
         return leaf
 
@@ -216,11 +214,11 @@ class TreeEngine:
         from data.Database import Database
         delete_leaf = cls.lookup_leaf(ObjectId(leaf_id))
         Database.delete_leaf(delete_leaf)
-        cls.all_leaves.remove(delete_leaf)
+        cls.active_leaves.remove(delete_leaf)
 
     @classmethod
     def disable_leaf(cls, leaf_id):
         from data.Database import Database
         disable_leaf = cls.lookup_leaf(ObjectId(leaf_id))
         Database.disable_leaf(disable_leaf)
-        cls.all_leaves.remove(disable_leaf)
+        cls.active_leaves.remove(disable_leaf)

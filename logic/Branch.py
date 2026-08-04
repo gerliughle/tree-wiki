@@ -1,8 +1,9 @@
 import os
 
+from logic.TreeEngine import TreeEngine
+
 
 class Branch:
-
     def __init__(self,
                  _id,
                  is_active,
@@ -18,7 +19,7 @@ class Branch:
         self.name = name
         self.description = description
         self.image = image
-        self.parent_id = parent_id
+        self.__parent_id = parent_id
         branch_map[_id] = self
 
     @classmethod
@@ -55,5 +56,13 @@ class Branch:
 
     @property
     def has_image(self):
-        file_path = os.path.join("static","assets","branch_img",self.image)
+        file_path = os.path.join("ui","static","assets","branch_img",self.image)
+        print(file_path)
         return os.path.exists(file_path)
+
+    @property
+    def parent_id(self):
+        parent = TreeEngine.lookup_branch(self.__parent_id)
+        while parent and not parent.is_active: # if the parent is disabled, look up its parent.
+            parent = TreeEngine.lookup_branch(parent.__parent_id)
+        return parent.id if parent else None
