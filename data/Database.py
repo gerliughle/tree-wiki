@@ -254,62 +254,6 @@ class Database:
 
 
     @classmethod
-    def save_leaf(cls, leaf_dict, leaf_map):
-        """ This uses a filter to see if there is a leaf with the same branch, cat and subcat. If not, it adds, if so, it edits. """
-        cls.connect()
-        query_filter = {}
-        task = ""
-        leaf = False
-
-        if leaf_dict.get("_id", False):
-            leaf_id = leaf_dict["_id"]
-            query_filter["_id"] = leaf_id
-            leaf_dict.pop("_id")
-            if "is_active" in leaf_dict:
-                if leaf_dict["is_active"] is True:
-                    task = "Enable Leaf"
-                elif leaf_dict["is_active"] is False:
-                    task = "Disable Leaf"
-            else:
-                task = "Edit Leaf"
-            leaf = TreeEngine.lookup_leaf(leaf_id)
-
-        else:
-            query_filter["_id"] = ObjectId()
-            task = "Create Leaf"
-
-
-        # Replaces everything else.
-        update_payload = {
-            "$set": leaf_dict
-        }
-
-        new_leaf_doc = cls.__leaves.find_one_and_update(query_filter,
-                                                        update_payload,
-                                                        upsert=True,
-                                                        return_document=ReturnDocument.AFTER)
-
-        log_payload = {
-            "timestamp": datetime.now(timezone.utc),
-            "user_id": current_user.id,
-            "username": current_user.username,
-            "target_id": new_leaf_doc["_id"],
-            "target_name": new_leaf_doc["subcategory"],
-            "task": task,
-            "edit": {"before": {},
-                     "after": leaf_dict}
-        }
-        if leaf:
-            for edit in leaf_dict:
-                log_payload["edit"]["before"][edit] = (getattr(leaf, edit))
-
-        print(f"{log_payload=}")
-
-        cls.update_log(log_payload)
-
-        return Leaf.build(new_leaf_doc, leaf_map)
-
-    @classmethod
     def delete_leaf(cls, leaf):
         cls.connect()
         delete_doc = cls.__leaves.delete_one({"_id": leaf.id})

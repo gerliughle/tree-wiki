@@ -29,5 +29,7 @@ data/database_restore.sh
 data/StaticData.py
 flask_session
 ui/flask_session
+backup/
 
 cloudflared-linux-arm64.deb
+
