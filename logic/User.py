@@ -37,6 +37,10 @@ class User(UserMixin):
         return self.__username
 
     @property
+    def name(self):
+        return self.__username
+
+    @property
     def id(self):
         return self._id
 
@@ -57,3 +61,7 @@ class User(UserMixin):
     @property
     def is_active(self):
         return self.__is_active
+
+    @property
+    def pw_hash(self):
+        return "HASH REDACTED"

@@ -52,67 +52,6 @@ class Database:
     def get_client(cls):
         return cls.__connection
 
-    #
-    # @classmethod
-    # def rebuild_data(cls):
-    #     """ Returns data to original hard coded sample data, as a backup. """
-    #     cls.connect()
-    #
-    #     print("This will restore data to original dummy data.")
-    #     print("Are you sure you want to continue? This is permanent. Mongo Backup and Restore is preferred. Y/N: ")
-    #     user_input = input().lower()
-    #     if user_input != "y":
-    #         "Exiting."
-    #         exit()
-    #     print("Restoring data.")
-    #
-    #     # Remake collections
-    #     cls.__branches = cls.__database.Branches
-    #     cls.__branches.drop()
-    #     cls.__branches = cls.__database.Branches
-    #     cls.__leaves.drop()
-    #     cls.__leaves = cls.__database.Leaves
-    #     cls.__users.drop()
-    #     cls.__users = cls.__database.Users
-    #
-    #     # The static data should upload dictionaries without id's.
-    #
-    #     # Users go first, so I can save josh's id and apply it to all entries.
-    #     all_users = StaticData.get_all_users()
-    #     admin_id = cls.__users.insert_one(all_users[0])
-    #     cls.__users.insert_one(all_users[1])
-    #
-    #     # This gets all the branch dicts from StaticData.
-    #     # As it uploads, it takes that branch's _id and sets it as parent
-    #     # for the next branch. It collects the id's into a list to be
-    #     # referenced when adding leaves.
-    #     all_branches = StaticData.get_all_branches()
-    #     parent_id = None
-    #     id_list = []
-    #     for branch in all_branches:
-    #         branch['parent_id'] = parent_id
-    #         branch['author_id'] = admin_id.inserted_id
-    #         current_branch = cls.__branches.insert_one(branch)
-    #         parent_id = current_branch.inserted_id
-    #         id_list.append(current_branch.inserted_id)
-    #
-    #     # This is more manual based on # of leaves per branch.
-    #     all_leaves = StaticData.get_all_leaves()
-    #     for leaf in all_leaves:
-    #         leaf['author_id'] = admin_id.inserted_id
-    #     for i in range(3):  # 3 trunk leaves
-    #         all_leaves[i]['branch_id'] = id_list[0]
-    #         cls.__leaves.insert_one(all_leaves[i])
-    #     # 0 broadleaf leaves
-    #     for i in range(3, 5):  # 2 deciduous broadleaf leaves
-    #         all_leaves[i]['branch_id'] = id_list[2]
-    #         cls.__leaves.insert_one(all_leaves[i])
-    #     all_leaves[5]['branch_id'] = id_list[3]
-    #     cls.__leaves.insert_one(all_leaves[5])
-    #     for i in range(6, 10):  # 4 JM leaves
-    #         all_leaves[i]['branch_id'] = id_list[4]
-    #         cls.__leaves.insert_one(all_leaves[i])
-
     @classmethod
     def read_data(cls):
         """ Reads data from database and builds objects. """
@@ -138,84 +77,19 @@ class Database:
         return users
 
     @classmethod
-    def read_audit(cls):
+    def read_audit(cls): # FIXME is this unused?
         cls.connect()
         return cls.__audit_log
 
-    # @classmethod
-    # def read_static_data(cls):
-    #     """ Reads StaticData, and calls build methods to create objects.
-    #
-    #     I think it gets a list of dicts, converts to objs while passing a map.
-    #
-    #     It may be broken now, with id management."""
-    #
-    #     branch_map = {}
-    #     branch_dicts = get_all_branches()
-    #     branches = [Branch.build(branch, branch_map) for branch in branch_dicts]
-    #
-    #     leaf_map = {}
-    #     leaf_dicts = get_all_leaves()
-    #     leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
-    #
-    #     return branches, leaves, branch_map, leaf_map
+    @classmethod
+    def get_audit_log(cls):
+        audit_dict = list(cls.__audit_log.find())
+        return audit_dict
 
     @classmethod
-    def save_user(cls, user_dict):
-        cls.connect()
-        print(f"Debug. {user_dict=}")
-        # Dict either has ID, and I edit, or no ID, and I create.
-        query_filter = {}
-        if user_dict.get("_id", False):
-            query_filter["_id"] = user_dict["_id"]
-            user_dict.pop("_id")
-            editor_id = current_user.id
-            editor_username = current_user.username
-            task = "Edit User"
-        else:
-            new_id = ObjectId()
-            query_filter["_id"] = new_id
-            task = "Register User"
-            editor_id = new_id
-            editor_username = user_dict["username"]
-
-        if not user_dict.get("role", False):
-            user_dict["role"] = "user"
-
-        update_payload = {
-            "$set": user_dict
-        }
-
-        new_user_doc = cls.__users.find_one_and_update(query_filter,
-                                                       update_payload,
-                                                       upsert=True,
-                                                       return_document=ReturnDocument.AFTER)
-
-        log_user_dict = user_dict.copy()
-        log_user_dict.pop("pw_hash", None)
-
-        log_payload = {
-            "timestamp": datetime.now(timezone.utc),
-            "user_id": editor_id,
-            "username": editor_username,
-            "target_id": new_user_doc["_id"],
-            "target_name": new_user_doc["username"],
-            "task": task,
-            "edit": log_user_dict
-        }
-        print(f"{log_payload=}")
-        cls.update_log(log_payload)
-
-        return User.build(new_user_doc)
-
-    @classmethod
-    def lookup_user(cls, attr, value):
-        cls.connect()
-        user_doc = cls.__users.find_one({attr: value})
-        if user_doc:
-            return User.build(user_doc)
-        else:
-            return None
+    def get_audit_entry(cls, entry_id):
+        audit_entry = cls.__audit_log.find_one({"_id": ObjectId(entry_id)})
+        return audit_entry
 
     @classmethod
     def update_log(cls, payload):
@@ -230,14 +104,166 @@ class Database:
             print(f"Log Updated at {formatted_date} - {formatted_time}")
 
     @classmethod
-    def get_audit_log(cls):
-        audit_dict = list(cls.__audit_log.find())
-        return audit_dict
+    def db_save(cls, save_dict, save_type, obj_type, obj_map=None):
+        """ Single save method that should allow all create/edit/disable/enable routing to one spot
+
+        Rather than figuring it out by analyzing the dict, just ask the caller.
+        save_dict should have _id if existing, if not it will create. otherwise have all changes
+        save_type should be "create", "edit", "disable", enable"
+        obj_type should be "user", "branch" or "leaf"
+        Deleting is handled separately.
+        """
+
+        query_filter = {}
+        save_obj = None
+        obj_name = ""
+        obj_db = None
+        current_user_id = None
+        current_username = ""
+
+
+        cls.connect()
+        print(f"Processing save request.")
+        print(f"{save_type=} {obj_type=}")
+
+
+        if save_type == "create":
+            query_filter["_id"] = ObjectId()
+        else:
+            save_id = save_dict["_id"]
+            query_filter["_id"] = save_id
+            save_dict.pop("_id")
+            if obj_type == "user":
+                save_obj = UserManager.lookup_user_id(save_id)
+            elif obj_type == "branch":
+                save_obj = TreeEngine.lookup_branch(save_id)
+            elif obj_type == "leaf":
+                save_obj = TreeEngine.lookup_leaf(save_id)
+            obj_name = save_obj.name
+
+        if obj_type == "user":
+            obj_db = cls.__users
+        if obj_type == "branch":
+            obj_db = cls.__branches
+        if obj_type == "leaf":
+            obj_db = cls.__leaves
+
+        update_payload = {
+            "$set": save_dict
+        }
+
+        new_obj_doc = obj_db.find_one_and_update(
+            query_filter,
+            update_payload,
+            upsert=True,
+            return_document=ReturnDocument.AFTER
+        )
+
+        if "pw_hash" in save_dict:
+            save_dict["pw_hash"] = "HASH REDACTED"
+
+        if not current_user.is_active:
+            current_user_id = new_obj_doc["_id"]
+            current_username = new_obj_doc["username"]
+        else:
+            current_user_id = current_user.id
+            current_username = current_user.username
+
+        log_payload = {
+            "timestamp": datetime.now(timezone.utc),
+            "user_id": current_user_id,
+            "username": current_username,
+            "target_id": new_obj_doc["_id"],
+            "target_name": obj_name,
+            "task": save_type.title(),
+            "obj_type": obj_type.title(),
+            "edit": {
+                "after": save_dict,
+                "before": {}
+            }
+        }
+
+        if save_obj:
+            for edit in save_dict:
+                log_payload["edit"]["before"][edit] = (getattr(save_obj, edit))
+
+        cls.update_log(log_payload)
+        if obj_type == "user":
+            print("Successfully updated user.")
+            return User.build(new_obj_doc)
+        elif obj_type == "branch":
+            print("Successfully updated branch.")
+            return Branch.build(new_obj_doc, obj_map)
+        elif obj_type == "leaf":
+            print("Successfully updated leaf.")
+            return Leaf.build(new_obj_doc, obj_map)
+        print("Error, did not complete save method.")
+        return None
+
+
+    #
+    #
+    #
+    # @classmethod
+    # def save_user(cls, user_dict):
+    #     cls.connect()
+    #     print(f"Debug. {user_dict=}")
+    #     # Dict either has ID, and I edit, or no ID, and I create.
+    #     query_filter = {}
+    #     if user_dict.get("_id", False):
+    #         query_filter["_id"] = user_dict["_id"]
+    #         user_dict.pop("_id")
+    #         editor_id = current_user.id
+    #         editor_username = current_user.username
+    #         task = "Edit User"
+    #     else:
+    #         new_id = ObjectId()
+    #         query_filter["_id"] = new_id
+    #         task = "Register User"
+    #         editor_id = new_id
+    #         editor_username = user_dict["username"]
+    #
+    #     if not user_dict.get("role", False):
+    #         user_dict["role"] = "user"
+    #
+    #     update_payload = {
+    #         "$set": user_dict
+    #     }
+    #
+    #     new_user_doc = cls.__users.find_one_and_update(query_filter,
+    #                                                    update_payload,
+    #                                                    upsert=True,
+    #                                                    return_document=ReturnDocument.AFTER)
+    #
+    #     log_user_dict = user_dict.copy()
+    #     log_user_dict.pop("pw_hash", None)
+    #
+    #     log_payload = {
+    #         "timestamp": datetime.now(timezone.utc),
+    #         "user_id": editor_id,
+    #         "username": editor_username,
+    #         "target_id": new_user_doc["_id"],
+    #         "target_name": new_user_doc["username"],
+    #         "task": task,
+    #         "edit": log_user_dict
+    #     }
+    #     print(f"{log_payload=}")
+    #     cls.update_log(log_payload)
+    #
+    #     return User.build(new_user_doc)
 
     @classmethod
-    def get_audit_entry(cls, entry_id):
-        audit_entry = cls.__audit_log.find_one({"_id": ObjectId(entry_id)})
-        return audit_entry
+    def lookup_user(cls, attr, value):
+        cls.connect()
+        user_doc = cls.__users.find_one({attr: value})
+        if user_doc:
+            return User.build(user_doc)
+        else:
+            return None
+
+
+
+
 
     @classmethod
     def save_branch(cls, branch_dict, branch_map):
@@ -294,7 +320,8 @@ class Database:
         cls.update_log(log_payload)
 
         return Branch.build(new_branch_doc, branch_map)
-    #
+
+
     # @classmethod
     # def disable_branch(cls, branch):
     #     cls.connect()
@@ -496,6 +523,7 @@ class Database:
 
     @classmethod
     def update_class(cls, class_db, property_dict):
+        """ Used when needing to add property to an entire class """
         cls.connect()
 
         for prop, default_value in property_dict.items():
@@ -513,6 +541,7 @@ class Database:
 
     @classmethod
     def add_authorship(cls):
+        """ Used to ensure all objects had author. """
         cls.connect()
         user = UserManager.lookup_user_name("josh")
         user_id = user.id

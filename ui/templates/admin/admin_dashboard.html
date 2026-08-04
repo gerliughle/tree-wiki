@@ -19,7 +19,7 @@
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
                         <td>{{ log["timestamp"].strftime('%m/%d/%Y %H:%M:%S') }}</td>
-                        <td>{{ log["task"] }}</td>
+                        <td>{{ log["task"] }} {{ log["obj_type"] }}</td>
 
                         <td>
                             <form method="POST" action="/edit_user">
@@ -29,12 +29,12 @@
                         </td>
 
                         <td>
-                            {% if "Branch" in log["task"] %}
+                            {% if log["obj_type"] == "Branch" %}
                                 <a class="btn"
                                    href="/show_branch?branch={{ log.target_id }}">{{ log["target_name"] }}</a>
-                            {% elif "Leaf" in log["task"] %}
+                            {% elif log["obj_type"] == "Leaf" %}
                                 '{{ log["target_name"] }}' Leaf
-                            {% elif "User" in log["task"] %}
+                            {% elif log["obj_type"] == "User" %}
                                 <form method="POST" action="/edit_user">
                                     <input type="hidden" name="user_selection" value="{{ log.target_name }}">
                                     <button class="btn" type="submit">{{ log["target_name"] }}</button>
@@ -44,7 +44,7 @@
                         <td>
                             <form method="POST" action="/log_action">
                                 <input type="hidden" name="log_id" value="{{ log["_id"] }}">
-                                {% if "Create" in log["task"] or "Register" in log["task"] or "Enable" in log["task"] %}
+                                {% if log["task"] == "Create" or log["task"] == "Enable" %}
                                     <button class="btn btn-sm btn-outline-warning" type="submit"
                                             name="action" value="log_disable">Dsbl
                                     </button>
@@ -52,11 +52,11 @@
                                             value="log_delete">
                                         Dlt
                                     </button>
-                                {% elif "Disable" in log["task"] %}
+                                {% elif log["task"] == "Disable" %}
                                     <button class="btn btn-sm btn-outline-success" type="submit"
                                             name="action" value="log_enable">Enbl
                                     </button>
-                                {% elif "Edit" in log["task"] %}
+                                {% elif log["task"] == "Edit" %}
                                     <button class="btn btn-sm btn-outline-info" type="submit" name="action"
                                             value="log_revert">
                                         Rvt

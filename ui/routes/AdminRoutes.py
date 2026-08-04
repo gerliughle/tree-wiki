@@ -3,12 +3,47 @@ from ui.WebUI import WebUI
 from logic.User import User
 from logic.AdminManager import AdminManager
 from logic.UserManager import UserManager
+from logic.TreeEngine import TreeEngine
 from flask import render_template, request, redirect, url_for
 from flask_login import LoginManager, login_required, login_user, logout_user
+from bson import ObjectId
 
 
 class AdminRoutes:
     __app = WebUI.get_app()
+
+    @staticmethod
+    @__app.route('/log_action', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin")
+    def log_action():
+        """ Takes the action and log_id from admin log. Route to relevant next step. """
+        target_type = ""
+        save_type = ""
+
+        log_id = request.form.get("log_id")
+        action = request.form.get("action")
+        log = AdminManager.get_audit_entry(ObjectId(log_id))
+        target_id = ObjectId(log["target_id"])
+        obj_type = log["obj_type"]
+        obj_dict = {"_id": target_id}
+
+        #actions are log_disable, log_enable, log_revert
+        if action == "log_enable":
+            obj_dict["is_active"] = True
+            save_type = "enable"
+        elif action == "log_disable":
+            obj_dict["is_active"] = False
+            save_type = "disable"
+
+        if obj_type == "User":
+            UserManager.save_user(obj_dict, save_type)
+
+        elif action == "log_delete":
+            if target_type == "branch":
+                delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
+                return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
+        return redirect(url_for("admin_dashboard"))
 
     @staticmethod
     @__app.route("/manage_users")
@@ -40,27 +75,33 @@ class AdminRoutes:
     @login_required
     @UserManager.role_required("admin")
     def do_edit_user():
+        save_type = ""
+        new_pw_hash = ""
+
         user_id = request.form.get("user_id")
         user = UserManager.lookup_user_id(user_id)
-        print(f"Debug. {user.is_active=}")
         role_change = request.form.get("role_change")
         disable_account = request.form.get("disable_account")
         enable_account = request.form.get("enable_account")
-        new_pw_hash = User.hash_password(request.form.get("password"))
+        if request.form["password"] != "":
+            new_pw_hash = User.hash_password(request.form["password"])
 
         if user and user.username != "josh":
             user_edits = {"_id": user.id}
             if role_change and role_change != "":
                 user_edits["role"] = role_change
-            elif role_change == "":
-                user_edits["role"] = user.role
+                save_type = "edit"
+            elif new_pw_hash != "":
+                user_edits["pw_hash"] = new_pw_hash
+                save_type = "edit"
             elif disable_account:
                 user_edits["is_active"] = False
+                save_type = "disable"
             elif enable_account:
                 user_edits["is_active"] = True
-            elif new_pw_hash:
-                user_edits["pw_hash"] = new_pw_hash
-            updated_user = UserManager.save_user(user_edits)
+                save_type = "enable"
+            print(f"Debug.{user_edits=}")
+            updated_user = UserManager.save_user(user_edits, save_type)
             print(f"Updated user: {updated_user}")
             return redirect(url_for("homepage"))
         return render_template("error.html")

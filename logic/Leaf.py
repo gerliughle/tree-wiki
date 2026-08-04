@@ -1,3 +1,4 @@
+from logic.TreeEngine import TreeEngine
 
 class Leaf:
     def __init__(self,
@@ -50,4 +51,9 @@ class Leaf:
     @property
     def id(self):
         return self._id
+
+    @property
+    def name(self):
+        branch_name = TreeEngine.lookup_branch(self.branch_id).name
+        return branch_name + self.subcategory
 

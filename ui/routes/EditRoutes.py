@@ -336,34 +336,5 @@ class EditRoutes:
 
         return render_template("edit/confirm_leaf_disabled.html", branch=branch)
 
-    @staticmethod
-    @__app.route('/log_action', methods=['POST'])
-    @login_required
-    @UserManager.role_required("admin")
-    def log_action():
-        """ Takes the action and log_id from admin log. Route to relevant next step. """
-        target_type = ""
-        active = True
-        log_id = request.form.get("log_id")
-        log = AdminManager.get_audit_entry(ObjectId(log_id))
-        target_id = ObjectId(log["target_id"])
-        if "Branch" in log["task"]:
-            target_type = "branch"
-        elif "Leaf" in log["task"]:
-            target_type = "leaf"
-        elif "User" in log["task"]:
-            target_type = "user"
-        action = request.form.get("action")
-        if action == "log_enable":
-            active = True
-        elif action == "log_disable":
-            active = False
-        if target_type == "branch":
-                TreeEngine.disable_enable_branch(target_id, active)
 
-        elif action == "log_delete":
-            if target_type == "branch":
-                delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
-                return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
-        return redirect(url_for("admin_dashboard"))
 

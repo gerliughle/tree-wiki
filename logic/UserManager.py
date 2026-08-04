@@ -52,25 +52,12 @@ class UserManager:
         return cls.__all_users
 
     @classmethod
-    def save_user(cls, user_dict):
+    def save_user(cls, user_dict, save_type):
         from data.Database import Database
-        user_dict.setdefault("role", "user")
-        user_dict.setdefault("is_active", True)
-        user = Database.save_user(user_dict)
+        print("UserManager - Saving User")
+        user = Database.db_save(user_dict, save_type, "user")
         return user
-    
-    # @classmethod # FIXME make user version
-    # def disable_user(cls, branch_id):
-    #     from data.Database import Database
-    #     branch_id = ObjectId(branch_id)
-    #     enable_branch = cls.lookup_branch(branch_id)
-    #     enable_name = enable_branch.name
-    #     branch_dict = {"_id": branch_id,
-    #                    "is_active": True}
-    #     Database.save_branch(branch_dict, cls.branch_map)
-    #     enable_branch.is_active = True
-    #     cls.active_branches.append(enable_branch) # resets all_branches
-    #     return enable_name
+
 
     @classmethod
     def get_audit_log(cls):

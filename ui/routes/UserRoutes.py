@@ -44,9 +44,11 @@ class UserRoutes:
                 print("Password hashed.")
                 user_dict = {
                     "username": username,
-                    "pw_hash": pw_hash
+                    "pw_hash": pw_hash,
+                    "role": "user",
+                    "is_active": True
                 }
-                new_user = UserManager.save_user(user_dict)
+                new_user = UserManager.save_user(user_dict, "create")
                 login_user(new_user)
                 print("New User registered and logged in.")
             else:
