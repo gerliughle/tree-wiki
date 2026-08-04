@@ -114,6 +114,7 @@ class Database:
         Deleting is handled separately.
         """
 
+        print(f"Debug. {save_dict=}")
         query_filter = {}
         save_obj = None
         obj_name = ""
@@ -121,10 +122,8 @@ class Database:
         current_user_id = None
         current_username = ""
 
-
         cls.connect()
-        print(f"Processing save request.")
-        print(f"{save_type=} {obj_type=}")
+        print(f"Processing {save_type=} request for {obj_type=}")
 
 
         if save_type == "create":
@@ -138,6 +137,7 @@ class Database:
             elif obj_type == "branch":
                 save_obj = TreeEngine.lookup_branch(save_id)
             elif obj_type == "leaf":
+                print(f"debug {save_id=}")
                 save_obj = TreeEngine.lookup_leaf(save_id)
             obj_name = save_obj.name
 
@@ -200,58 +200,6 @@ class Database:
         print("Error, did not complete save method.")
         return None
 
-
-    #
-    #
-    #
-    # @classmethod
-    # def save_user(cls, user_dict):
-    #     cls.connect()
-    #     print(f"Debug. {user_dict=}")
-    #     # Dict either has ID, and I edit, or no ID, and I create.
-    #     query_filter = {}
-    #     if user_dict.get("_id", False):
-    #         query_filter["_id"] = user_dict["_id"]
-    #         user_dict.pop("_id")
-    #         editor_id = current_user.id
-    #         editor_username = current_user.username
-    #         task = "Edit User"
-    #     else:
-    #         new_id = ObjectId()
-    #         query_filter["_id"] = new_id
-    #         task = "Register User"
-    #         editor_id = new_id
-    #         editor_username = user_dict["username"]
-    #
-    #     if not user_dict.get("role", False):
-    #         user_dict["role"] = "user"
-    #
-    #     update_payload = {
-    #         "$set": user_dict
-    #     }
-    #
-    #     new_user_doc = cls.__users.find_one_and_update(query_filter,
-    #                                                    update_payload,
-    #                                                    upsert=True,
-    #                                                    return_document=ReturnDocument.AFTER)
-    #
-    #     log_user_dict = user_dict.copy()
-    #     log_user_dict.pop("pw_hash", None)
-    #
-    #     log_payload = {
-    #         "timestamp": datetime.now(timezone.utc),
-    #         "user_id": editor_id,
-    #         "username": editor_username,
-    #         "target_id": new_user_doc["_id"],
-    #         "target_name": new_user_doc["username"],
-    #         "task": task,
-    #         "edit": log_user_dict
-    #     }
-    #     print(f"{log_payload=}")
-    #     cls.update_log(log_payload)
-    #
-    #     return User.build(new_user_doc)
-
     @classmethod
     def lookup_user(cls, attr, value):
         cls.connect()
@@ -261,93 +209,6 @@ class Database:
         else:
             return None
 
-
-
-
-
-    @classmethod
-    def save_branch(cls, branch_dict, branch_map):
-        """ This either saves or creates a new branch. """
-        cls.connect()
-
-        # I receive a dict with either no id and the dict to create or an existing id and edits.
-        # or an id and a disable/enable request
-        branch = False
-        query_filter = {}
-        task = ""
-        if branch_dict.get("_id", False):
-            branch_id = branch_dict["_id"]
-            query_filter["_id"] = branch_id
-            branch_dict.pop("_id")
-            if "is_active" in branch_dict:
-                if branch_dict["is_active"] is True:
-                    task = "Enable Branch"
-                elif branch_dict["is_active"] is False:
-                    task = "Disable Branch"
-            else:
-                task = "Edit Branch"
-            branch = TreeEngine.lookup_branch(branch_id)
-        else:
-            query_filter["_id"] = ObjectId()
-            task = "Create Branch"
-
-        update_payload = {
-            "$set": branch_dict
-        }
-
-        new_branch_doc = cls.__branches.find_one_and_update(query_filter,
-                                                            update_payload,
-                                                            upsert=True,
-                                                            return_document=ReturnDocument.AFTER)
-
-        log_payload = {
-            "timestamp": datetime.now(timezone.utc),
-            "user_id": current_user.id,
-            "username": current_user.username,
-            "target_id": new_branch_doc["_id"],
-            "target_name": new_branch_doc["name"],
-            "task": task,
-            "edit": {
-                "after": branch_dict,
-                "before": {}
-            }
-        }
-        if branch:
-            for edit in branch_dict:
-                log_payload["edit"]["before"][edit] = (getattr(branch, edit))
-
-        # print(f"{log_payload=}")
-        cls.update_log(log_payload)
-
-        return Branch.build(new_branch_doc, branch_map)
-
-
-    # @classmethod
-    # def disable_branch(cls, branch):
-    #     cls.connect()
-    #     disabled_branch = cls.__branches.update_one(
-    #         {"_id": branch.id},
-    #         {"$set": {"is_active": False}}
-    #     )
-    #
-    #     if disabled_branch:
-    #         print("Disabled branch")
-    #         log_payload = {
-    #             "timestamp": datetime.now(timezone.utc),
-    #             "user_id": current_user.id,
-    #             "username": current_user.username,
-    #             "target_id": branch.id,
-    #             "target_name": branch.name,
-    #             "task": "Disable Branch",
-    #             "edit": {
-    #                 "before": {"is_active": True},
-    #                 "after": {"is_active": False}
-    #             }
-    #         }
-    #         cls.update_log(log_payload)
-    #         branch.is_active = False  # update local Object
-    #     else:
-    #         print("Did not disable branch.")
 
     @classmethod
     def delete_branch(cls, branch, children):

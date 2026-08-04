@@ -66,16 +66,14 @@ Done:
   * Updated branch parent_id to check is_active. If so, checks up the chain.
   * Updated read_data to pull all/active branches and leaves. This keeps disabled branches in memory for gap filling
   * Big rewrite of database save methods, so its one shared method across all objects/tasks except delete.
+  * Updated user, branch, leaf logic to use consolidated create/edit/enable/disable logic.
+  * Made smarter buttons on admin dashboard for appropriate actions. 
 
 
 To-Do:
 * Add disable features for branches/leaves:
-* Make delete for user
-  * How do i disable leaves that have no-phase killswitches?
-  * How do i disable branches with children? Delete resets their parent. If disable.. # I think this is fixed with new logic
-    * if child = disabled, get children of THAT branch and add them? 
-  * def get_care_guid # i think this is fixed iwth new logic
-    * for breadcrumbs, for setting next round, if parent is disabled, use THAT parent? 
+* need to fix delete/revert logic
+  * How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
   * Add disable button to dashboard for new accounts, revert for everything else
   * Re-enable for disabled things
 * Finish reverting, before/after states. Look for tricky situations.. parents, children attached leaves, etc

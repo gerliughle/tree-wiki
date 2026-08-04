@@ -38,11 +38,15 @@ class AdminRoutes:
 
         if obj_type == "User":
             UserManager.save_user(obj_dict, save_type)
+        if obj_type == "Branch":
+            TreeEngine.save_branch(obj_dict, save_type)
+        if obj_type == "Leaf":
+            TreeEngine.save_leaf(obj_dict, save_type)
 
-        elif action == "log_delete":
-            if target_type == "branch":
-                delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
-                return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
+        # elif action == "log_delete": # FIXME
+        #     if target_type == "branch":
+        #         delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
+        #         return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
         return redirect(url_for("admin_dashboard"))
 
     @staticmethod

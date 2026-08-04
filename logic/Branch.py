@@ -57,7 +57,6 @@ class Branch:
     @property
     def has_image(self):
         file_path = os.path.join("ui","static","assets","branch_img",self.image)
-        print(file_path)
         return os.path.exists(file_path)
 
     @property

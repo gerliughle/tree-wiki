@@ -53,7 +53,7 @@ class EditRoutes:
             "image": branch_image,
             "parent_id": parent_branch_id
         }
-        branch = TreeEngine.save_branch(branch_dict)
+        branch = TreeEngine.save_branch(branch_dict, "create")
         return render_template("edit/confirm_branch_created.html", branch=branch)
 
     @staticmethod
@@ -100,7 +100,7 @@ class EditRoutes:
 
         branch_author = current_user.id
         branch_edits["author_id"] = branch_author
-        updated_branch = TreeEngine.save_branch(branch_edits)
+        updated_branch = TreeEngine.save_branch(branch_edits, "edit")
         return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
 
     @staticmethod
@@ -149,11 +149,12 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_disable_branch():
-        disable_name = ""
         if "branch_id" in request.form:
             disable_branch_id = ObjectId(request.form["branch_id"])
-            disable_name = TreeEngine.disable_enable_branch(disable_branch_id, active=False)
-        return render_template("edit/confirm_branch_disabled.html", disable_name=disable_name)
+            branch_dict = {"_id": disable_branch_id,
+                           "is_active": False}
+            disable_branch = TreeEngine.save_branch(branch_dict, "disable")
+        return render_template("edit/confirm_branch_disabled.html", disable_branch=disable_branch)
 
     @staticmethod
     @__app.route('/select_edit_leaf')
@@ -232,8 +233,12 @@ class EditRoutes:
         branch_id = ""
         category = ""
         subcategory = ""
+        save_type = ""
+        leaf_id = None
 
-        leaf_id = ObjectId(request.form.get("leaf_id"))
+        if request.form.get("leaf_id"):
+            leaf_id = ObjectId(request.form.get("leaf_id"))
+
         if "branch_id" in request.form:
             branch_id = ObjectId(request.form["branch_id"])
         if "category" in request.form:
@@ -269,7 +274,10 @@ class EditRoutes:
         }
         if leaf_id:
             leaf_dict["_id"] = leaf_id
-        leaf = TreeEngine.save_leaf(leaf_dict)
+            save_type = "edit"
+        else:
+            save_type = "create"
+        leaf = TreeEngine.save_leaf(leaf_dict, save_type)
         if leaf:
             print(f"leaf created. Id: {leaf.id}")
         else:
@@ -327,14 +335,11 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_disable_leaf():
-        disable_leaf_id = ""
-        if "leaf_id" in request.form:
-            disable_leaf_id = ObjectId(request.form["leaf_id"])
-        disable_leaf = TreeEngine.lookup_leaf(disable_leaf_id)
-        branch = TreeEngine.lookup_branch(disable_leaf.branch_id)
-        TreeEngine.disable_enable_leaf(disable_leaf_id, active=False)
-
+        disable_leaf_id = ObjectId(request.form.get("leaf_id"))
+        branch = TreeEngine.lookup_branch(TreeEngine.lookup_leaf(disable_leaf_id).branch_id)
+        leaf_dict = {
+            "_id": disable_leaf_id,
+            "is_active": False
+        }
+        TreeEngine.save_leaf(leaf_dict, "disable")
         return render_template("edit/confirm_leaf_disabled.html", branch=branch)
-
-
-
