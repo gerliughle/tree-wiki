@@ -105,7 +105,7 @@ class WebUI:
 
                 filtered_care_guide.append(filtered_leaf)
         branch_has_image = branch.has_image
-        print(f"{branch.name} has image: {branch_has_image}")
+        # print(f"{branch.name} has image: {branch_has_image}")
         children = TreeEngine.get_children_of_branch(branch.id)
         all_seasons = ["Spring", "Summer", "Fall", "Winter"]
         page_context = {
@@ -119,9 +119,9 @@ class WebUI:
             "branch_has_image": branch_has_image
         }
         if current_user.is_authenticated:
-            print(f"Request for '{branch.name}' by '{current_user.username}'. Care Guide contains {len(filtered_care_guide)} entries.")
+            print(f"View: '{branch.name}' by '{current_user.username}'. Guide: {len(filtered_care_guide)} leaves.")
         else:
-            print(f"Request for '{branch.name}' by anonymous user. Care Guide contains {len(filtered_care_guide)} entries.")
+            print(f"View: '{branch.name}' by anon. Guide: {len(filtered_care_guide)} leaves.")
 
         # Sets or removes edit mode for session
         if request.args.get("mode") == "exit":
