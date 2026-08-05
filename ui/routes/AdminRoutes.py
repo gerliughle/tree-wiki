@@ -29,7 +29,23 @@ class AdminRoutes:
         obj_dict = {"_id": target_id}
 
         # Possible actions are log_disable, log_enable, log_revert, log_delete
-        if action == "log_enable":
+
+        if action == "log_delete":
+            print("Log Delete Selected")
+            if obj_type == "Branch":
+                delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
+                return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
+            elif obj_type == "Leaf":
+                delete_leaf = TreeEngine.lookup_leaf(ObjectId(target_id))
+                branch = TreeEngine.lookup_branch(delete_leaf.branch_id)
+                return render_template("edit/check_delete_leaf.html", delete_leaf=delete_leaf, branch=branch)
+            elif obj_type == "User":
+                delete_user = UserManager.lookup_user_id(ObjectId(target_id))
+                print(f"{delete_user=}")
+                return render_template("admin/check_delete_user.html", user=delete_user)
+
+
+        elif action == "log_enable":
             obj_dict["is_active"] = True
             save_type = "enable"
         elif action == "log_disable":
@@ -43,10 +59,8 @@ class AdminRoutes:
         if obj_type == "Leaf":
             TreeEngine.save_leaf(obj_dict, save_type)
 
-        # elif action == "log_delete": # FIXME
-        #     if target_type == "branch":
-        #         delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
-        #         return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
+
+
         return redirect(url_for("admin_dashboard"))
 
     @staticmethod
@@ -129,3 +143,30 @@ class AdminRoutes:
         revert_entry = AdminManager.get_audit_entry(revert_id)
         print(f"{revert_entry=}")
         return render_template("admin/check_revert_change.html", revert_entry=revert_entry)
+
+    @staticmethod
+    @__app.route('/check_delete_user', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin")
+    def check_delete_user():
+        delete_user = ""
+        if "user_id" in request.form:
+            delete_user = UserManager.lookup_user_id(ObjectId(request.form["user_id"]))
+        if delete_user:
+            print("Delete user selected")
+        else:
+            print("No user found to delete.")
+        return render_template("admnin/check_delete_user.html", user=delete_user)
+
+    @staticmethod
+    @__app.route('/do_delete_user', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin")
+    def do_delete_user():
+        delete_user_id = ""
+        if "user_id" in request.form:
+            delete_user_id = ObjectId(request.form["user_id"])
+        delete_user = UserManager.lookup_user_id(delete_user_id)
+        delete_name = delete_user.name
+        UserManager.delete_user(delete_user_id)
+        return render_template("admin/confirm_user_deleted.html", delete_name=delete_name)

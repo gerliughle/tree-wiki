@@ -6,14 +6,16 @@
         <form method="POST" action="/do_delete_branch">
             <input type="hidden" name="branch_id" value="{{ delete_branch.id }}">
             <h3 class="my-2">Are you sure you want to delete {{ delete_branch.name }}?</h3>
-            <span class="text-info">Warning, this cannot be undone.</span>
+            <div class="text-info">Warning, this cannot be undone. This will also permanently delete all of this
+                branch's leaves! It will set all children branch's parent to this branch's parent. This should only be
+                done during development to remove test junk, not for standard use.</div>
 
-            <div class="row">
-                <div class="col 1">
-                    <button type="submit" class="btn btn-primary">Delete</button>
-                    <a href="/">Cancel</a>
+                <div class="row">
+                    <div class="col 1">
+                        <button type="submit" class="btn btn-primary">Delete</button>
+                        <a href="/">Cancel</a>
+                    </div>
                 </div>
-            </div>
         </form>
 
     </div>

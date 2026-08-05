@@ -1,0 +1,23 @@
+{% extends "template.html" %}
+{% block title %}Confirm User Deletion{% endblock %}
+{% block content %}
+    <div class="container col-md-4 col-8">
+
+        <form method="POST" action="/do_delete_user">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <h3 class="my-2">Are you sure you want to delete {{ user.name }}?</h3>
+            <div class="text-info">Warning, this cannot be undone. This should rarely, if ever, be done. Missing
+                authorship errors could arise. Disable users instead.
+            </div>
+
+            <div class="row">
+                <div class="col 1">
+                    <button type="submit" class="btn btn-primary">Delete</button>
+                    <a href="/">Cancel</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}

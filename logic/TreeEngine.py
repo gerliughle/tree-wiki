@@ -23,11 +23,16 @@ class TreeEngine:
     @classmethod
     def __init__(cls):
         """ Generate the branch and leaf objects. """
-        from data.Database import Database
-        cls.active_branches, cls.active_branches, cls.branch_map, cls.active_leaves, cls.active_leaves, cls.leaf_map \
-            = Database.read_data()
+        cls.read_data()
         print(f"Branches loaded: {len(cls.active_branches)}")
         print(f"Leaves loaded: {len(cls.active_leaves)}")
+
+    @classmethod
+    def read_data(cls):
+        from data.Database import Database
+        (cls.active_branches, cls.active_branches, cls.branch_map,
+         cls.active_leaves, cls.active_leaves, cls.leaf_map) \
+            = Database.read_data()
 
     # @classmethod
     # def get_leaves(cls):
@@ -152,20 +157,8 @@ class TreeEngine:
     @classmethod
     def save_branch(cls, branch_dict, save_type):
         from data.Database import Database
-        branch_id = branch_dict.get("_id", None)
         branch = Database.db_save(branch_dict, save_type, "branch", cls.branch_map)
-
-        # This logic is for updating in-memory active lists.
-        match_index = next((i for i, all_branch in enumerate(cls.active_branches) if all_branch.id == branch.id), None)
-        if match_index is not None and branch.is_active:
-            cls.active_branches[match_index] = branch
-            print("Branch edited")
-        elif branch.is_active:
-            cls.active_branches.append(branch)
-            print("Branch Created")
-        elif not branch.is_active:
-            cls.active_branches = [branch for branch in cls.active_branches if branch.id != branch_id]
-
+        cls.read_data()
         return branch
 
     @classmethod
@@ -179,27 +172,15 @@ class TreeEngine:
 
         Database.delete_branch(delete_branch, children)
 
-        cls.active_leaves = [leaf for leaf in cls.active_leaves if leaf.branch_id != branch_id]
-        cls.active_branches = [branch for branch in cls.active_branches if branch.id != branch_id]
+        cls.read_data()
         return delete_name
 
 
     @classmethod
     def save_leaf(cls, leaf_dict, save_type):
         from data.Database import Database
-        leaf_id = leaf_dict.get("_id", None)
         leaf = Database.db_save(leaf_dict, save_type, "leaf", cls.leaf_map)
-
-        # this check if leaf exists in all_leaves already, in case of edit vs creation.
-        match_index = next((i for i, all_leaf in enumerate(cls.active_leaves) if all_leaf.id == leaf.id), None)
-        if match_index is not None and leaf.is_active:
-            cls.active_leaves[match_index] = leaf
-            print("Leaf edited")
-        elif leaf.is_active:
-            cls.active_leaves.append(leaf)
-            print("Leaf Created")
-        elif not leaf.is_active:
-            cls.active_leaves = [leaf for leaf in cls.active_leaves if leaf.id != leaf_id]
+        cls.read_data()
         return leaf
 
     @classmethod

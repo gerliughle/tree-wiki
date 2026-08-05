@@ -63,7 +63,7 @@ class Database:
         active_branches = [branch for branch in branches if branch.is_active]
 
         leaf_map = {}
-        leaf_dicts = list(cls.__leaves.find({"is_active": True}))
+        leaf_dicts = list(cls.__leaves.find())
         leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
         active_leaves = [leaf for leaf in leaves if leaf.is_active]
 
@@ -140,6 +140,7 @@ class Database:
             elif obj_type == "leaf":
                 print(f"debug {save_id=}")
                 save_obj = TreeEngine.lookup_leaf(save_id)
+                print(f"HELLO?! {save_obj=}")
             obj_name = save_obj.name
 
         if obj_type == "user":
@@ -224,13 +225,12 @@ class Database:
         # Delete all the leaves from the branch
         cls.__leaves.delete_many({"branch_id": branch.id})
 
-        # Update the in-memory objects from user session.
-        if children:
-            for child in children:
-                setattr(child, "parent_id", branch.parent_id)
-
         # Delete the branch and provide a delete_doc
         delete_doc = cls.__branches.delete_one({"_id": branch.id})
+
+        child_dict = {}
+        for child in children:
+            child_dict[str(child.id)] = child.name
 
         if delete_doc.acknowledged:
             print("Deleted branch")
@@ -242,13 +242,10 @@ class Database:
                 "target_name": branch.name,
                 "task": "Delete Branch",
                 "edit": {
-                    # "deleted_branch_id": branch.id,
-                    # "deleted_branch_name": branch.name,
-                    # "new_parent_id": branch.parent_id
-                    "impacted_children": children
+                    "new_parent_id": branch.parent_id,
+                    "impacted_children": child_dict
                 }
             }
-            # print(f"{log_payload=}")
             cls.update_log(log_payload)
         else:
             print("Did not complete branch deletion.")
@@ -265,7 +262,7 @@ class Database:
                 "user_id": current_user.id,
                 "username": current_user.username,
                 "target_id": leaf.id,
-                "target_name": leaf.subcategory,
+                "target_name": leaf.name,
                 "task": "Delete Leaf",
                 "edit": {
                     "deleted_leaf_id": leaf.id,
@@ -278,30 +275,27 @@ class Database:
             print("Did not complete leaf deletion.")
 
     @classmethod
-    def disable_leaf(cls, leaf): # FIXME can be simplified with branch/leaf
+    def delete_user(cls, user):
         cls.connect()
-        disabled_leaf = cls.__leaves.update_one(
-            {"_id": leaf.id},
-            {"$set": {"is_active": False}}
-        )
-
-        if disabled_leaf:
-            print("Disabled leaf")
+        delete_doc = cls.__users.delete_one({"_id": user.id})
+        if delete_doc.acknowledged:
+            print("Deleted user")
             log_payload = {
                 "timestamp": datetime.now(timezone.utc),
                 "user_id": current_user.id,
                 "username": current_user.username,
-                "target_id": leaf.id,
-                "target_name": leaf.subcategory,
-                "task": "Disable Leaf",
+                "target_id": user.id,
+                "target_name": user.name,
+                "task": "Delete User",
                 "edit": {
-                    "before": {"is_active": True},
-                    "after": {"is_active": False}
+                    "deleted_user_id": user.id
                 }
             }
+            print(f"{log_payload=}")
             cls.update_log(log_payload)
         else:
-            print("Did not disable leaf.")
+            print("Did not complete user deletion.")
+
 
     @classmethod
     def rebuild_leaves(cls):
