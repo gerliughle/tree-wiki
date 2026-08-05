@@ -1,6 +1,5 @@
-from bson import ObjectId
 from functools import wraps
-from flask import render_template, abort
+from flask import abort
 from flask_login import current_user
 
 class AdminManager:
@@ -28,4 +27,3 @@ class AdminManager:
         from data.Database import Database
         log_entry = Database.get_audit_entry(log_id)
         return log_entry
-

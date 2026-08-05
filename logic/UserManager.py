@@ -58,10 +58,3 @@ class UserManager:
         user = Database.db_save(user_dict, save_type, "user")
         return user
 
-
-    @classmethod
-    def get_audit_log(cls):
-        from data.Database import Database
-        log = Database.get_audit_log()
-        return log
-

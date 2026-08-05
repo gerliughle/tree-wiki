@@ -1,8 +1,7 @@
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
-from logic.AdminManager import AdminManager
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request
 from flask_login import current_user, login_required
 from bson import ObjectId
 
@@ -20,7 +19,6 @@ class EditRoutes:
         branch_id = request.form.get("select_branch_id")
         if branch_id:
             branch = TreeEngine.lookup_branch(ObjectId(branch_id))
-
         return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
 
     @staticmethod

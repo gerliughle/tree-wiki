@@ -128,6 +128,7 @@ class Database:
 
         if save_type == "create":
             query_filter["_id"] = ObjectId()
+            obj_name = save_dict.get("name", save_dict.get("username", "New"))
         else:
             save_id = save_dict["_id"]
             query_filter["_id"] = save_id

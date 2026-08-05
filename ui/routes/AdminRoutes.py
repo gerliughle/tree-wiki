@@ -1,11 +1,11 @@
-from logic.UserManager import UserManager
 from ui.WebUI import WebUI
 from logic.User import User
 from logic.AdminManager import AdminManager
 from logic.UserManager import UserManager
 from logic.TreeEngine import TreeEngine
+
 from flask import render_template, request, redirect, url_for
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import login_required
 from bson import ObjectId
 
 
@@ -17,8 +17,8 @@ class AdminRoutes:
     @login_required
     @UserManager.role_required("admin")
     def log_action():
-        """ Takes the action and log_id from admin log. Route to relevant next step. """
-        target_type = ""
+        """ Takes the action and log_id from admin dashboard buttons. Route to relevant next step. """
+
         save_type = ""
 
         log_id = request.form.get("log_id")
@@ -28,7 +28,7 @@ class AdminRoutes:
         obj_type = log["obj_type"]
         obj_dict = {"_id": target_id}
 
-        #actions are log_disable, log_enable, log_revert
+        # Possible actions are log_disable, log_enable, log_revert, log_delete
         if action == "log_enable":
             obj_dict["is_active"] = True
             save_type = "enable"
@@ -104,7 +104,6 @@ class AdminRoutes:
             elif enable_account:
                 user_edits["is_active"] = True
                 save_type = "enable"
-            print(f"Debug.{user_edits=}")
             updated_user = UserManager.save_user(user_edits, save_type)
             print(f"Updated user: {updated_user}")
             return redirect(url_for("homepage"))

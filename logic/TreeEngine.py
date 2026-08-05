@@ -1,5 +1,3 @@
-# from logic.Branch import Branch
-# from logic.Leaf import Leaf
 from bson import ObjectId
 
 
@@ -31,9 +29,9 @@ class TreeEngine:
         print(f"Branches loaded: {len(cls.active_branches)}")
         print(f"Leaves loaded: {len(cls.active_leaves)}")
 
-    @classmethod
-    def get_leaves(cls):
-        return cls.active_leaves
+    # @classmethod
+    # def get_leaves(cls):
+    #     return cls.active_leaves
 
     @classmethod
     def get_branches(cls):
@@ -105,7 +103,6 @@ class TreeEngine:
 
         subcategory_list = set()  # subcategories that already have a leaf
         inherited_leaves = []  # list of inherited leaves only
-        category_list = []
 
         branch = cls.lookup_branch(branch_id)
         current_branch = cls.lookup_branch(branch.id)
@@ -131,7 +128,6 @@ class TreeEngine:
     @classmethod
     def get_children_of_branch(cls, branch_id):
         children_list = []
-        current_branch = cls.lookup_branch(branch_id)
         for branch in cls.active_branches:
             if branch_id == branch.parent_id:
                 children_list.append(branch)
