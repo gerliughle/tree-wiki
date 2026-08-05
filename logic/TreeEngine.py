@@ -188,5 +188,5 @@ class TreeEngine:
         from data.Database import Database
         delete_leaf = cls.lookup_leaf(ObjectId(leaf_id))
         Database.delete_leaf(delete_leaf)
-        cls.active_leaves.remove(delete_leaf)
+        cls.read_data()
 

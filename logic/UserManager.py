@@ -56,6 +56,7 @@ class UserManager:
         from data.Database import Database
         print("UserManager - Saving User")
         user = Database.db_save(user_dict, save_type, "user")
+        cls.__all_users = Database.read_users()
         return user
 
     @classmethod
@@ -64,5 +65,4 @@ class UserManager:
         delete_user = cls.lookup_user_id(ObjectId(user_id))
         Database.delete_user(delete_user)
         cls.__all_users = Database.read_users()
-
 
