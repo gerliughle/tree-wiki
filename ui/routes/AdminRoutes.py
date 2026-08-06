@@ -44,6 +44,20 @@ class AdminRoutes:
                 print(f"{delete_user=}")
                 return render_template("admin/check_delete_user.html", user=delete_user)
 
+        if action == "log_revert":
+            print("Log Revert Selected")
+            obj_dict = log["edit"]["before"]
+            obj_dict["_id"] = target_id
+            print(f"Debug {obj_dict=}")
+            if obj_type == "Branch":
+                TreeEngine.save_branch(obj_dict, "edit")
+            elif obj_type == "Leaf":
+                TreeEngine.save_leaf(obj_dict, "edit")
+            elif obj_type == "User":
+                UserManager.save_user(obj_dict, "edit")
+
+
+
 
         elif action == "log_enable":
             obj_dict["is_active"] = True
@@ -51,15 +65,13 @@ class AdminRoutes:
         elif action == "log_disable":
             obj_dict["is_active"] = False
             save_type = "disable"
-
-        if obj_type == "User":
-            UserManager.save_user(obj_dict, save_type)
-        if obj_type == "Branch":
-            TreeEngine.save_branch(obj_dict, save_type)
-        if obj_type == "Leaf":
-            TreeEngine.save_leaf(obj_dict, save_type)
-
-
+        if action == "log_enable" or action == "log_disable":
+            if obj_type == "User":
+                UserManager.save_user(obj_dict, save_type)
+            if obj_type == "Branch":
+                TreeEngine.save_branch(obj_dict, save_type)
+            if obj_type == "Leaf":
+                TreeEngine.save_leaf(obj_dict, save_type)
 
         return redirect(url_for("admin_dashboard"))
 
@@ -73,7 +85,6 @@ class AdminRoutes:
         if josh in users:
             users.remove(josh)
         return render_template("admin/manage_users.html", users=users)
-
 
     @staticmethod
     @__app.route("/edit_user", methods=["POST"])
@@ -128,7 +139,7 @@ class AdminRoutes:
     @login_required
     @UserManager.role_required("admin")
     def admin_dashboard():
-        audit_log = AdminManager.get_audit_log() # I would probably want to sequence by 25 rows. I should only pull that each time
+        audit_log = AdminManager.get_audit_log()  # I would probably want to sequence by 25 rows. I should only pull that each time
         # I can take in a range based on the page, as a form or link.
         # For now do page/table design then do that.
         return render_template("admin/admin_dashboard.html", audit_log=audit_log)

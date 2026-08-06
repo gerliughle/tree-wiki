@@ -114,7 +114,6 @@ class Database:
         Deleting is handled separately.
         """
 
-        print(f"Debug. {save_dict=}")
         query_filter = {}
         save_obj = None
         obj_name = ""
@@ -130,6 +129,7 @@ class Database:
             query_filter["_id"] = ObjectId()
             obj_name = save_dict.get("name", save_dict.get("username", "New"))
         else:
+            print(f"Debug {save_dict=}")
             save_id = save_dict["_id"]
             query_filter["_id"] = save_id
             save_dict.pop("_id")
@@ -138,9 +138,7 @@ class Database:
             elif obj_type == "branch":
                 save_obj = TreeEngine.lookup_branch(save_id)
             elif obj_type == "leaf":
-                print(f"debug {save_id=}")
                 save_obj = TreeEngine.lookup_leaf(save_id)
-                print(f"HELLO?! {save_obj=}")
             obj_name = save_obj.name
 
         if obj_type == "user":

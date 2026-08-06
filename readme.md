@@ -68,15 +68,12 @@ Done:
   * Big rewrite of database save methods, so its one shared method across all objects/tasks except delete.
   * Updated user, branch, leaf logic to use consolidated create/edit/enable/disable logic.
   * Made smarter buttons on admin dashboard for appropriate actions. 
+  * Added delete for admin roles. 
+  * Reverting branch/leaf/user edits should work now! Admin dashboard should be fully functional!!! 
 
 
 To-Do:
-* Add disable features for branches/leaves:
-* need to fix delete/revert logic
-  * How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
-  * Add disable button to dashboard for new accounts, revert for everything else
-  * Re-enable for disabled things
-* Finish reverting, before/after states. Look for tricky situations.. parents, children attached leaves, etc
+* How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
 * Leaf collapse button
 * Fix leaf breadcrumb.. not entire crumb but leaf-chain-specifically
 * Admin Log - pagination
