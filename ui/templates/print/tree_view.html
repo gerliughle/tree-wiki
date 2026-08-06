@@ -35,7 +35,7 @@
         }
 
         .tree ul li {
-            border-left: 2px solid blue;
+            border-left: 2px solid darkolivegreen;
         }
 
         .tree ul li:last-child {
@@ -50,7 +50,7 @@
             left: -2px;
             width: calc(var(--spacing) + 2px);
             height: calc(var(--spacing) + 1px);
-            border: solid blue;
+            border: solid darkolivegreen;
             border-width: 0 0 2px 2px;
         }
 
@@ -104,7 +104,7 @@
             {% macro render_node(tree_node) %} <!-- takes a single node entry from tree map -->
                 <li>
 
-                    <span><a class="btn btn-info btn-sm mb-1"
+                    <span><a class="btn btn-outline-success btn-sm mb-1"
                                   href="/show_branch?branch={{ tree_node.node.id }}">{{ tree_node.node.name }}</a></span>
                     {% if tree_node.children %}
                         <ul>
