@@ -57,3 +57,8 @@ class Leaf:
         branch_name = TreeEngine.lookup_branch(self.branch_id).name
         return str(f"{branch_name}: {self.subcategory}")
 
+    @property
+    def branch_name(self):
+        branch_name = TreeEngine.lookup_branch(self.branch_id).name
+        return str(f"{branch_name}")
+

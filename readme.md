@@ -70,12 +70,14 @@ Done:
   * Made smarter buttons on admin dashboard for appropriate actions. 
   * Added delete for admin roles. 
   * Reverting branch/leaf/user edits should work now! Admin dashboard should be fully functional!!! 
+* Tightened up leaf cards
+* Leaf collapse button
 
 
 To-Do:
 * How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
-* Leaf collapse button
-* Fix leaf breadcrumb.. not entire crumb but leaf-chain-specifically
+
+* I removed leaf breadcrumb, it would be cool to have a chain of subcat edits, but need leaf-specific bredcrumbs
 * Admin Log - pagination
 * change password (require fresh login)
 * forget password

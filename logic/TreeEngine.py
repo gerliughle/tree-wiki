@@ -105,6 +105,8 @@ class TreeEngine:
 
     @classmethod
     def get_inherited_leaves(cls, branch_id):
+        """ Not sure this is even used, only called on old edit page. But seems 80% like
+        the above method, but removes current leaves. """
 
         subcategory_list = set()  # subcategories that already have a leaf
         inherited_leaves = []  # list of inherited leaves only

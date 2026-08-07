@@ -100,7 +100,8 @@ class WebUI:
                     "category": leaf.category,
                     "subcategory": leaf.subcategory,
                     "seasons": leaf.seasons,
-                    "entries": filtered_entries
+                    "entries": filtered_entries,
+                    "branch_name": leaf.branch_name
                 }
 
                 filtered_care_guide.append(filtered_leaf)
