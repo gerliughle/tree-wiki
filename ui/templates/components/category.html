@@ -35,24 +35,95 @@
         </div>
         <!-- season section -->
         {% set seasons = namespace(value=false) %}
+        {% set spring = namespace(value=false) %}
+        {% set summer = namespace(value=false) %}
+        {% set fall = namespace(value=false) %}
+        {% set winter = namespace(value=false) %}
         {% for leaf in care_guide %}
             {% if leaf.seasons|length < 4 and leaf.category == category %}
                 {% set seasons.value = true %}
+                {% if "Spring" in leaf.seasons %}
+                    {% set spring.value = true %}
+                {% endif %}
+                {% if "Summer" in leaf.seasons %}
+                    {% set summer.value = true %}
+                {% endif %}
+                {% if "Fall" in leaf.seasons %}
+                    {% set fall.value = true %}
+                {% endif %}
+                {% if "Winter" in leaf.seasons %}
+                    {% set winter.value = true %}
+                {% endif %}
             {% endif %}
+
+
+
+
         {% endfor %}
         {% if seasons.value == true %}
             <div class="row row-cols-1 row-cols-lg-4 g-2">
-                <!-- Season column loop -->
-                {% for season in all_seasons %}
-                    <div class="col">
-                        <div class="h6 rounded text-center mb-0 bg-secondary bg-opacity-25 px-3 py-2">{{ season }}</div>
-                        {% for leaf in care_guide %}
-                            {% if leaf.seasons|length < 4 and season in leaf.seasons and leaf.category == category %}
-                                {% include "components/leaf.html" %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endfor %}
+                <!-- Season columns -->
+
+                <div class="col">
+                    {% if spring.value == false %}
+                        <div class="h6 rounded text-center mb-0 bg-success-subtle bg-opacity-25 px-3 py-2 d-none d-lg-block">
+                            Spring
+                        </div>
+                    {% else %}
+                        <div class="h6 rounded text-center mb-0 bg-success-subtle bg-opacity-25 px-3 py-2 ">Spring</div>
+                    {% endif %}
+                    {% for leaf in care_guide %}
+                        {% if leaf.seasons|length < 4 and "Spring" in leaf.seasons and leaf.category == category %}
+                            {% include "components/leaf.html" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="col">
+                    {% if summer.value == false %}
+
+                        <div class="h6 rounded text-center mb-0 bg-danger-subtle bg-opacity-25 px-3 py-2 d-none d-lg-block">
+                            Summer
+                        </div>
+                    {% else %}
+                        <div class="h6 rounded text-center mb-0 bg-danger-subtle bg-opacity-25 px-3 py-2 ">Summer</div>
+                    {% endif %}
+                    {% for leaf in care_guide %}
+                        {% if leaf.seasons|length < 4 and "Summer" in leaf.seasons and leaf.category == category %}
+                            {% include "components/leaf.html" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="col">
+                    {% if fall.value == false %}
+
+                        <div class="h6 rounded text-center mb-0 bg-warning-subtle bg-opacity-25 px-3 py-2 d-none d-lg-block">
+                            Fall
+                        </div>
+                    {% else %}
+                        <div class="h6 rounded text-center mb-0 bg-warning-subtle bg-opacity-25 px-3 py-2 ">Fall</div>
+                    {% endif %}
+                    {% for leaf in care_guide %}
+                        {% if leaf.seasons|length < 4 and "Fall" in leaf.seasons and leaf.category == category %}
+                            {% include "components/leaf.html" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="col">
+                    {% if winter.value == false %}
+
+                        <div class="h6 rounded text-center mb-0 bg-info-subtle bg-opacity-25 px-3 py-2 d-none d-lg-block">
+                            Winter
+                        </div>
+                    {% else %}
+                        <div class="h6 rounded text-center mb-0 bg-info-subtle bg-opacity-25 px-3 py-2 ">Winter</div>
+                    {% endif %}
+                    {% for leaf in care_guide %}
+                        {% if leaf.seasons|length < 4 and "Winter" in leaf.seasons and leaf.category == category %}
+                            {% include "components/leaf.html" %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
 
             </div>
         {% endif %}

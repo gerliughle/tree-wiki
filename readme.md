@@ -72,6 +72,7 @@ Done:
   * Reverting branch/leaf/user edits should work now! Admin dashboard should be fully functional!!! 
 * Tightened up leaf cards
 * Leaf collapse button
+* Fixed seasons appearing on stack column, colored seasons
 
 
 To-Do:
