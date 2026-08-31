@@ -76,38 +76,52 @@ Done:
 
 
 To-Do:
-* How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
 
-* I removed leaf breadcrumb, it would be cool to have a chain of subcat edits, but need leaf-specific bredcrumbs
-* Admin Log - pagination
-* change password (require fresh login)
-* forget password
-* Alternate User Id to allow for id changing.. see flask-login
+PO:
 * Edit page default text should be old text.
-* Dark mode - svg color tweaks
-* User edit mode - change role, disable, delete users. maybe that's only allowed for even another role
-* Dark/Light Mode - color palette adjustments
-* Category Collapse - arrow direction change
+* Edit page should allow changing parents/categories. May also want a leaf chain system there somehow.
 * Ensure you're using jinja escapes appropriately
-* Have phases be UserState variable
 * Homepage
-* Tree View. Started, but ugly
-* About page/legend/guide/phase description
-* Thoughts on non-bonsai applicability. Season = category, phase = filter
-* Tooltips
 * input validation
-* user emails
- redesign to be less round and floaty. a bit more table-y would be more functional
-* Data entry
-* Find pictures somehow
-* Non admin edit/suggestion
-* Temp Selector system
+* pictures solution 
+
+* Cat/Leaf Schema
+* How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
+  * I think leaf 'breadcrumb' would be nice, to expand, trace back.. and i wonder if that helps with a killswitch..
+  * I removed leaf breadcrumb, it would be cool to have a chain of subcat edits, but need leaf-specific breadcrumbs
 
 been skipping any validations but it is important:
 * checking for any form errors
 * avoiding duplicates
 * avoiding no phase/no season submissions
 * avoiding matching subcat for leaves
+
+Later:
+* TBH, the whole revert thing... it probably just makes sense to go full git, and save versions of everything. 
+  * It seems like this could be tricky or hard. I need to keep same _id so the trees don't get really fucked
+  * So they'd all be stored in the same object, but i'd only want to call the latest one for page views, but call
+  * them all for admin/mod stuff
+* Mod role: Editors edit pages, mods can revert/disable, and admins can manage users
+* Admin Log - pagination
+* Tree View. Started, but ugly
+* About page/legend/guide/phase description
+* change password (require fresh login)
+* forget password
+* Alternate User Id to allow for id changing.. see flask-login
+* Dark mode - svg color tweaks
+* User edit mode - change role, disable, delete users. maybe that's only allowed for even another role
+  *  What if... individual accounts can have their own version of a tree, with notes, their own prefernces, etc. 
+  * Then they can submit them to be accepted or something
+* Dark/Light Mode - color palette adjustments
+* Category Collapse - arrow direction change
+* Have phases be UserState variable
+* Thoughts on non-bonsai applicability. Season = category, phase = filter
+* Tooltips
+* user emails
+ redesign to be less round and floaty. a bit more table-y would be more functional
+* Data entry
+* Non admin edit/suggestion
+* Temp Selector system
 
 
 next up: tree view
