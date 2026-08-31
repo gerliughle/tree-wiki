@@ -92,9 +92,9 @@ class EditRoutes:
         if "branch_description" in request.form:
             if request.form["branch_description"].strip() != "":
                 branch_edits["description"] = request.form["branch_description"].strip()
-        if "select_branch_id" in request.form:
-            if request.form["select_branch_id"] != "":
-                branch_edits["parent_id"] = ObjectId(request.form["select_branch_id"])
+        if "select_parent_id" in request.form:
+            if request.form["select_parent_id"] != "":
+                branch_edits["parent_id"] = ObjectId(request.form["select_parent_id"])
 
         branch_author = current_user.id
         branch_edits["author_id"] = branch_author

@@ -78,7 +78,7 @@ Done:
 To-Do:
 
 PO:
-* Edit page default text should be old text.
+* Edit page default text should be old text. - Done for branches. For leaves, need to think through entries.
 * Edit page should allow changing parents/categories. May also want a leaf chain system there somehow.
 * Ensure you're using jinja escapes appropriately
 * Homepage
