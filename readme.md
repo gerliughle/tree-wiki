@@ -79,11 +79,13 @@ To-Do:
 
 PO:
 * Edit page default text should be old text. - Done for branches. For leaves, need to think through entries.
-* Edit page should allow changing parents/categories. May also want a leaf chain system there somehow.
+  * Kind of done for both but need to fix backend. Need to not make edits if the value is blank or exactly the same?
+  * Also need to limit to just 1 season or all seasons now
+  * Need to handle all season form submission logic
 * Ensure you're using jinja escapes appropriately
 * Homepage
 * input validation
-* pictures solution 
+* pictures solution
 
 * Cat/Leaf Schema
 * How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.

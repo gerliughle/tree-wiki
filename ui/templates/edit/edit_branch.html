@@ -5,7 +5,9 @@
     <div class="container my-2 col-md-8 col-10 d-flex-vertical">
         <form method="POST" action="/do_edit_branch">
             <input type="hidden" name="branch_id" value="{{ edit_branch.id }}">
-            <h3 class="col-lg-8">Editing '{{ edit_branch.name }}'</h3>
+            <h3 class="col-lg-8">Branch Editor</h3>
+             <h5>Editing '{{ edit_branch.name }}'
+
             <span class="text-info">Leave fields blank or unchanged if you don't want to make any changes.</span>
             <div class="my-3">
                 <label for="select_parent_id">Change Parent Branch</label>
