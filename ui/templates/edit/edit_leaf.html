@@ -69,7 +69,8 @@
                 <!-- original entries -->
 
                 <p class="mb-3">Leaves should apply to either every season as general info, or a single season.
-                    Each leaf can have multiple entries for different phases. Any and all existing entries will be overwritten when submitting this form.
+                    Each leaf can have multiple entries for different phases. Any and all existing entries will be
+                    overwritten when submitting this form.
                     <span class="text-danger">In the case where you want to "end the chain" and stop inheriting a leaf
                         for a subcategory, submit this form with no entries selected. The subcategory will not show up
                         on the selected branch page or any children.</span>
@@ -92,7 +93,17 @@
                             {% for season in ["Spring", "Summer", "Fall", "Winter"] %}
                                 <input type="radio" class="btn-check" id="{{ season }}" autocomplete="off"
                                        name="season" {% if season in leaf.seasons %}checked{% endif %}>
-                                <label class="btn btn-outline-primary" for="{{ season }}">{{ season }}</label>
+                                <label class="btn
+                                    {% if season == "Spring" %}
+                                        btn-outline-success
+                                    {% elif season == "Summer" %}
+                                        btn-outline-danger
+                                    {% elif season == "Fall" %}
+                                        btn-outline-warning
+                                    {% elif season == "Winter" %}
+                                        btn-outline-info
+                                    {% endif %}
+                                    " for="{{ season }}">{{ season }}</label>
                             {% endfor %}
                             <input type="radio" class="btn-check" id="all_seasons" autocomplete="off" name="season"
                                    {% if leaf.seasons|length == 4 %}checked{% endif %}>
@@ -139,7 +150,7 @@
                                     <input type="checkbox" class="btn-check" id="phase_3rd+_{{ loop.index }}"
                                            autocomplete="off" name="phase_3rd+_{{ loop.index }}"
                                             {% if leaf.entries|length >= loop.index %}
-                                                {% if "3rd" in leaf.entries[loop.index0]["phases"] %}
+                                                {% if "3rd+" in leaf.entries[loop.index0]["phases"] %}
                                            checked
                                                 {% endif %}
                                             {% endif %}>
@@ -154,7 +165,8 @@
                                        class="form-label">Entry {{ loop.index }} Text:</label>
                                 <textarea class="form-control" id="entry_text_{{ loop.index }}"
                                           name="entry_text_{{ loop.index }}"
-                                          rows="4">{% if leaf.entries|length >= loop.index %}{{ leaf.entries[loop.index0]["text"] }}{% endif %}</textarea> {# Do not let this auto wrap #}
+                                          rows="4">{% if leaf.entries|length >= loop.index %}{{ leaf.entries[loop.index0]["text"] }}{% endif %}</textarea>
+                                {# IMPORTANT Do not let this auto wrap #}
                             </div>
                         </li>
                     {% endfor %}
