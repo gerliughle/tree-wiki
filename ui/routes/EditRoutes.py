@@ -33,6 +33,12 @@ class EditRoutes:
         branch_image = ""
         if "branch_name" in request.form:
             branch_name = request.form["branch_name"].strip()
+            existing_branch = TreeEngine.lookup_branch_by_name(branch_name)
+
+            if existing_branch:
+                print(f"Looked up {branch_name}. Found {existing_branch.name}")
+                return render_template("error.html")
+            print(f"Looked up {branch_name}. Found nothing.")
             branch_image = str(branch_name.strip().lower().replace(" ", "_") + ".jpg")
         if "branch_description" in request.form:
             branch_description = request.form["branch_description"].strip()
@@ -81,21 +87,34 @@ class EditRoutes:
     def do_edit_branch():
         """ FIXME needs lots of form validation, checking dupes, etc.
 
-        Form design should have better labels, and be better in general. """
+        Checks if form inputs exist, are not blank, and do not match the original.
+         If so, it adds them to an update dict and passes requests an edit.
+         Then it updates the branch and goes to confirmation page.
+         """
         branch_id = ObjectId(request.form["branch_id"])
+        original_branch = TreeEngine.lookup_branch(branch_id)
         branch_edits = {"_id": branch_id}
         if "branch_name" in request.form:
-            if request.form["branch_name"].strip() != "":
+            if (request.form["branch_name"].strip() != ""
+                    and request.form["branch_name"].strip() != original_branch.name):
                 name = request.form["branch_name"].strip()
+                existing_branch = TreeEngine.lookup_branch_by_name(name)
+                if existing_branch:
+                    print(f"Looking up {name} and found {existing_branch}")
+                    return render_template("error.html")
+                print(f"Looking up {name} and found nothing")
                 branch_edits["name"] = name
                 branch_edits["image"] = str(name.strip().lower().replace(" ", "_") + ".jpg")
         if "branch_description" in request.form:
-            if request.form["branch_description"].strip() != "":
+            if (request.form["branch_description"].strip() != ""
+                    and request.form["branch_description"].strip() != original_branch.description):
                 branch_edits["description"] = request.form["branch_description"].strip()
         if "select_parent_id" in request.form:
-            if request.form["select_parent_id"] != "":
+            if request.form["select_parent_id"] != "" \
+                    and request.form["select_parent_id"].strip() != original_branch.parent_id:
                 branch_edits["parent_id"] = ObjectId(request.form["select_parent_id"])
-
+        if len(branch_edits) == 1: # No edits made.
+            return render_template("error.html")
         branch_author = current_user.id
         branch_edits["author_id"] = branch_author
         updated_branch = TreeEngine.save_branch(branch_edits, "edit")
@@ -177,9 +196,9 @@ class EditRoutes:
         print(f"Branch_leaves count: {len(branch_leaves)}. Inherited_leaves count: {len(inherited_leaves)}")
 
         page_context = {
-            "branch":branch,
-            "branch_leaves":branch_leaves,
-            "inherited_leaves":inherited_leaves,
+            "branch": branch,
+            "branch_leaves": branch_leaves,
+            "inherited_leaves": inherited_leaves,
             "all_categories": TreeEngine.CATEGORIES
         }
         return render_template('edit/select_edit_leaf_type.html', **page_context)
@@ -198,8 +217,8 @@ class EditRoutes:
         category_name: if creating a new subcat, this will exist. there will be no leaf_id or source branch.
         """
 
-        leaf = None # The branch i am cloning from
-        target_branch = None # The branch i am creating a leaf for
+        leaf = None  # The branch i am cloning from
+        target_branch = None  # The branch i am creating a leaf for
         source_branch = None
         category_name = None
 
@@ -216,7 +235,8 @@ class EditRoutes:
         if "category_name" in request.form:
             category_name = request.form["category_name"]
 
-        return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch, target_branch=target_branch, category_name=category_name)
+        return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch,
+                               target_branch=target_branch, category_name=category_name)
 
     @staticmethod
     @__app.route('/do_edit_leaf', methods=['POST'])
@@ -231,7 +251,6 @@ class EditRoutes:
         branch_id = ""
         category = ""
         subcategory = ""
-        save_type = ""
         leaf_id = None
 
         if request.form.get("leaf_id"):
@@ -243,15 +262,19 @@ class EditRoutes:
             category = request.form["category"]
         if "subcategory" in request.form:
             subcategory = request.form["subcategory"]
-        author_id = current_user.id # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
+        author_id = current_user.id  # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
         season_list = ['Spring', 'Summer', 'Fall', 'Winter']
         seasons = []
-        for season in season_list:
-            if season in request.form:
-                seasons.append(season)
+        if request.form.get("season"):
+            print(request.form.get("season"))
+            seasons = request.form.getlist("season")
+            if request.form["season"] in [season_list]:
+                seasons.append(request.form["season"])
+            elif request.form["season"] == "all_seasons":
+                seasons = season_list
         entries = []
-        for i in range(1,5):
-            if 'entry_enabled_'+str(i) in request.form:
+        for i in range(1, 5):
+            if 'entry_enabled_' + str(i) in request.form:
                 phases = []
                 if 'phase_1st_' + str(i) in request.form:
                     phases.append("1st")
@@ -259,6 +282,8 @@ class EditRoutes:
                     phases.append("2nd")
                 if 'phase_3rd+_' + str(i) in request.form:
                     phases.append("3rd+")
+                if len(phases) == 0:
+                    return render_template("error.html")
                 entry = {"text": request.form["entry_text_" + str(i)], "phases": phases}
                 entries.append(entry)
         leaf_dict = {
@@ -282,7 +307,6 @@ class EditRoutes:
             print(f"No leaf created and returned.")
         branch = TreeEngine.lookup_branch(branch_id)
         return render_template("edit/confirm_leaf_created.html", leaf=leaf, branch=branch)
-
 
     @staticmethod
     @__app.route('/check_delete_leaf', methods=['POST'])

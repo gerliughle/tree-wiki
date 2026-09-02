@@ -91,7 +91,7 @@
 
                             <label class="btn btn-group-text-primary disabled">Season(s):</label>
                             {% for season in ["Spring", "Summer", "Fall", "Winter"] %}
-                                <input type="radio" class="btn-check" id="{{ season }}" autocomplete="off"
+                                <input type="radio" class="btn-check" id="{{ season }}" value="{{ season }}" autocomplete="off"
                                        name="season" {% if season in leaf.seasons %}checked{% endif %}>
                                 <label class="btn
                                     {% if season == "Spring" %}
@@ -105,7 +105,7 @@
                                     {% endif %}
                                     " for="{{ season }}">{{ season }}</label>
                             {% endfor %}
-                            <input type="radio" class="btn-check" id="all_seasons" autocomplete="off" name="season"
+                            <input type="radio" class="btn-check" id="all_seasons" value="all_seasons" autocomplete="off" name="season"
                                    {% if leaf.seasons|length == 4 %}checked{% endif %}>
                             <label class="btn btn-outline-primary" for="all_seasons">All Seasons</label>
                         </div>

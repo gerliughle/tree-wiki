@@ -73,15 +73,14 @@ Done:
 * Tightened up leaf cards
 * Leaf collapse button
 * Fixed seasons appearing on stack column, colored seasons
-
+* Edit page default text should be old text.
+* Branch creation/editing checks for duplicate names
+* Leaves only allow one or all seasons, with all season selector. 
+* Don't allow leaves with no phases
 
 To-Do:
 
 PO:
-* Edit page default text should be old text. - Done for branches. For leaves, need to think through entries.
-  * Kind of done for both but need to fix backend. Need to not make edits if the value is blank or exactly the same?
-  * Also need to limit to just 1 season or all seasons now
-  * Need to handle all season form submission logic
 * Ensure you're using jinja escapes appropriately
 * Homepage
 * input validation
@@ -103,6 +102,7 @@ Later:
   * It seems like this could be tricky or hard. I need to keep same _id so the trees don't get really fucked
   * So they'd all be stored in the same object, but i'd only want to call the latest one for page views, but call
   * them all for admin/mod stuff
+* Custom error pages.
 * Mod role: Editors edit pages, mods can revert/disable, and admins can manage users
 * Admin Log - pagination
 * Tree View. Started, but ugly
