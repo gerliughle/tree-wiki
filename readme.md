@@ -7,6 +7,7 @@ Structure:
 * Developed using Flask Python Server
 * Login, Cookies, Sessions use Flask-login
 * Password Security uses bcrypt
+* Profanity detection using alt-profanity-check and better_profanity
 * HTML control with Jinja templates
 * CSS design framework from Bootstrap
 * Database is cloud-based, NoSQL dictionary using MongoDB Atlas
@@ -15,6 +16,7 @@ Structure:
 * Production server uses Gunicorn
 * Front-end routing/https uses Cloudflared tunnel
 * Domain name from CloudFlare
+* Multiple CloudFlare security layers including AI labrynth, Rate Limiting, Turnstile
 
 Done:
 * Branch Class
@@ -77,26 +79,27 @@ Done:
 * Branch creation/editing checks for duplicate names
 * Leaves only allow one or all seasons, with all season selector. 
 * Don't allow leaves with no phases
+* Implement CloudFlare turnstile for bot detection
 
 To-Do:
 
 PO:
 * Implement custom error page/flashes:
   * Error page template
-  * Send appropriate error and message
-  * Utilize flask flash message and bootstrap alert? yea..
+  * Send custom error and message
+  * Utilize flask flash message and bootstrap alert for errors and messaging, avoiding error pages
 * Data validation:
   * Run frontend and backend validation check on every user input
-  * Strip inputs, set max limits, decide if required, if empty response is allowed. 
-  * Sanitize using jinja escapes, limit character usage, limit links
+  * Strip inputs, character removal, space removal, capitalize/lowercase, links
+  * set max limits, required, empty response, autocomplete
+  * jinja escapes?
   * Captcha ? 
   * Honeypot field? 
   * Rate limit? 
-  * Hidden token thing? 
-  * Ensure you're using jinja escapes appropriately
-  * Profanity restrict. profanity_check
+  * Hidden token thing
+  * Profanity restrict
 * Homepage
-* input validation
+* About page
 * pictures solution
 
 * Cat/Leaf Schema

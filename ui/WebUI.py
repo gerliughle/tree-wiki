@@ -64,7 +64,8 @@ class WebUI:
         branch_id = request.args.get("branch")
         if branch_id:
             try:
-                branch = WebUI.engine.lookup_branch(ObjectId(branch_id))
+                branch_id = ObjectId(branch_id)
+                branch = WebUI.engine.lookup_branch(branch_id)
             except Exception as e:
                 flash("Error, branch not found.", "warning")
                 print(str(e))
@@ -131,6 +132,7 @@ class WebUI:
             if current_user.is_authenticated and current_user.role in ["admin", "editor"]:
                 page_context["is_edit_mode"] = True
                 session["mode"] = "edit"
+
 
         return render_template("index.html", **page_context)
 
