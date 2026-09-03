@@ -1,10 +1,10 @@
-from ui.WebUI import WebUI
-from logic.TreeEngine import TreeEngine
-from logic.UserManager import UserManager
 from flask import render_template, request
 from flask_login import current_user, login_required
 from bson import ObjectId
 
+from ui.WebUI import WebUI
+from logic.TreeEngine import TreeEngine
+from logic.UserManager import UserManager
 
 class EditRoutes:
     __app = WebUI.get_app()

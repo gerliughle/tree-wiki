@@ -9,23 +9,29 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-{% block head %} {% endblock %}
+    {% block head %} {% endblock %}
 </head>
 
 <body>
 {% include 'components/navbar.html' %}
-
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% include 'components/flash.html' %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
 {% block content %}
-<h1>Default Content</h1>
+    <h1>Default Content</h1>
 {% endblock %}
 
 <div class="container mt-5">
     <div class="row">
         <div class="col-lg-8">
 
-Copyright 2026 Joshua Shaw.<br>
-All Work in progress, do not use or share without permission.
+            Copyright 2026 Joshua Shaw.<br>
+            All Work in progress, do not use or share without permission.
         </div>
     </div>
 </div>

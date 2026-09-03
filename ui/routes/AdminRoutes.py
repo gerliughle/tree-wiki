@@ -1,13 +1,12 @@
+from flask import render_template, request, redirect, url_for, flash
+from flask_login import login_required
+from bson import ObjectId
+
 from ui.WebUI import WebUI
 from logic.User import User
 from logic.AdminManager import AdminManager
 from logic.UserManager import UserManager
 from logic.TreeEngine import TreeEngine
-
-from flask import render_template, request, redirect, url_for
-from flask_login import login_required
-from bson import ObjectId
-
 
 class AdminRoutes:
     __app = WebUI.get_app()
@@ -20,7 +19,6 @@ class AdminRoutes:
         """ Takes the action and log_id from admin dashboard buttons. Route to relevant next step. """
 
         save_type = ""
-
         log_id = request.form.get("log_id")
         action = request.form.get("action")
         log = AdminManager.get_audit_entry(ObjectId(log_id))
@@ -55,9 +53,6 @@ class AdminRoutes:
                 TreeEngine.save_leaf(obj_dict, "edit")
             elif obj_type == "User":
                 UserManager.save_user(obj_dict, "edit")
-
-
-
 
         elif action == "log_enable":
             obj_dict["is_active"] = True
@@ -97,7 +92,8 @@ class AdminRoutes:
             return render_template("admin/edit_user.html", user=user)
         else:
             print("User does not exist.")
-            return redirect(url_for("do_login"))
+            flash("User does not exist.", "warning")
+            return redirect(url_for("manage_users"))
 
     @staticmethod
     @__app.route("/do_edit_user", methods=["POST"])
@@ -130,9 +126,12 @@ class AdminRoutes:
                 user_edits["is_active"] = True
                 save_type = "enable"
             updated_user = UserManager.save_user(user_edits, save_type)
+            flash("User updated successfully.", "success")
             print(f"Updated user: {updated_user}")
             return redirect(url_for("homepage"))
-        return render_template("error.html")
+
+        flash("Error. User does not exist.", "warning")
+        return render_template("manage_users.html")
 
     @staticmethod
     @__app.route('/admin_dashboard')
@@ -163,21 +162,21 @@ class AdminRoutes:
         delete_user = ""
         if "user_id" in request.form:
             delete_user = UserManager.lookup_user_id(ObjectId(request.form["user_id"]))
-        if delete_user:
-            print("Delete user selected")
         else:
-            print("No user found to delete.")
-        return render_template("admnin/check_delete_user.html", user=delete_user)
+            flash("User does not exist.", "warning")
+            return render_template("index.html")
+        return render_template("admin/check_delete_user.html", user=delete_user)
 
     @staticmethod
     @__app.route('/do_delete_user', methods=['POST'])
     @login_required
     @UserManager.role_required("admin")
     def do_delete_user():
-        delete_user_id = ""
+        """ Probably needs better error handling. """
         if "user_id" in request.form:
             delete_user_id = ObjectId(request.form["user_id"])
         delete_user = UserManager.lookup_user_id(delete_user_id)
         delete_name = delete_user.name
         UserManager.delete_user(delete_user_id)
-        return render_template("admin/confirm_user_deleted.html", delete_name=delete_name)
+        flash(f"User '{delete_name}' deleted successfully.", "success")
+        return redirect(url_for("homepage"))

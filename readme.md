@@ -81,7 +81,20 @@ Done:
 To-Do:
 
 PO:
-* Ensure you're using jinja escapes appropriately
+* Implement custom error page/flashes:
+  * Error page template
+  * Send appropriate error and message
+  * Utilize flask flash message and bootstrap alert? yea..
+* Data validation:
+  * Run frontend and backend validation check on every user input
+  * Strip inputs, set max limits, decide if required, if empty response is allowed. 
+  * Sanitize using jinja escapes, limit character usage, limit links
+  * Captcha ? 
+  * Honeypot field? 
+  * Rate limit? 
+  * Hidden token thing? 
+  * Ensure you're using jinja escapes appropriately
+  * Profanity restrict. profanity_check
 * Homepage
 * input validation
 * pictures solution
@@ -102,7 +115,7 @@ Later:
   * It seems like this could be tricky or hard. I need to keep same _id so the trees don't get really fucked
   * So they'd all be stored in the same object, but i'd only want to call the latest one for page views, but call
   * them all for admin/mod stuff
-* Custom error pages.
+* User stats, awards, gamification, authorship.
 * Mod role: Editors edit pages, mods can revert/disable, and admins can manage users
 * Admin Log - pagination
 * Tree View. Started, but ugly

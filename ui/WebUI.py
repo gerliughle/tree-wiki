@@ -1,13 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_login import LoginManager, current_user
-from flask_session import Session # FIXME why is this red
-
-from logic.TreeEngine import TreeEngine
-from logic.Branch import Branch
-from logic.UserManager import UserManager
-from bson import ObjectId
+from flask_session import Session
 import os
 from configparser import ConfigParser
+from bson import ObjectId
+
+from logic.TreeEngine import TreeEngine
+from logic.UserManager import UserManager
 
 class WebUI:
     __app = Flask(__name__)
@@ -62,19 +61,20 @@ class WebUI:
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
-        if "branch" in request.args:
-            branch_id = ObjectId(request.args["branch"])
-            branch = WebUI.engine.lookup_branch(branch_id)
-            branch_id = branch.id
-        else:
+        branch_id = request.args.get("branch")
+        if branch_id:
+            try:
+                branch = WebUI.engine.lookup_branch(ObjectId(branch_id))
+            except Exception as e:
+                flash("Error, branch not found.", "warning")
+                print(str(e))
+                branch_id = None
+        if (branch_id is not None and branch is None) or branch_id is None:
             branch_name = "Japanese Maple"
             branch = WebUI.engine.lookup_branch_by_name(branch_name)
             branch_id = branch.id
 
-        if branch:
-            care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
-        else:
-            return render_template("error.html") #FIXME no error routing
+        care_guide, breadcrumbs, category_list = WebUI.engine.get_care_guide(branch_id)
 
         phases = []
         if "1st" in request.args:
@@ -103,8 +103,8 @@ class WebUI:
                     "entries": filtered_entries,
                     "branch_name": leaf.branch_name
                 }
-
                 filtered_care_guide.append(filtered_leaf)
+
         branch_has_image = branch.has_image
         # print(f"{branch.name} has image: {branch_has_image}")
         children = TreeEngine.get_children_of_branch(branch.id)
@@ -134,6 +134,7 @@ class WebUI:
 
         return render_template("index.html", **page_context)
 
+
     @staticmethod
     @__app.route('/index')
     @__app.route('/index.html')
@@ -143,23 +144,11 @@ class WebUI:
         """ Redirects to show branch. Can replace with a home page one day. """
         return redirect(url_for('show_branch'))
 
-
-
     @staticmethod
     @__app.route('/tree_view')
     def tree_view():
         tree_dict = TreeEngine.get_tree()
         return render_template("print/tree_view.html", tree_dict=tree_dict)
-
-    @staticmethod
-    @__app.route('/print_tree')
-    def print_tree():
-        """ Will eventually be replaced. For now, allows selection of any branch."""
-        all_branches = WebUI.engine.get_branches()
-
-        #should i send list for each depth?
-
-        return render_template("print/print_tree.html", branches=all_branches)
 
     @classmethod
     def run(cls):
