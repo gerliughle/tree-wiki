@@ -7,3 +7,4 @@ alt-profanity-check
 wordsegment
 better-profanity
 requests
+markupsafe

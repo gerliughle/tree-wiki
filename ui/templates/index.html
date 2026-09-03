@@ -5,6 +5,7 @@
 
     {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
         <div class="container sticky-top col-6">
+      <div class="p-4"></div> {#  Keep. Prevents alert from scrolling behind navbar #}
             <div class="alert alert-info d-flex justify-content-between align-items-baseline mt-3" role="alert">
                 <span><strong>EDIT MODE</strong> is active.</span>
                 <a class="btn btn-outline-info btn-sm"

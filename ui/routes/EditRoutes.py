@@ -1,6 +1,7 @@
-from flask import render_template, request
+from flask import render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
 from bson import ObjectId
+from markupsafe import Markup
 
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
@@ -12,14 +13,30 @@ class EditRoutes:
     @staticmethod
     @login_required
     @UserManager.role_required("admin", "editor")
-    @__app.route('/create_branch', methods=['POST'])
+    @__app.route('/create_branch', methods=['POST', 'GET'])
     def create_branch():
+        """ Sets up create branch page.
+
+        The branch from the form or arg sets the default parent branch for
+        the selector. Should error out gracefully. """
+
         branch = None
         all_branches = TreeEngine.get_branches()
-        branch_id = request.form.get("select_branch_id")
+        try:
+            if request.form.get("select_branch_id"):
+                branch_id = ObjectId(request.form.get("select_branch_id"))
+            if request.args.get("branch"):
+                branch_id = ObjectId(request.args.get("branch"))
+        except Exception as e:
+            print(str(e))
+            flash(f"Error. Invalid branch request.", "warning")
+            return redirect(url_for("homepage"))
         if branch_id:
             branch = TreeEngine.lookup_branch(ObjectId(branch_id))
-        return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
+            return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
+        else:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage"))
 
     @staticmethod
     @__app.route('/do_create_branch', methods=['POST'])
@@ -31,15 +48,20 @@ class EditRoutes:
         branch_description = ""
         parent_branch_id = ""
         branch_image = ""
-        if "branch_name" in request.form:
-            branch_name = request.form["branch_name"].strip()
-            existing_branch = TreeEngine.lookup_branch_by_name(branch_name)
 
-            if existing_branch:
-                print(f"Looked up {branch_name}. Found {existing_branch.name}")
-                return render_template("error.html")
-            print(f"Looked up {branch_name}. Found nothing.")
-            branch_image = str(branch_name.strip().lower().replace(" ", "_") + ".jpg")
+        branch_name = request.form.get("branch_name").strip()
+        existing_branch = TreeEngine.lookup_branch_by_name(branch_name)
+        if "parent_branch_id" in request.form:
+            parent_branch_id = ObjectId(request.form["parent_branch_id"])
+            parent_branch = TreeEngine.lookup_branch(parent_branch_id)
+
+        if existing_branch: # Dupe check
+            print(f"Looked up {branch_name}. Found existing branch.")
+            flash("Error, this branch already exists.", "warning")
+            return redirect(url_for("create_branch", branch=parent_branch.id))
+
+        print(f"Looked up {branch_name}. Found no duplicates. Proceeding.")
+        branch_image = str(branch_name.strip().lower().replace(" ", "_") + ".jpg")
         if "branch_description" in request.form:
             branch_description = request.form["branch_description"].strip()
         if "parent_branch_id" in request.form:
@@ -59,14 +81,6 @@ class EditRoutes:
         }
         branch = TreeEngine.save_branch(branch_dict, "create")
         return render_template("edit/confirm_branch_created.html", branch=branch)
-
-    @staticmethod
-    @__app.route('/select_edit_branch')
-    @login_required
-    @UserManager.role_required("admin", "editor")
-    def select_edit_branch():
-        all_branches = TreeEngine.get_branches()
-        return render_template("edit/select_edit_branch.html", branches=all_branches)
 
     @staticmethod
     @__app.route('/edit_branch', methods=['POST'])
@@ -120,13 +134,13 @@ class EditRoutes:
         updated_branch = TreeEngine.save_branch(branch_edits, "edit")
         return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
 
-    @staticmethod
-    @__app.route('/select_delete_branch')
-    @login_required
-    @UserManager.role_required("admin")
-    def delete_branch():
-        all_branches = TreeEngine.get_branches()
-        return render_template("edit/select_delete_branch.html", branches=all_branches)
+    # @staticmethod
+    # @__app.route('/select_delete_branch')
+    # @login_required
+    # @UserManager.role_required("admin")
+    # def delete_branch():
+    #     all_branches = TreeEngine.get_branches()
+    #     return render_template("edit/select_delete_branch.html", branches=all_branches)
 
     @staticmethod
     @__app.route('/check_delete_branch', methods=['POST'])
@@ -148,7 +162,11 @@ class EditRoutes:
         if "branch_id" in request.form:
             delete_branch_id = ObjectId(request.form["branch_id"])
             delete_name = TreeEngine.delete_branch(delete_branch_id)
-        return render_template("edit/confirm_branch_deleted.html", delete_name=delete_name)
+            flash(f"Successfully deleted branch: {delete_name}")
+            return redirect(url_for("homepage"))
+        else:
+            flash(f"No branch to delete.", "warning")
+            return redirect(url_for("homepage"))
 
     @staticmethod
     @__app.route('/check_disable_branch', methods=['POST'])
@@ -217,8 +235,8 @@ class EditRoutes:
         category_name: if creating a new subcat, this will exist. there will be no leaf_id or source branch.
         """
 
-        leaf = None  # The branch i am cloning from
-        target_branch = None  # The branch i am creating a leaf for
+        leaf = None  # The branch I am cloning from
+        target_branch = None  # The branch I am creating a leaf for
         source_branch = None
         category_name = None
 
