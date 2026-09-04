@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from bson import ObjectId
 from markupsafe import Markup
 
+from logic.Validate import Validate
 from ui.WebUI import WebUI
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
@@ -24,15 +25,15 @@ class EditRoutes:
         all_branches = TreeEngine.get_branches()
         try:
             if request.form.get("select_branch_id"):
-                branch_id = ObjectId(request.form.get("select_branch_id"))
+                branch_id = Validate.make_objectid(request.form.get("select_branch_id"))
             if request.args.get("branch"):
-                branch_id = ObjectId(request.args.get("branch"))
+                branch_id = Validate.make_objectid(request.args.get("branch"))
         except Exception as e:
             print(str(e))
             flash(f"Error. Invalid branch request.", "warning")
             return redirect(url_for("homepage"))
         if branch_id:
-            branch = TreeEngine.lookup_branch(ObjectId(branch_id))
+            branch = TreeEngine.lookup_branch(branch_id)
             return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
         else:
             flash("Error. No branch selected.", "warning")

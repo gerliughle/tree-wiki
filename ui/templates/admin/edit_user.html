@@ -2,16 +2,16 @@
 {% block title %}Edit User{% endblock %}
 {% block content %}
 
-    <div class="container my-2 col-md-6 col-4 d-flex-vertical">
+    <div class="container my-2 col-lg-4 col-6 d-flex-vertical">
         {% if current_user.role == "admin" %}
             <form method="POST" action="/do_edit_user">
                 <input type="hidden" name="user_id" value="{{ user.id }}">
                 <h3 class="col-lg-8">Editing User: '{{ user.username }}'</h3>
-                <span class="text-primary-emphasis">Current role: {{ user.role }}</span>
-                <span>Adjust role or take moderation action. </span>
+                <div class="text-primary-emphasis mb-2">Current role: {{ user.role }}</div>
+                <div class="mb-2">Adjust role or take moderation action. </div>
 
 
-                <select class="form-select my-2" aria-label="Change user role" name="role_change">
+                <select class="form-select mb-2" aria-label="Change user role" name="role_change">
                     <option selected value="">--Change user role--</option>
 
                     <option value="user">Standard User</option>
@@ -19,7 +19,7 @@
                     <option value="admin">Admin</option>
 
                 </select>
-                <div class="form-floating w-100 mb-2">
+                <div class="form-floating mb-3">
                     <input type="password" name="password" class="form-control" id="password"
                            placeholder="Password">
                     <label for="password">Change {{ user.username }}'s password</label>

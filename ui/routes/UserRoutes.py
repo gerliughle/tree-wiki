@@ -28,12 +28,23 @@ class UserRoutes:
         token = request.form.get("cf-turnstile-response")
         ip = request.headers.get("CF-Connecting-IP", request.remote_addr)
         if not token or not UserManager.verify_turnstile(token, ip):
+            print("Cloudflare Turnstile error.")
             flash("Error with verification. Please try again.", "danger")
             return redirect(url_for("do_login"))
 
         # Process inputs
-        username = request.form.get("username").strip().lower()
+        username = request.form.get("username")
+        valid, username, error = Validate.validate_input(username, "username", 4, 25, "username")
+        if not valid:
+            flash(error, "warning")
+            return redirect(url_for("do_login"))
+
         password = request.form.get("password")
+        valid, password, error = Validate.validate_input(password, "password", 8, 30, "password", check_profanity=False)
+        if not valid:
+            flash(error, "warning")
+            return redirect(url_for("do_login"))
+
         remember = True if request.form.get("remember_me") else False
         login_action = request.form.get("login_action")
         user = UserManager.lookup_user_name(username)
@@ -42,19 +53,15 @@ class UserRoutes:
         if login_action == "login":
             print(f"Processing login request for '{username}'.")
             if user and user.verify_password(password) and user.is_active:
-                    print(f"Password verified. Logging in {user.username}")
+                    print(f"Login verified. Logging in {user.username}")
                     login_user(user, remember=remember)
             else:
                 print(f"Login attempt for '{username}' failed.")
-                flash("Login failed, please check your username or password.", "danger")
+                flash("Login failed, please check your username or password.", "warning")
                 return redirect(url_for("do_login"))
         elif login_action == "register":
             print(f"Processing registration request for {username}.")
             if not user:
-                if Validate.check_profanity(username):
-                    flash("Registration failed. Please try again.", "danger")
-                    return redirect(url_for("login"))
-
                 pw_hash = User.hash_password(password)
                 print("Password hashed.")
                 user_dict = {
@@ -66,7 +73,7 @@ class UserRoutes:
                 new_user = UserManager.save_user(user_dict, "create")
                 login_user(new_user)
                 flash("Registration successful. Welcome to bonsaitree.wiki!", "success")
-                print("New User registered and logged in.")
+                print(f"New User '{username}'registered and logged in.")
             else:
                 print("User already exists.")
                 flash("Username already exists. Please try again.", "warning")
@@ -79,4 +86,3 @@ class UserRoutes:
         logout_user()
         flash("You have been logged out.", "success")
         return redirect(url_for("homepage"))
-

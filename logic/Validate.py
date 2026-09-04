@@ -1,20 +1,19 @@
-from bson import ObjectId
-from bson.errors import InvalidId
 from profanity_check import predict
 from wordsegment import load, segment
 from better_profanity import profanity
-from flask import flash
 from bson import ObjectId
 from bson.errors import InvalidId
 import string
 
-class Validate:
 
+class Validate:
     load()
     profanity.load_censor_words()
+    USERNAME_CHARS = set(string.ascii_lowercase + string.digits + "-_")
+
 
     @staticmethod
-    def validate_objectid(obj_id):
+    def make_objectid(obj_id):
         """ Returns ObjectId from string or ObjectId"""
         if not obj_id:
             print("validate_objectid - Error: No id provided.")
@@ -63,25 +62,28 @@ class Validate:
                        field_name,
                        min_length=0,
                        max_length=1000,
-                       clean_profile=None,
-                       check_profanity=True):
-        """ Set rules for input validation.
+                       kind=None,
+                       check_profanity=True,
+                       clean=True):
+        """ Validates strings for user inputs to accept or reject inputs.
 
-        Returns tuple: True/False if passes validation, the text, and an error message.
+        Returns tuple: True/False if passes validation and an error message.
 
         text: the text string to be validated
         field_name: The field the text is for, to return appropriate error.
         min_length: min_char length. If 0, then field can be blank.
         max_length: max_char length.
         check_profanity: Check text through profanity filter. Returns False if profane.
-        clean_profile: "username", "password", "title", "text" will check against rules and apply some cleaning.
-            "username" is all lowercase, no spaces, limited characters.
-            "password" is no spaces
-            "title" uses title capitalization, no special characters.
-            "text" uses first capitalization
+        kind: "username", "password", "title", "text" will be checked against unique rules.
+            "username" - no spaces, limited characters.
+            "password" - no spaces
+            "title" - no special characters.
+            "text" - currently has no rules.
         """
 
-        text = text.strip()
+        if clean:
+            text = cls.clean_input(text, kind)
+
         field_name = field_name.capitalize()
         if text is None and min_length > 0:
             return False, text, f"{field_name} cannot be empty."
@@ -89,30 +91,57 @@ class Validate:
         if check_profanity:
             profane = cls.check_profanity(text)
             if profane:
-                return False, text, f"{field_name} was invalid. Please try again."
+                print("Profanity found. Yikes.")
+                return False, text, f"{field_name} was not accepted. Please try again."
 
-        if clean_profile == "username":
-            text = text.lower()
-            text = text.replace(" ", "")
-            for letter in text:
-                if letter not in [string.ascii_lowercase, string.digits, ['_', '-']]:
-                    return False, text, f"{field_name} contains invalid characters. Please try again."
-        elif clean_profile == "password":
-            for letter in text:
-                if letter == " ":
+        if kind == "username":
+            for char in text:
+                if char not in cls.USERNAME_CHARS:
+                    return False, text, f"{field_name}s can only contain lowercase letters, numbers, and dashes. Please try again."
+
+        elif kind == "password":
+            for char in text:
+                if char == " ":
                     return False, text, f"{field_name} cannot have spaces. Please try again."
-        elif clean_profile == "title":
-            text.title()
-            for letter in text:
-                if letter not in string.ascii_letters:
-                    return False, text, f"{field_name} can only contain letters. Please try again."
-        elif clean_profile == "text":
-            text.capitalize()
 
+        elif kind == "title":
+            if not text.isalpha():
+                return False, text, f"{field_name} can only contain letters. Please try again."
+        elif kind == "text":
+            pass
 
         if len(text) < min_length:
             return False, text, f"{field_name} is too short."
         elif len(text) > max_length:
             return False, text, f"{field_name} is too long."
+
         return True, text, ""
+
+    @classmethod
+    def clean_input(cls,
+                    text: str,
+                    kind=None):
+        """ Cleans string inputs for inputs.
+
+        Returns cleaned text. Strips all text.
+
+        text: the text string to be validated
+        clean_profile: "username", "password", "title", "text" will check against rules and apply some cleaning.
+            "username" is all lowercase.
+            "password" has nothing.
+            "title" uses title capitalization
+            "text" uses first capitalization
+        """
+        text = text.strip()
+
+        if kind == "username":
+            text.lower()
+        elif kind == "password":
+            pass
+        elif kind == "title":
+            text.title()
+        elif kind == "text":
+            text.capitalize()
+
+        return text
 

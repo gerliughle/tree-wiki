@@ -79,25 +79,25 @@ Done:
 * Branch creation/editing checks for duplicate names
 * Leaves only allow one or all seasons, with all season selector. 
 * Don't allow leaves with no phases
-* Implement CloudFlare turnstile for bot detection
+* Implement custom error page/flashes:
+  * Setup custom error messages instead of redirect to error page.
+  * Utilize flask flash message and bootstrap alert for errors and messaging, avoiding error pages
+* Data validation:
+  * CloudFlare Turnstile
+  * Rate limit
 
 To-Do:
 
 PO:
-* Implement custom error page/flashes:
-  * Error page template
-  * Send custom error and message
-  * Utilize flask flash message and bootstrap alert for errors and messaging, avoiding error pages
 * Data validation:
-  * Run frontend and backend validation check on every user input
-  * Strip inputs, character removal, space removal, capitalize/lowercase, links
-  * set max limits, required, empty response, autocomplete
-  * jinja escapes?
-  * Captcha ? 
-  * Honeypot field? 
-  * Rate limit? 
-  * Hidden token thing
-  * Profanity restrict
+  * Client side form validation, and field tuning (autocomplete, etc). 
+  * Server side input validation for all text inputs. Function done. In progress
+  * Server side input cleaning. Function done. Implementation in progress
+  * jinja escapes check
+  * Honeypot field for login, edit forms.
+  * Profanity checks. Function done. Implementation in progress.
+  * ObjectId validation... Function done. Implementation in progress/needs standardization to inputs only
+* Mobile menu fix.. logout/dark toggle.
 * Homepage
 * About page
 * pictures solution

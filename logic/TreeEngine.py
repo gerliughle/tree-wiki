@@ -57,7 +57,7 @@ class TreeEngine:
 
     @classmethod
     def lookup_branch(cls, branch_id):
-        branch_id = Validate.validate_objectid(branch_id)
+        branch_id = Validate.make_objectid(branch_id)
         if branch_id in cls.branch_map:
             return cls.branch_map[branch_id]
         return None
@@ -67,7 +67,7 @@ class TreeEngine:
         """ Return leaves that are for branch_id.
         Database is all_branches, all_leaves, branch_map, leaf_map"""
         leaf_matches = []
-        branch_id = Validate.validate_objectid(branch_id)
+        branch_id = Validate.make_objectid(branch_id)
         for leaf in cls.active_leaves:
             if leaf.branch_id == branch_id:
                 leaf_matches.append(leaf)
@@ -75,7 +75,7 @@ class TreeEngine:
 
     @classmethod
     def lookup_leaf(cls, leaf_id):
-        leaf_id = Validate.validate_objectid(leaf_id)
+        leaf_id = Validate.make_objectid(leaf_id)
         if leaf_id in cls.leaf_map:
             return cls.leaf_map[leaf_id]
         return None
@@ -89,7 +89,7 @@ class TreeEngine:
         care_guide = []  # list of all leaves in a care guide. Returned.
         category_list = []
 
-        branch_id = Validate.validate_objectid(branch_id)
+        branch_id = Validate.make_objectid(branch_id)
         current_branch = cls.lookup_branch(branch_id)
 
         while current_branch is not None:
@@ -139,7 +139,7 @@ class TreeEngine:
     def get_children_of_branch(cls, branch_id):
         children_list = []
 
-        branch_id = Validate.validate_objectid(branch_id)
+        branch_id = Validate.make_objectid(branch_id)
         for branch in cls.active_branches:
             if branch_id == branch.parent_id:
                 children_list.append(branch)
@@ -172,7 +172,7 @@ class TreeEngine:
     def delete_branch(cls, branch_id):
         from data.Database import Database
         delete_leaves = []
-        branch_id = Validate.validate_objectid(branch_id)
+        branch_id = Validate.make_objectid(branch_id)
         delete_branch = cls.lookup_branch(branch_id)
         delete_name = delete_branch.name
         children = cls.get_children_of_branch(branch_id)
@@ -193,7 +193,7 @@ class TreeEngine:
     @classmethod
     def delete_leaf(cls, leaf_id):
         from data.Database import Database
-        leaf_id = Validate.validate_objectid(leaf_id)
+        leaf_id = Validate.make_objectid(leaf_id)
         delete_leaf = cls.lookup_leaf(ObjectId(leaf_id))
         Database.delete_leaf(delete_leaf)
         cls.read_data()

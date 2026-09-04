@@ -9,6 +9,7 @@ from logic.UserManager import UserManager
 from logic.TreeEngine import TreeEngine
 from logic.Validate import Validate
 
+
 class AdminRoutes:
     __app = WebUI.get_app()
 
@@ -20,10 +21,10 @@ class AdminRoutes:
         """ Takes the action and log_id from admin dashboard buttons. Route to relevant next step. """
 
         save_type = ""
-        log_id = Validate.validate_objectid(request.form.get("log_id"))
+        log_id = Validate.make_objectid(request.form.get("log_id"))
         action = request.form.get("action")
         log = AdminManager.get_audit_entry(log_id)
-        target_id = Validate.validate_objectid(log["target_id"])
+        target_id = Validate.make_objectid(log["target_id"])
         obj_type = log["obj_type"]
         obj_dict = {"_id": target_id}
 
@@ -106,19 +107,20 @@ class AdminRoutes:
         new_pw_hash = ""
 
         user_id = request.form.get("user_id")
-        user_id = Validate.validate_objectid(user_id)
+        user_id = Validate.make_objectid(user_id)
         user = UserManager.lookup_user_id(user_id)
         role_change = request.form.get("role_change")
         disable_account = request.form.get("disable_account")
         enable_account = request.form.get("enable_account")
 
         pw = request.form.get("password")
-        pw_valid, pw, message =  Validate.validate_input(
+        pw_valid, pw, message = Validate.validate_input(
             pw,
             "password",
             8,
-            20,
-            "password")
+            30,
+            "password",
+            check_profanity=False)
         if pw_valid:
             new_pw_hash = User.hash_password(pw)
         else:
@@ -175,7 +177,7 @@ class AdminRoutes:
     def check_delete_user():
         delete_user = ""
         user_id = request.form.get("user_id")
-        user_id = Validate.validate_objectid(user_id)
+        user_id = Validate.make_objectid(user_id)
         delete_user = UserManager.lookup_user_id(user_id)
         if not delete_user:
             flash("User does not exist.", "warning")
@@ -189,7 +191,7 @@ class AdminRoutes:
     def do_delete_user():
         """ Probably needs better error handling. """
         user_id = request.form.get("user_id")
-        delete_user_id = Validate.validate_objectid(user_id)
+        delete_user_id = Validate.make_objectid(user_id)
         delete_user = UserManager.lookup_user_id(user_id)
         if delete_user:
             delete_name = delete_user.name

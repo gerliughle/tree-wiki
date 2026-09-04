@@ -36,7 +36,7 @@ class UserManager:
     def lookup_user_id(user_id):
         """ Takes id as str, then passes to db to look up. """
         from data.Database import Database
-        user_id = Validate.validate_objectid(user_id)
+        user_id = Validate.make_objectid(user_id)
         user = Database.lookup_user("_id", user_id)
         if user:
             return user
@@ -68,14 +68,16 @@ class UserManager:
     @classmethod
     def delete_user(cls, user_id):
         from data.Database import Database
-        user_id = Validate.validate_objectid(user_id)
+        user_id = Validate.make_objectid(user_id)
         delete_user = cls.lookup_user_id(ObjectId(user_id))
         Database.delete_user(delete_user)
         cls.__all_users = Database.read_users()
 
     @classmethod
-    def verify_turnstile(cls, token, remote_ip):
-        """ Verifies Cloudflare turnstile token to mitigate bot requests. """
+    def verify_turnstile(cls, token, remote_ip=None):
+        """ Verifies Cloudflare turnstile token to fight bot logins.
+
+        AI did take the lead on this function, sorry humans. """
 
         home_path = os.environ['HOME']
         path = os.path.join(home_path, cls.APP_NAME)
@@ -87,14 +89,31 @@ class UserManager:
         config_parser.read(file)
         turnstile_secret_key = config_parser.get("Turnstile", "turnstile_secret_key")
 
-        response = requests.post(
-            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-            data={
-                "secret": turnstile_secret_key,
-                "response": token,
-                "remoteip": remote_ip
-            },
-            timeout=5
-        )
-        result = response.json()
-        return result.get("success", False)
+        payload = {
+            "secret": turnstile_secret_key,
+            "response": token
+        }
+
+        # Omit local loopback IPs (127.0.0.1 / ::1) as Cloudflare siteverify rejects them in remoteip
+        if remote_ip and remote_ip not in ("127.0.0.1", "::1"):
+            payload["remoteip"] = remote_ip
+
+        try:
+            response = requests.post(
+                "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+                data=payload,
+                timeout=5
+            )
+            result = response.json()
+
+            if not result.get("success", False):
+                # Prints the exact Cloudflare failure reason (e.g., 'invalid-input-response')
+                error_codes = result.get("error-codes", [])
+                print(f"[Turnstile Failed] Errors returned by Cloudflare: {error_codes}")
+                return False
+
+            return True
+
+        except Exception as e:
+            print(f"[Turnstile Error] Network request exception: {e}")
+            return False

@@ -15,9 +15,9 @@
     {% endif %}
 
     <!-- Hero -->
-    <div class="container col-md-9 px-4 py-5">
+    <div class="container col-md-9 px-4 {# py-5 #}">
         {% if branch_has_image %}
-            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+            <div class="row flex-lg-row-reverse align-items-center g-5 pt-3 pb-5">
 
             <div class="col-10 col-sm-8 col-lg-6">
                 <img
@@ -101,9 +101,9 @@
                 <form method="GET" action="/show_branch">
                     <input type="hidden" name="branch" value="{{ branch.id }}"/>
 
-                    <div class="card-header d-flex justify-content-start align-items-center">
-                        <h4 class="h5 mb-0 p-2">Filters:</h4>
-                        <div class="btn-group btn-group-sm p-2" data-toggle="buttons" role="group">
+                    <div class="card-header d-flex justify-content-start flex-wrap gap-2 align-items-center">
+                        <h4 class="h5 mb-0">Filters:</h4>
+                        <div class="btn-group btn-group-sm" data-toggle="buttons" role="group">
                             <label class="btn btn-group-text-primary disabled">Phase:</label>
                             {% if "1st" in phases %}
                                 <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st" checked>

@@ -62,7 +62,7 @@ class WebUI:
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
-        branch_id = Validate.validate_objectid(request.args.get("branch"))
+        branch_id = Validate.make_objectid(request.args.get("branch"))
         branch = TreeEngine.lookup_branch(branch_id)
         if not branch:
             branch_id = None
