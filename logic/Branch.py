@@ -2,7 +2,6 @@ import os
 
 from logic.TreeEngine import TreeEngine
 
-
 class Branch:
     def __init__(self,
                  _id,

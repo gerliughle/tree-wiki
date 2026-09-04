@@ -198,28 +198,28 @@ class EditRoutes:
     def select_edit_leaf():
         all_branches = TreeEngine.get_branches()
         return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
-
-    @staticmethod
-    @__app.route('/select_edit_leaf_type', methods=['POST'])
-    @login_required
-    @UserManager.role_required("admin", "editor")
-    def select_edit_leaf_type():
-        branch_id = ""
-        if "select_branch_id" in request.form:
-            branch_id = ObjectId(request.form["select_branch_id"])
-
-        branch = TreeEngine.lookup_branch(branch_id)
-        branch_leaves = TreeEngine.get_leaves_for_branch(branch_id)
-        inherited_leaves = TreeEngine.get_inherited_leaves(branch_id)
-        print(f"Branch_leaves count: {len(branch_leaves)}. Inherited_leaves count: {len(inherited_leaves)}")
-
-        page_context = {
-            "branch": branch,
-            "branch_leaves": branch_leaves,
-            "inherited_leaves": inherited_leaves,
-            "all_categories": TreeEngine.CATEGORIES
-        }
-        return render_template('edit/select_edit_leaf_type.html', **page_context)
+    #
+    # @staticmethod
+    # @__app.route('/select_edit_leaf_type', methods=['POST'])
+    # @login_required
+    # @UserManager.role_required("admin", "editor")
+    # def select_edit_leaf_type():
+    #     branch_id = ""
+    #     if "select_branch_id" in request.form:
+    #         branch_id = ObjectId(request.form["select_branch_id"])
+    #
+    #     branch = TreeEngine.lookup_branch(branch_id)
+    #     branch_leaves = TreeEngine.get_leaves_for_branch(branch_id)
+    #     inherited_leaves = TreeEngine.get_inherited_leaves(branch_id)
+    #     print(f"Branch_leaves count: {len(branch_leaves)}. Inherited_leaves count: {len(inherited_leaves)}")
+    #
+    #     page_context = {
+    #         "branch": branch,
+    #         "branch_leaves": branch_leaves,
+    #         "inherited_leaves": inherited_leaves,
+    #         "all_categories": TreeEngine.CATEGORIES
+    #     }
+    #     return render_template('edit/select_edit_leaf_type.html', **page_context)
 
     @staticmethod
     @__app.route('/edit_leaf', methods=['POST'])

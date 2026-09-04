@@ -1,5 +1,7 @@
 from bson import ObjectId
 
+from logic.Validate import Validate
+
 
 class TreeEngine:
     all_branches = []
@@ -34,9 +36,6 @@ class TreeEngine:
          cls.active_leaves, cls.active_leaves, cls.leaf_map) \
             = Database.read_data()
 
-    # @classmethod
-    # def get_leaves(cls):
-    #     return cls.active_leaves
 
     @classmethod
     def get_branches(cls):
@@ -58,6 +57,7 @@ class TreeEngine:
 
     @classmethod
     def lookup_branch(cls, branch_id):
+        branch_id = Validate.validate_objectid(branch_id)
         if branch_id in cls.branch_map:
             return cls.branch_map[branch_id]
         return None
@@ -67,6 +67,7 @@ class TreeEngine:
         """ Return leaves that are for branch_id.
         Database is all_branches, all_leaves, branch_map, leaf_map"""
         leaf_matches = []
+        branch_id = Validate.validate_objectid(branch_id)
         for leaf in cls.active_leaves:
             if leaf.branch_id == branch_id:
                 leaf_matches.append(leaf)
@@ -74,6 +75,7 @@ class TreeEngine:
 
     @classmethod
     def lookup_leaf(cls, leaf_id):
+        leaf_id = Validate.validate_objectid(leaf_id)
         if leaf_id in cls.leaf_map:
             return cls.leaf_map[leaf_id]
         return None
@@ -87,6 +89,7 @@ class TreeEngine:
         care_guide = []  # list of all leaves in a care guide. Returned.
         category_list = []
 
+        branch_id = Validate.validate_objectid(branch_id)
         current_branch = cls.lookup_branch(branch_id)
 
         while current_branch is not None:
@@ -99,42 +102,44 @@ class TreeEngine:
                     care_guide.append(leaf)
                 if leaf.category not in category_list:
                     category_list.append(leaf.category)
-            current_branch = cls.lookup_branch(current_branch.parent_id) # Untested
-
-        return care_guide, breadcrumbs, category_list
-
-    @classmethod
-    def get_inherited_leaves(cls, branch_id):
-        """ Not sure this is even used, only called on old edit page. But seems 80% like
-        the above method, but removes current leaves. """
-
-        subcategory_list = set()  # subcategories that already have a leaf
-        inherited_leaves = []  # list of inherited leaves only
-
-        branch = cls.lookup_branch(branch_id)
-        current_branch = cls.lookup_branch(branch.id)
-
-        while current_branch is not None:
-            # print(f"Checking {current_branch.name}")
-            current_leaves = cls.get_leaves_for_branch(current_branch._id)
-
-            for leaf in current_leaves:
-                if leaf.subcategory not in subcategory_list:
-                    subcategory_list.add(leaf.subcategory)
-                    inherited_leaves.append(leaf)
-                    # print(f"Added {leaf.subcategory} to leaf guide.")
-
             current_branch = cls.lookup_branch(current_branch.parent_id)
 
-        for leaf in inherited_leaves:  # remove current leaves
-            if leaf.branch_id == branch_id:
-                inherited_leaves.remove(leaf)
-
-        return inherited_leaves
+        return care_guide, breadcrumbs, category_list
+    #
+    # @classmethod
+    # def get_inherited_leaves(cls, branch_id):
+    #     """ Not sure this is even used, only called on old edit page. But seems 80% like
+    #     the above method, but removes current leaves. """
+    #
+    #     subcategory_list = set()  # subcategories that already have a leaf
+    #     inherited_leaves = []  # list of inherited leaves only
+    #
+    #     branch = cls.lookup_branch(branch_id)
+    #     current_branch = cls.lookup_branch(branch.id)
+    #
+    #     while current_branch is not None:
+    #         # print(f"Checking {current_branch.name}")
+    #         current_leaves = cls.get_leaves_for_branch(current_branch._id)
+    #
+    #         for leaf in current_leaves:
+    #             if leaf.subcategory not in subcategory_list:
+    #                 subcategory_list.add(leaf.subcategory)
+    #                 inherited_leaves.append(leaf)
+    #                 # print(f"Added {leaf.subcategory} to leaf guide.")
+    #
+    #         current_branch = cls.lookup_branch(current_branch.parent_id)
+    #
+    #     for leaf in inherited_leaves:  # remove current leaves
+    #         if leaf.branch_id == branch_id:
+    #             inherited_leaves.remove(leaf)
+    #
+    #     return inherited_leaves
 
     @classmethod
     def get_children_of_branch(cls, branch_id):
         children_list = []
+
+        branch_id = Validate.validate_objectid(branch_id)
         for branch in cls.active_branches:
             if branch_id == branch.parent_id:
                 children_list.append(branch)
@@ -167,7 +172,7 @@ class TreeEngine:
     def delete_branch(cls, branch_id):
         from data.Database import Database
         delete_leaves = []
-        branch_id = ObjectId(branch_id)
+        branch_id = Validate.validate_objectid(branch_id)
         delete_branch = cls.lookup_branch(branch_id)
         delete_name = delete_branch.name
         children = cls.get_children_of_branch(branch_id)
@@ -188,6 +193,7 @@ class TreeEngine:
     @classmethod
     def delete_leaf(cls, leaf_id):
         from data.Database import Database
+        leaf_id = Validate.validate_objectid(leaf_id)
         delete_leaf = cls.lookup_leaf(ObjectId(leaf_id))
         Database.delete_leaf(delete_leaf)
         cls.read_data()

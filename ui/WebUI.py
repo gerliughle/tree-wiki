@@ -3,10 +3,11 @@ from flask_login import LoginManager, current_user
 from flask_session import Session
 import os
 from configparser import ConfigParser
-from bson import ObjectId
 
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
+from logic.Validate import Validate
+
 
 class WebUI:
     __app = Flask(__name__)
@@ -61,16 +62,13 @@ class WebUI:
     @staticmethod
     @__app.route('/show_branch', methods=["GET", "POST"])
     def show_branch():
-        branch_id = request.args.get("branch")
-        if branch_id:
-            try:
-                branch_id = ObjectId(branch_id)
-                branch = WebUI.engine.lookup_branch(branch_id)
-            except Exception as e:
-                flash("Error, branch not found.", "warning")
-                print(str(e))
-                branch_id = None
-        if (branch_id is not None and branch is None) or branch_id is None:
+        branch_id = Validate.validate_objectid(request.args.get("branch"))
+        branch = TreeEngine.lookup_branch(branch_id)
+        if not branch:
+            branch_id = None
+        if request.args.get("branch") is not None and branch is None:
+            flash(f"Error, branch not found.", "warning")
+        if (branch_id is not None and branch is None) or branch_id is None: # lmao
             branch_name = "Japanese Maple"
             branch = WebUI.engine.lookup_branch_by_name(branch_name)
             branch_id = branch.id
@@ -132,7 +130,6 @@ class WebUI:
             if current_user.is_authenticated and current_user.role in ["admin", "editor"]:
                 page_context["is_edit_mode"] = True
                 session["mode"] = "edit"
-
 
         return render_template("index.html", **page_context)
 

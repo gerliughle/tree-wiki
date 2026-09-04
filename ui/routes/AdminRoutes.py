@@ -7,6 +7,7 @@ from logic.User import User
 from logic.AdminManager import AdminManager
 from logic.UserManager import UserManager
 from logic.TreeEngine import TreeEngine
+from logic.Validate import Validate
 
 class AdminRoutes:
     __app = WebUI.get_app()
@@ -19,10 +20,10 @@ class AdminRoutes:
         """ Takes the action and log_id from admin dashboard buttons. Route to relevant next step. """
 
         save_type = ""
-        log_id = request.form.get("log_id")
+        log_id = Validate.validate_objectid(request.form.get("log_id"))
         action = request.form.get("action")
-        log = AdminManager.get_audit_entry(ObjectId(log_id))
-        target_id = ObjectId(log["target_id"])
+        log = AdminManager.get_audit_entry(log_id)
+        target_id = Validate.validate_objectid(log["target_id"])
         obj_type = log["obj_type"]
         obj_dict = {"_id": target_id}
 
@@ -31,18 +32,17 @@ class AdminRoutes:
         if action == "log_delete":
             print("Log Delete Selected")
             if obj_type == "Branch":
-                delete_branch = TreeEngine.lookup_branch(ObjectId(target_id))
+                delete_branch = TreeEngine.lookup_branch(target_id)
                 return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
             elif obj_type == "Leaf":
-                delete_leaf = TreeEngine.lookup_leaf(ObjectId(target_id))
+                delete_leaf = TreeEngine.lookup_leaf(target_id)
                 branch = TreeEngine.lookup_branch(delete_leaf.branch_id)
                 return render_template("edit/check_delete_leaf.html", delete_leaf=delete_leaf, branch=branch)
             elif obj_type == "User":
-                delete_user = UserManager.lookup_user_id(ObjectId(target_id))
+                delete_user = UserManager.lookup_user_id(target_id)
                 print(f"{delete_user=}")
                 return render_template("admin/check_delete_user.html", user=delete_user)
-
-        if action == "log_revert":
+        elif action == "log_revert":
             print("Log Revert Selected")
             obj_dict = log["edit"]["before"]
             obj_dict["_id"] = target_id
@@ -60,6 +60,9 @@ class AdminRoutes:
         elif action == "log_disable":
             obj_dict["is_active"] = False
             save_type = "disable"
+        else:
+            flash("Invalid action.", "warning")
+            return redirect(url_for("admin_dashboard"))
         if action == "log_enable" or action == "log_disable":
             if obj_type == "User":
                 UserManager.save_user(obj_dict, save_type)
@@ -91,7 +94,6 @@ class AdminRoutes:
         if user and user.username != "josh":
             return render_template("admin/edit_user.html", user=user)
         else:
-            print("User does not exist.")
             flash("User does not exist.", "warning")
             return redirect(url_for("manage_users"))
 
@@ -104,12 +106,24 @@ class AdminRoutes:
         new_pw_hash = ""
 
         user_id = request.form.get("user_id")
+        user_id = Validate.validate_objectid(user_id)
         user = UserManager.lookup_user_id(user_id)
         role_change = request.form.get("role_change")
         disable_account = request.form.get("disable_account")
         enable_account = request.form.get("enable_account")
-        if request.form["password"] != "":
-            new_pw_hash = User.hash_password(request.form["password"])
+
+        pw = request.form.get("password")
+        pw_valid, pw, message =  Validate.validate_input(
+            pw,
+            "password",
+            8,
+            20,
+            "password")
+        if pw_valid:
+            new_pw_hash = User.hash_password(pw)
+        else:
+            flash(message, "warning")
+            return render_template("admin/edit_user.html", user=user)
 
         if user and user.username != "josh":
             user_edits = {"_id": user.id}
@@ -160,9 +174,10 @@ class AdminRoutes:
     @UserManager.role_required("admin")
     def check_delete_user():
         delete_user = ""
-        if "user_id" in request.form:
-            delete_user = UserManager.lookup_user_id(ObjectId(request.form["user_id"]))
-        else:
+        user_id = request.form.get("user_id")
+        user_id = Validate.validate_objectid(user_id)
+        delete_user = UserManager.lookup_user_id(user_id)
+        if not delete_user:
             flash("User does not exist.", "warning")
             return render_template("index.html")
         return render_template("admin/check_delete_user.html", user=delete_user)
@@ -173,10 +188,13 @@ class AdminRoutes:
     @UserManager.role_required("admin")
     def do_delete_user():
         """ Probably needs better error handling. """
-        if "user_id" in request.form:
-            delete_user_id = ObjectId(request.form["user_id"])
-        delete_user = UserManager.lookup_user_id(delete_user_id)
-        delete_name = delete_user.name
-        UserManager.delete_user(delete_user_id)
-        flash(f"User '{delete_name}' deleted successfully.", "success")
+        user_id = request.form.get("user_id")
+        delete_user_id = Validate.validate_objectid(user_id)
+        delete_user = UserManager.lookup_user_id(user_id)
+        if delete_user:
+            delete_name = delete_user.name
+            UserManager.delete_user(delete_user_id)
+            flash(f"User '{delete_name}' deleted successfully.", "success")
+        else:
+            flash("Error. User does not exist.", "warning")
         return redirect(url_for("homepage"))

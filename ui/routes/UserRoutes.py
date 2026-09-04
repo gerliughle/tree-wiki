@@ -4,6 +4,7 @@ from flask_login import LoginManager, login_required, login_user, logout_user
 from ui.WebUI import WebUI
 from logic.User import User
 from logic.UserManager import UserManager
+from logic.Validate import Validate
 
 class UserRoutes:
     login_manager = LoginManager()
@@ -50,7 +51,7 @@ class UserRoutes:
         elif login_action == "register":
             print(f"Processing registration request for {username}.")
             if not user:
-                if UserManager.is_username_profane(username):
+                if Validate.check_profanity(username):
                     flash("Registration failed. Please try again.", "danger")
                     return redirect(url_for("login"))
 
