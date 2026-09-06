@@ -1,7 +1,5 @@
 from flask import render_template, request, flash, redirect, url_for
 from flask_login import current_user, login_required
-from bson import ObjectId
-from markupsafe import Markup
 
 from logic.Validate import Validate
 from ui.WebUI import WebUI
@@ -12,16 +10,15 @@ class EditRoutes:
     __app = WebUI.get_app()
 
     @staticmethod
+    @__app.route('/create_branch', methods=['POST', 'GET'])
     @login_required
     @UserManager.role_required("admin", "editor")
-    @__app.route('/create_branch', methods=['POST', 'GET'])
     def create_branch():
         """ Sets up create branch page.
 
         The branch from the form or arg sets the default parent branch for
         the selector. Should error out gracefully. """
 
-        branch = None
         all_branches = TreeEngine.get_branches()
         branch_id_form = Validate.make_objectid(request.form.get("select_branch_id"))
         branch_id_arg = Validate.make_objectid(request.args.get("branch"))
@@ -29,17 +26,20 @@ class EditRoutes:
             branch = TreeEngine.lookup_branch(branch_id_form)
         elif branch_id_arg:
             branch = TreeEngine.lookup_branch(branch_id_arg)
-        if branch:
-            return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
         else:
+            branch = None
+
+        if not branch:
             flash("Error. No branch selected.", "warning")
             print("Edit_route: Create branch. Branch not found.")
             return redirect(url_for("homepage"))
+        else:
+            return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
 
     @staticmethod
+    @__app.route('/do_create_branch', methods=['POST'])
     @login_required
     @UserManager.role_required("admin", "editor")
-    @__app.route('/do_create_branch', methods=['POST'])
     def do_create_branch():
         """ Creates a new branch. Requires title,  description and parent branch.
 
@@ -91,7 +91,7 @@ class EditRoutes:
         }
         branch = TreeEngine.save_branch(branch_dict, "create")
         flash(f"Successfully created branch {branch.name}", "success")
-        return render_template("print/print_tree.html", branch=branch)
+        return redirect(url_for("show_branch", branch=branch.id))
 
     @staticmethod
     @__app.route('/edit_branch', methods=['POST', 'GET'])
@@ -102,12 +102,8 @@ class EditRoutes:
 
         branch_id_form = Validate.make_objectid(request.form.get("select_branch_id"))
         branch_id_arg = Validate.make_objectid(request.args.get("branch"))
-        if branch_id_form:
-            branch = TreeEngine.lookup_branch(branch_id_form)
-        elif branch_id_arg:
-            branch = TreeEngine.lookup_branch(branch_id_arg)
-        else:
-            branch = None
+        branch_id = branch_id_form if branch_id_form else branch_id_arg
+        branch = TreeEngine.lookup_branch(branch_id)
         if not branch:
             flash("Error. No branch selected.", "warning")
             return redirect(url_for("homepage"))
@@ -174,11 +170,12 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin")
     def check_delete_branch():
-        """ FIXME """
-        delete_branch = ""
-        if "select_branch_id" in request.form:
-            delete_branch = TreeEngine.lookup_branch(ObjectId(request.form["select_branch_id"]))
-        print(f"Delete branch name: {delete_branch.name=}")
+        """ Confirms that you want to delete a branch """
+        delete_branch_id = Validate.make_objectid(request.form.get("select_branch_id"))
+        delete_branch = TreeEngine.lookup_branch(delete_branch_id)
+        if not delete_branch:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage"))
         return render_template("edit/check_delete_branch.html", delete_branch=delete_branch)
 
     @staticmethod
@@ -186,27 +183,27 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin")
     def do_delete_branch():
-        """ FIXME """
-        delete_name = ""
-        if "branch_id" in request.form:
-            delete_branch_id = ObjectId(request.form["branch_id"])
-            delete_name = TreeEngine.delete_branch(delete_branch_id)
-            flash(f"Successfully deleted branch: {delete_name}")
-            return redirect(url_for("homepage"))
-        else:
-            flash(f"No branch to delete.", "warning")
-            return redirect(url_for("homepage"))
+        """ Permanently deletes a branch. """
+
+        delete_branch_id = Validate.make_objectid(request.form.get("branch_id"))
+        delete_branch = TreeEngine.lookup_branch(delete_branch_id)
+        if not delete_branch:
+            flash("Error. No branch selected.", "warning")
+        delete_name = TreeEngine.delete_branch(delete_branch.id)
+        flash(f"'{delete_name}' branch was successfully deleted.", "success")
+        return redirect(url_for("homepage"))
 
     @staticmethod
     @__app.route('/check_disable_branch', methods=['POST'])
     @login_required
     @UserManager.role_required("admin", "editor")
     def check_disable_branch():
-        """ FIXME """
-        disable_branch = ""
-        if "select_branch_id" in request.form:
-            disable_branch = TreeEngine.lookup_branch(ObjectId(request.form["select_branch_id"]))
-        print(f"Disable branch name: {disable_branch.name=}")
+        """ Sets up disable branch confirmation page. """
+        disable_branch_id = Validate.make_objectid(request.form.get("select_branch_id"))
+        disable_branch = TreeEngine.lookup_branch(disable_branch_id)
+        if not disable_branch:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage"))
         return render_template("edit/check_disable_branch.html", disable_branch=disable_branch)
 
     @staticmethod
@@ -214,114 +211,95 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_disable_branch():
-        """ FIXME"""
-        if "branch_id" in request.form:
-            disable_branch_id = ObjectId(request.form["branch_id"])
-            branch_dict = {"_id": disable_branch_id,
-                           "is_active": False}
-            disable_branch = TreeEngine.save_branch(branch_dict, "disable")
-        return render_template("edit/confirm_branch_disabled.html", disable_branch=disable_branch)
+        """ Disables branch."""
+
+        branch_id = Validate.make_objectid(request.form.get("branch_id"))
+        if not branch_id:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage"))
+        branch_dict = {"_id": branch_id,
+                       "is_active": False}
+        disable_branch = TreeEngine.save_branch(branch_dict, "disable")
+        flash(f"'{disable_branch.name}' branch was successfully disabled.", "success")
+        return redirect(url_for("homepage"))
 
     @staticmethod
-    @__app.route('/select_edit_leaf')
-    @login_required
-    @UserManager.role_required("admin", "editor")
-    def select_edit_leaf():
-        """ FIXME"""
-        all_branches = TreeEngine.get_branches()
-        return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
-    #
-    # @staticmethod
-    # @__app.route('/select_edit_leaf_type', methods=['POST'])
-    # @login_required
-    # @UserManager.role_required("admin", "editor")
-    # def select_edit_leaf_type():
-    #     branch_id = ""
-    #     if "select_branch_id" in request.form:
-    #         branch_id = ObjectId(request.form["select_branch_id"])
-    #
-    #     branch = TreeEngine.lookup_branch(branch_id)
-    #     branch_leaves = TreeEngine.get_leaves_for_branch(branch_id)
-    #     inherited_leaves = TreeEngine.get_inherited_leaves(branch_id)
-    #     print(f"Branch_leaves count: {len(branch_leaves)}. Inherited_leaves count: {len(inherited_leaves)}")
-    #
-    #     page_context = {
-    #         "branch": branch,
-    #         "branch_leaves": branch_leaves,
-    #         "inherited_leaves": inherited_leaves,
-    #         "all_categories": TreeEngine.CATEGORIES
-    #     }
-    #     return render_template('edit/select_edit_leaf_type.html', **page_context)
-
-    @staticmethod
-    @__app.route('/edit_leaf', methods=['POST'])
+    @__app.route('/edit_leaf', methods=['POST', 'GET'])
     @login_required
     @UserManager.role_required("admin", "editor")
     def edit_leaf():
-        """ Leaf editing router FIXME
+        """ Leaf editing router.
 
         Either clone, edit, or create new.
-        leaf: clone source, edit source, or None
+
+        leaf: clone source, edit source, or None.
         source_branch: branch the leaf is sourced from, or being edited, or None.
         target_branch: branch_id for this leaf. this is selected in step 1. if this matches source, you're editing
         category_name: if creating a new subcat, this will exist. there will be no leaf_id or source branch.
         """
 
-        leaf = None  # The branch I am cloning from
-        target_branch = None  # The branch I am creating a leaf for
-        source_branch = None
-        category_name = None
 
-        if "target_branch_id" in request.form:
-            target_branch_id = ObjectId(request.form["target_branch_id"])
-            target_branch = TreeEngine.lookup_branch(target_branch_id)
+        target_branch_id_form = Validate.make_objectid(request.form.get("target_branch_id"))
+        target_branch_id_arg = Validate.make_objectid(request.args.get("target_branch_id"))
+        target_branch_id = target_branch_id_form if target_branch_id_form else target_branch_id_arg
+        target_branch = TreeEngine.lookup_branch(target_branch_id)
+        if not target_branch:
+            flash("Error. No target branch selected.", "warning")
+            return redirect(url_for("homepage"))
 
-        if "leaf_id" in request.form:
-            leaf_id = ObjectId(request.form["leaf_id"])
-            leaf = TreeEngine.lookup_leaf(leaf_id)
+        leaf_id_form = Validate.make_objectid(request.form.get("leaf_id"))
+        leaf_id_arg = Validate.make_objectid(request.args.get("leaf_id"))
+        leaf_id = leaf_id_form if leaf_id_form else leaf_id_arg
+        leaf = TreeEngine.lookup_leaf(leaf_id)
+        if leaf:
             source_branch_id = leaf.branch_id
             source_branch = TreeEngine.lookup_branch(source_branch_id)
-
-        if "category_name" in request.form:
-            category_name = request.form["category_name"]
+        else:
+            source_branch = None
+        category_name = request.form.get("category_name")
 
         return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch,
                                target_branch=target_branch, category_name=category_name)
 
     @staticmethod
-    @__app.route('/do_edit_leaf', methods=['POST'])
+    @__app.route('/do_edit_leaf', methods=['POST', 'GET'])
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_edit_leaf():
-        """ FIXME more validation
+        """
+        FIXME almost done, redirects are not good.
 
+        Leaf editor.
         leaf_id is added if it is existing. Then in save_leaf, it uses that to determine different approach.
-        It seems like this could be improved to only send changed data instead of all of it, but needs form update."""
+        It seems like this could be improved to only send changed data instead of all of it, but needs form update.
 
-        branch_id = ""
-        category = ""
-        subcategory = ""
-        leaf_id = None
+        Season can either be one season or all of them.
+        There are four possible entries, each one is checked for phases and text is validated. """
 
-        if request.form.get("leaf_id"):
-            leaf_id = ObjectId(request.form.get("leaf_id"))
+        leaf_id = Validate.make_objectid(request.form.get("leaf_id"))
+        branch_id = Validate.make_objectid(request.form.get("branch_id"))
+        if not branch_id:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage"))
 
-        if "branch_id" in request.form:
-            branch_id = ObjectId(request.form["branch_id"])
-        if "category" in request.form:
-            category = request.form["category"]
-        if "subcategory" in request.form:
-            subcategory = request.form["subcategory"]
+        category = request.form.get("category")
+        subcategory = request.form.get("subcategory")
+        if not (category or subcategory):
+            flash("Error, missing necessary category/subcategory.", "warning")
+            return redirect(url_for("edit_leaf", leaf_id=leaf_id, target_branch_id=branch_id))
+
         author_id = current_user.id  # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
-        season_list = ['Spring', 'Summer', 'Fall', 'Winter']
-        seasons = []
-        if request.form.get("season"):
-            print(request.form.get("season"))
-            seasons = request.form.getlist("season")
-            if request.form["season"] in [season_list]:
-                seasons.append(request.form["season"])
-            elif request.form["season"] == "all_seasons":
-                seasons = season_list
+        season= request.form.get("season")
+
+        if season == "all_seasons":
+            seasons = ['Spring', 'Summer', 'Fall', 'Winter']
+        elif season is None:
+            seasons = [] # FIXME this is how killswitch currently works but I don't like it.
+        else:
+            seasons = [season]
+
+        # Entry loop. Each leaf can have up to 4 entries for different phases.
+
         entries = []
         for i in range(1, 5):
             if 'entry_enabled_' + str(i) in request.form:
@@ -333,9 +311,17 @@ class EditRoutes:
                 if 'phase_3rd+_' + str(i) in request.form:
                     phases.append("3rd+")
                 if len(phases) == 0:
-                    return render_template("error.html")
-                entry = {"text": request.form["entry_text_" + str(i)], "phases": phases}
+                    flash("Must select at least one phase.", "warning")
+                    return redirect(url_for("edit_leaf", leaf_id=leaf_id, target_branch_id=branch_id))
+                entry_text = request.form.get("entry_text_" + str(i))
+                valid, entry, error = Validate.validate_input(entry_text, "Entry " + str(i),
+                                                              0, 400, kind="text")
+                if not valid:
+                    flash(error, "warning")
+                    return redirect(url_for("edit_leaf", leaf_id=leaf_id, target_branch_id=branch_id))
+                entry = {"text": entry_text, "phases": phases}
                 entries.append(entry)
+
         leaf_dict = {
             "author_id": author_id,
             "is_active": True,
@@ -351,70 +337,72 @@ class EditRoutes:
         else:
             save_type = "create"
         leaf = TreeEngine.save_leaf(leaf_dict, save_type)
-        if leaf:
+        if leaf and save_type == "edit":
+            print(f"leaf edited. Id: {leaf.id}")
+            flash("Successfully edited leaf.", "success")
+        elif leaf and save_type == "create":
             print(f"leaf created. Id: {leaf.id}")
+            flash("Successfully created leaf.", "success")
         else:
-            print(f"No leaf created and returned.")
-        branch = TreeEngine.lookup_branch(branch_id)
-        return render_template("edit/confirm_leaf_created.html", leaf=leaf, branch=branch)
+            print(f"Error. No leaf created.")
+            flash("Error creating leaf.", "warning")
+        return redirect(url_for("show_branch", branch=leaf.branch_id))
+
+
+    @staticmethod
+    def verify_leaf():
+        """ Used multiple times. """
+        leaf_id = Validate.make_objectid(request.form.get("leaf_id"))
+        leaf = TreeEngine.lookup_leaf(leaf_id)
+        branch = TreeEngine.lookup_branch(leaf.branch_id)
+        if not branch:
+            flash("Error, no branch selected.", "warning")
+            return redirect(url_for("homepage"))
+        if not leaf:
+            flash("Error. No leaf selected.")
+            return redirect(url_for("show_branch", branch=branch.id))
+        return leaf_id, leaf, branch
 
     @staticmethod
     @__app.route('/check_delete_leaf', methods=['POST'])
     @login_required
     @UserManager.role_required("admin")
     def check_delete_leaf():
-        delete_leaf = ""
-        if "leaf_id" in request.form:
-            delete_leaf = TreeEngine.lookup_leaf(ObjectId(request.form["leaf_id"]))
-        if delete_leaf:
-            print("Delete leaf selected")
-        else:
-            print("No leaf found to delete.")
-        branch = TreeEngine.lookup_branch(delete_leaf.branch_id)
-        return render_template("edit/check_delete_leaf.html", delete_leaf=delete_leaf, branch=branch)
+        """ Select leaf to delete. """
+        leaf_id, leaf, branch = EditRoutes.verify_leaf()
+
+        return render_template("edit/check_delete_leaf.html", delete_leaf=leaf, branch=branch)
+
 
     @staticmethod
     @__app.route('/do_delete_leaf', methods=['POST'])
     @login_required
     @UserManager.role_required("admin")
     def do_delete_leaf():
-        """ FIXME"""
-        delete_leaf_id = ""
-        if "leaf_id" in request.form:
-            delete_leaf_id = ObjectId(request.form["leaf_id"])
-        delete_leaf = TreeEngine.lookup_leaf(delete_leaf_id)
-        branch = TreeEngine.lookup_branch(delete_leaf.branch_id)
-        TreeEngine.delete_leaf(delete_leaf_id)
-
-        return render_template("edit/confirm_leaf_deleted.html", branch=branch)
+        """ Delete leaf"""
+        leaf_id, leaf, branch = EditRoutes.verify_leaf()
+        TreeEngine.delete_leaf(leaf_id)
+        return redirect(url_for("show_branch", branch=branch.id))
 
     @staticmethod
     @__app.route('/check_disable_leaf', methods=['POST'])
     @login_required
     @UserManager.role_required("admin", "editor")
     def check_disable_leaf():
-        """ FIXME """
-        disable_leaf = ""
-        if "leaf_id" in request.form:
-            disable_leaf = TreeEngine.lookup_leaf(ObjectId(request.form["leaf_id"]))
-        if disable_leaf:
-            print("Disable leaf selected")
-        else:
-            print("No leaf found to delete.")
-        branch = TreeEngine.lookup_branch(disable_leaf.branch_id)
-        return render_template("edit/check_disable_leaf.html", disable_leaf=disable_leaf, branch=branch)
+        """ Select leaf to disable """
+        leaf_id, leaf, branch = EditRoutes.verify_leaf()
+        return render_template("edit/check_disable_leaf.html", disable_leaf=leaf, branch=branch)
 
     @staticmethod
     @__app.route('/do_disable_leaf', methods=['POST'])
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_disable_leaf():
-        """ FIXME"""
-        disable_leaf_id = ObjectId(request.form.get("leaf_id"))
-        branch = TreeEngine.lookup_branch(TreeEngine.lookup_leaf(disable_leaf_id).branch_id)
+        """ Disables leaf by changing is_active status. """
+        leaf_id, leaf, branch = EditRoutes.verify_leaf()
         leaf_dict = {
-            "_id": disable_leaf_id,
+            "_id": leaf_id,
             "is_active": False
         }
         TreeEngine.save_leaf(leaf_dict, "disable")
-        return render_template("edit/confirm_leaf_disabled.html", branch=branch)
+        return redirect(url_for("show_branch", branch=branch.id))

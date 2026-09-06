@@ -31,38 +31,37 @@
 
             {% endif %}
 
-
-            <div class="input-group my-3">
+            <input type="hidden" name="branch_id" value="{{ target_branch.id }}">
+            <div class="input-group my-3 w-50">
                 <span class="input-group-text" id="branch-name">Branch Name:</span>
                 <input type="text" class="form-control" name="branch_name" value="{{ target_branch.name }}" readonly
                        disabled>
-                <input type="hidden" name="branch_id" value="{{ target_branch.id }}">
             </div>
 
             {% if category_name is not none %}
-                <div class="input-group mb-3">
+                <input type="hidden" name="category" value="{{ category_name }}">
+                <div class="input-group mb-3 w-50">
                     <span class="input-group-text" id="category">Category:</span>
                     <input type="text" class="form-control" value="{{ category_name }}"
                            readonly disabled>
-                    <input type="hidden" name="category" value="{{ category_name }}">
                 </div>
-                <div class="input-group mb-4">
+                <div class="input-group mb-4 w-50">
                     <span class="input-group-text" id="subcategory">Subcategory:</span>
                     <input type="text" class="form-control" name="subcategory" placeholder="Enter new subcategory"
                            required>
                 </div>
             {% else %}
-                <div class="input-group mb-3">
+                <input type="hidden" name="category" value="{{ leaf.category }}">
+                <div class="input-group mb-3 w-50">
                     <span class="input-group-text" id="category">Category:</span>
                     <input type="text" class="form-control" value="{{ leaf.category }}"
                            readonly disabled>
-                    <input type="hidden" name="category" value="{{ leaf.category }}">
                 </div>
-                <div class="input-group mb-4">
+                <input type="hidden" name="subcategory" value="{{ leaf.subcategory }}">
+                <div class="input-group mb-4 w-50">
                     <span class="input-group-text" id="subcategory">Subcategory:</span>
                     <input type="text" class="form-control" value="{{ leaf.subcategory }}"
                            readonly disabled>
-                    <input type="hidden" name="subcategory" value="{{ leaf.subcategory }}">
                 </div>
 
 
@@ -85,7 +84,7 @@
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
-                        <!-- Season Selector FIXME TO SINGLE SEASON -->
+                        <!-- Season Selector -->
 
                         <div class="btn-group p-2 mb-3" data-toggle="buttons" role="group">
 
