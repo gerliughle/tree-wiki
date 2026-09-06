@@ -23,55 +23,64 @@ class EditRoutes:
 
         branch = None
         all_branches = TreeEngine.get_branches()
-        try:
-            if request.form.get("select_branch_id"):
-                branch_id = Validate.make_objectid(request.form.get("select_branch_id"))
-            if request.args.get("branch"):
-                branch_id = Validate.make_objectid(request.args.get("branch"))
-        except Exception as e:
-            print(str(e))
-            flash(f"Error. Invalid branch request.", "warning")
-            return redirect(url_for("homepage"))
-        if branch_id:
-            branch = TreeEngine.lookup_branch(branch_id)
+        branch_id_form = Validate.make_objectid(request.form.get("select_branch_id"))
+        branch_id_arg = Validate.make_objectid(request.args.get("branch"))
+        if branch_id_form:
+            branch = TreeEngine.lookup_branch(branch_id_form)
+        elif branch_id_arg:
+            branch = TreeEngine.lookup_branch(branch_id_arg)
+        if branch:
             return render_template("edit/create_branch.html", branches=all_branches, branch=branch)
         else:
             flash("Error. No branch selected.", "warning")
+            print("Edit_route: Create branch. Branch not found.")
             return redirect(url_for("homepage"))
 
     @staticmethod
-    @__app.route('/do_create_branch', methods=['POST'])
     @login_required
     @UserManager.role_required("admin", "editor")
+    @__app.route('/do_create_branch', methods=['POST'])
     def do_create_branch():
-        """ FIXME needs lots of form validation, checking dupes, etc. """
-        branch_name = ""
-        branch_description = ""
-        parent_branch_id = ""
-        branch_image = ""
+        """ Creates a new branch. Requires title,  description and parent branch.
 
-        branch_name = request.form.get("branch_name").strip()
-        existing_branch = TreeEngine.lookup_branch_by_name(branch_name)
-        if "parent_branch_id" in request.form:
-            parent_branch_id = ObjectId(request.form["parent_branch_id"])
-            parent_branch = TreeEngine.lookup_branch(parent_branch_id)
+         Auto generates image name (not very robust)
+         Validates and cleans inputs.
+         """
 
-        if existing_branch: # Dupe check
-            print(f"Looked up {branch_name}. Found existing branch.")
-            flash("Error, this branch already exists.", "warning")
-            return redirect(url_for("create_branch", branch=parent_branch.id))
+        # Setting up variables to reload page in case of errors.
+        parent_branch_id = Validate.make_objectid(request.form.get("parent_branch_id"))
+        parent_branch = TreeEngine.lookup_branch(parent_branch_id)
+        all_branches = TreeEngine.get_branches()
+        if not parent_branch:
+            flash("Error. No parent branch selected.", "warning")
+            return redirect(url_for("homepage"))
 
-        print(f"Looked up {branch_name}. Found no duplicates. Proceeding.")
-        branch_image = str(branch_name.strip().lower().replace(" ", "_") + ".jpg")
-        if "branch_description" in request.form:
-            branch_description = request.form["branch_description"].strip()
-        if "parent_branch_id" in request.form:
-            parent_branch_id = ObjectId(request.form["parent_branch_id"])
-        else:
-            print("No branch id")
+        branch_name = request.form.get("branch_name")
+        valid, branch_name, error = Validate.validate_input(
+            branch_name, "Branch Name", 3, 30, "title")
+        if not valid:
+            flash(error, "warning")
+            return render_template("edit/create_branch.html", branches=all_branches, branch=parent_branch)
+
+        duplicate_branch = TreeEngine.lookup_branch(branch_name)
+        if duplicate_branch:
+            print(f"Attempt to create branch {branch_name} failed. Already exists.")
+            flash("Error, this branch already exists!", "warning")
+            return render_template("edit/create_branch.html", branches=all_branches, branch=parent_branch)
+
+
+        if not parent_branch_id:
+            flash("Error. No parent branch selected.", "warning")
+            return redirect(url_for("create_branch"))
+        branch_image = str(branch_name.lower().replace(" ", "_") + ".jpg")
+        branch_description = request.form.get("branch_description")
+        valid, branch_description, error = Validate.validate_input(
+            branch_description, "Branch Description", 10, 200, "text")
+        if not valid:
+            flash(error, "warning")
+            return render_template("edit/create_branch.html", branches=all_branches, branch=parent_branch)
         branch_author = current_user.id
-        if branch_name == "" or branch_description == "" or parent_branch_id == "":
-            return render_template("error.html")
+
         branch_dict = {
             "author_id": branch_author,
             "is_active": True,
@@ -81,18 +90,28 @@ class EditRoutes:
             "parent_id": parent_branch_id
         }
         branch = TreeEngine.save_branch(branch_dict, "create")
-        return render_template("edit/confirm_branch_created.html", branch=branch)
+        flash(f"Successfully created branch {branch.name}", "success")
+        return render_template("print/print_tree.html", branch=branch)
 
     @staticmethod
-    @__app.route('/edit_branch', methods=['POST'])
+    @__app.route('/edit_branch', methods=['POST', 'GET'])
     @login_required
     @UserManager.role_required("admin", "editor")
     def edit_branch():
+        """ Sets up edit branch page.  """
+
+        branch_id_form = Validate.make_objectid(request.form.get("select_branch_id"))
+        branch_id_arg = Validate.make_objectid(request.args.get("branch"))
+        if branch_id_form:
+            branch = TreeEngine.lookup_branch(branch_id_form)
+        elif branch_id_arg:
+            branch = TreeEngine.lookup_branch(branch_id_arg)
+        else:
+            branch = None
+        if not branch:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage"))
         all_branches = TreeEngine.get_branches()
-        branch_id = ObjectId(request.form["select_branch_id"])
-        print(f"{branch_id=}")
-        branch = TreeEngine.lookup_branch(branch_id)
-        print(f"Branch loaded if this is a name: {branch.name}")
         return render_template("edit/edit_branch.html", edit_branch=branch, branches=all_branches)
 
     @staticmethod
@@ -100,54 +119,62 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_edit_branch():
-        """ FIXME needs lots of form validation, checking dupes, etc.
+        """ Edits an existing branch.
 
         Checks if form inputs exist, are not blank, and do not match the original.
          If so, it adds them to an update dict and passes requests an edit.
-         Then it updates the branch and goes to confirmation page.
          """
-        branch_id = ObjectId(request.form["branch_id"])
+        all_branches = TreeEngine.get_branches()
+        branch_id = Validate.make_objectid(request.form.get("branch_id"))
         original_branch = TreeEngine.lookup_branch(branch_id)
+        if not original_branch:
+            flash("Error. No branch selected.", "warning")
+            return redirect(url_for("homepage")) # no branch, so can't redirect to edit
+
         branch_edits = {"_id": branch_id}
-        if "branch_name" in request.form:
-            if (request.form["branch_name"].strip() != ""
-                    and request.form["branch_name"].strip() != original_branch.name):
-                name = request.form["branch_name"].strip()
-                existing_branch = TreeEngine.lookup_branch_by_name(name)
-                if existing_branch:
-                    print(f"Looking up {name} and found {existing_branch}")
-                    return render_template("error.html")
-                print(f"Looking up {name} and found nothing")
-                branch_edits["name"] = name
-                branch_edits["image"] = str(name.strip().lower().replace(" ", "_") + ".jpg")
-        if "branch_description" in request.form:
-            if (request.form["branch_description"].strip() != ""
-                    and request.form["branch_description"].strip() != original_branch.description):
-                branch_edits["description"] = request.form["branch_description"].strip()
-        if "select_parent_id" in request.form:
-            if request.form["select_parent_id"] != "" \
-                    and request.form["select_parent_id"].strip() != original_branch.parent_id:
-                branch_edits["parent_id"] = ObjectId(request.form["select_parent_id"])
+        branch_name = request.form.get("branch_name")
+        if branch_name != original_branch.name and branch_name != "": # Skip if blank or unchanged.
+            valid, branch_name, error = Validate.validate_input(branch_name, "Branch Name", 3, 30, "title")
+            if not valid:
+                flash(error, "warning")
+                return redirect(url_for("edit_branch", branches=all_branches, branch=original_branch.id))
+            duplicate_branch = TreeEngine.lookup_branch_by_name(branch_name)
+            if duplicate_branch:
+                print(f"Attempt to create branch {branch_name} failed. Already exists.")
+                flash("Error, this branch already exists.", "warning")
+                return redirect(url_for("edit_branch", branches=all_branches, branch=original_branch.id))
+            branch_edits["name"] = branch_name
+            branch_edits["image"] = str(branch_name.lower().replace(" ", "_") + ".jpg")
+
+        branch_description = request.form.get("branch_description")
+        if branch_description != original_branch.description and branch_description != "":  # Skip if blank or unchanged.
+            valid, branch_description, error = Validate.validate_input(
+                branch_description, "Branch Description", 10, 200, "text")
+            if not valid:
+                flash(error, "warning")
+                return redirect(url_for("edit_branch", branches=all_branches, branch=original_branch.id))
+            branch_edits["description"] = branch_description
+
+        parent_id = Validate.make_objectid(request.form.get("select_parent_id"))
+        if parent_id != "" and parent_id != original_branch.parent_id:
+            branch_edits["parent_id"] = parent_id
+
         if len(branch_edits) == 1: # No edits made.
-            return render_template("error.html")
+            flash("No changes made. No edits saved.", "warning")
+            return redirect(url_for("show_branch", branch=original_branch.id))
+
         branch_author = current_user.id
         branch_edits["author_id"] = branch_author
         updated_branch = TreeEngine.save_branch(branch_edits, "edit")
-        return render_template("edit/confirm_branch_updated.html", branch=updated_branch)
-
-    # @staticmethod
-    # @__app.route('/select_delete_branch')
-    # @login_required
-    # @UserManager.role_required("admin")
-    # def delete_branch():
-    #     all_branches = TreeEngine.get_branches()
-    #     return render_template("edit/select_delete_branch.html", branches=all_branches)
+        flash(f"'{updated_branch.name}' branch was successfully updated.", "success")
+        return redirect(url_for("show_branch", branch=updated_branch.id))
 
     @staticmethod
     @__app.route('/check_delete_branch', methods=['POST'])
     @login_required
     @UserManager.role_required("admin")
     def check_delete_branch():
+        """ FIXME """
         delete_branch = ""
         if "select_branch_id" in request.form:
             delete_branch = TreeEngine.lookup_branch(ObjectId(request.form["select_branch_id"]))
@@ -159,6 +186,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin")
     def do_delete_branch():
+        """ FIXME """
         delete_name = ""
         if "branch_id" in request.form:
             delete_branch_id = ObjectId(request.form["branch_id"])
@@ -174,6 +202,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def check_disable_branch():
+        """ FIXME """
         disable_branch = ""
         if "select_branch_id" in request.form:
             disable_branch = TreeEngine.lookup_branch(ObjectId(request.form["select_branch_id"]))
@@ -185,6 +214,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_disable_branch():
+        """ FIXME"""
         if "branch_id" in request.form:
             disable_branch_id = ObjectId(request.form["branch_id"])
             branch_dict = {"_id": disable_branch_id,
@@ -197,6 +227,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def select_edit_leaf():
+        """ FIXME"""
         all_branches = TreeEngine.get_branches()
         return render_template("edit/select_edit_leaf.html", all_branches=all_branches)
     #
@@ -227,7 +258,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def edit_leaf():
-        """ Leaf editing router
+        """ Leaf editing router FIXME
 
         Either clone, edit, or create new.
         leaf: clone source, edit source, or None
@@ -347,6 +378,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin")
     def do_delete_leaf():
+        """ FIXME"""
         delete_leaf_id = ""
         if "leaf_id" in request.form:
             delete_leaf_id = ObjectId(request.form["leaf_id"])
@@ -361,6 +393,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def check_disable_leaf():
+        """ FIXME """
         disable_leaf = ""
         if "leaf_id" in request.form:
             disable_leaf = TreeEngine.lookup_leaf(ObjectId(request.form["leaf_id"]))
@@ -376,6 +409,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def do_disable_leaf():
+        """ FIXME"""
         disable_leaf_id = ObjectId(request.form.get("leaf_id"))
         branch = TreeEngine.lookup_branch(TreeEngine.lookup_leaf(disable_leaf_id).branch_id)
         leaf_dict = {

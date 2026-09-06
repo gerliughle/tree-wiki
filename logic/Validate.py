@@ -16,7 +16,6 @@ class Validate:
     def make_objectid(obj_id):
         """ Returns ObjectId from string or ObjectId"""
         if not obj_id:
-            print("validate_objectid - Error: No id provided.")
             return None
         try:
             return ObjectId(obj_id)
@@ -85,6 +84,7 @@ class Validate:
             text = cls.clean_input(text, kind)
 
         field_name = field_name.capitalize()
+
         if text is None and min_length > 0:
             return False, text, f"{field_name} cannot be empty."
 
@@ -105,7 +105,7 @@ class Validate:
                     return False, text, f"{field_name} cannot have spaces. Please try again."
 
         elif kind == "title":
-            if not text.isalpha():
+            if not all(char.isalpha() or char.isspace() for char in text):
                 return False, text, f"{field_name} can only contain letters. Please try again."
         elif kind == "text":
             pass
@@ -135,13 +135,15 @@ class Validate:
         text = text.strip()
 
         if kind == "username":
-            text.lower()
+            text = text.lower()
         elif kind == "password":
             pass
         elif kind == "title":
-            text.title()
+            print(f"Title: {text}")
+            text = text.title()
+            print(f"New title: {text}")
         elif kind == "text":
-            text.capitalize()
+            text = text.capitalize()
 
         return text
 
