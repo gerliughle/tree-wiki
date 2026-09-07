@@ -68,7 +68,7 @@ class UserManager:
     @classmethod
     def delete_user(cls, user_id):
         from data.Database import Database
-        user_id = Validate.make_objectid(user_id)
+        # user_id = Validate.make_objectid(user_id)
         delete_user = cls.lookup_user_id(ObjectId(user_id))
         Database.delete_user(delete_user)
         cls.__all_users = Database.read_users()
@@ -111,7 +111,6 @@ class UserManager:
                 error_codes = result.get("error-codes", [])
                 print(f"[Turnstile Failed] Errors returned by Cloudflare: {error_codes}")
                 return False
-
             return True
 
         except Exception as e:

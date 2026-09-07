@@ -82,25 +82,27 @@ Done:
 * Implement custom error page/flashes:
   * Setup custom error messages instead of redirect to error page.
   * Utilize flask flash message and bootstrap alert for errors and messaging, avoiding error pages
+  * Server side input validation for all text inputs.
+  * Profanity checks
+  * Server side input cleaning
 * Data validation:
   * CloudFlare Turnstile
   * Rate limit
+* Removed lots of old edit pages/code that are obsolete from Edit Mode.
+* Removed confirmation pages due to flash messaging
+*   * ObjectId validation function.
 
 To-Do:
 
 PO:
-
-* Bad idea but taking a break on a bug. Edit leaf page error redirect is broken.Possibly form/arg routing
-* 
 * Data validation:
-  * Client side form validation, and field tuning (autocomplete, etc). 
-  * Server side input validation for all text inputs. Function done. In progress
-  * Server side input cleaning. Function done. Implementation in progress
+  * Client side form validation, and field tuning (autocomplete, etc).
   * jinja escapes check
   * Honeypot field for login, edit forms.
-  * Profanity checks. Function done. Implementation in progress.
-  * ObjectId validation... Function done. Implementation in progress/needs standardization to inputs only
+  * Commented out logic-level ObjectId validations. If that works after a while, can delete.
 * Mobile menu fix.. logout/dark toggle.
+* if logged out, can i redirect to homepage when accessing bad page? 
+* redo 404/etc pages? 
 * Homepage
 * About page
 * pictures solution
@@ -110,18 +112,13 @@ PO:
   * I think leaf 'breadcrumb' would be nice, to expand, trace back.. and i wonder if that helps with a killswitch..
   * I removed leaf breadcrumb, it would be cool to have a chain of subcat edits, but need leaf-specific breadcrumbs
 
-been skipping any validations but it is important:
-* checking for any form errors
-* avoiding duplicates
-* avoiding no phase/no season submissions
-* avoiding matching subcat for leaves
-
 Later:
 * TBH, the whole revert thing... it probably just makes sense to go full git, and save versions of everything. 
   * It seems like this could be tricky or hard. I need to keep same _id so the trees don't get really fucked
   * So they'd all be stored in the same object, but i'd only want to call the latest one for page views, but call
   * them all for admin/mod stuff
 * User stats, awards, gamification, authorship.
+* Can likely make check_disable/delete_branch/leaf page a single smart template.
 * Mod role: Editors edit pages, mods can revert/disable, and admins can manage users
 * Admin Log - pagination
 * Tree View. Started, but ugly

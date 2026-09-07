@@ -20,14 +20,8 @@ class EditRoutes:
         the selector. Should error out gracefully. """
 
         all_branches = TreeEngine.get_branches()
-        branch_id_form = Validate.make_objectid(request.form.get("select_branch_id"))
-        branch_id_arg = Validate.make_objectid(request.args.get("branch"))
-        if branch_id_form:
-            branch = TreeEngine.lookup_branch(branch_id_form)
-        elif branch_id_arg:
-            branch = TreeEngine.lookup_branch(branch_id_arg)
-        else:
-            branch = None
+        branch_id = Validate.make_objectid(request.form.get("select_branch_id"))
+        branch = TreeEngine.lookup_branch(branch_id)
 
         if not branch:
             flash("Error. No branch selected.", "warning")
@@ -51,6 +45,7 @@ class EditRoutes:
         parent_branch_id = Validate.make_objectid(request.form.get("parent_branch_id"))
         parent_branch = TreeEngine.lookup_branch(parent_branch_id)
         all_branches = TreeEngine.get_branches()
+
         if not parent_branch:
             flash("Error. No parent branch selected.", "warning")
             return redirect(url_for("homepage"))
@@ -68,10 +63,6 @@ class EditRoutes:
             flash("Error, this branch already exists!", "warning")
             return render_template("edit/create_branch.html", branches=all_branches, branch=parent_branch)
 
-
-        if not parent_branch_id:
-            flash("Error. No parent branch selected.", "warning")
-            return redirect(url_for("create_branch"))
         branch_image = str(branch_name.lower().replace(" ", "_") + ".jpg")
         branch_description = request.form.get("branch_description")
         valid, branch_description, error = Validate.validate_input(
@@ -100,9 +91,7 @@ class EditRoutes:
     def edit_branch():
         """ Sets up edit branch page.  """
 
-        branch_id_form = Validate.make_objectid(request.form.get("select_branch_id"))
-        branch_id_arg = Validate.make_objectid(request.args.get("branch"))
-        branch_id = branch_id_form if branch_id_form else branch_id_arg
+        branch_id = Validate.make_objectid(request.form.get("select_branch_id"))
         branch = TreeEngine.lookup_branch(branch_id)
         if not branch:
             flash("Error. No branch selected.", "warning")
@@ -120,6 +109,7 @@ class EditRoutes:
         Checks if form inputs exist, are not blank, and do not match the original.
          If so, it adds them to an update dict and passes requests an edit.
          """
+
         all_branches = TreeEngine.get_branches()
         branch_id = Validate.make_objectid(request.form.get("branch_id"))
         original_branch = TreeEngine.lookup_branch(branch_id)
@@ -133,12 +123,12 @@ class EditRoutes:
             valid, branch_name, error = Validate.validate_input(branch_name, "Branch Name", 3, 30, "title")
             if not valid:
                 flash(error, "warning")
-                return redirect(url_for("edit_branch", branches=all_branches, branch=original_branch.id))
+                return render_template("edit/edit_branch.html", edit_branch=original_branch, branches=all_branches)
             duplicate_branch = TreeEngine.lookup_branch_by_name(branch_name)
             if duplicate_branch:
                 print(f"Attempt to create branch {branch_name} failed. Already exists.")
                 flash("Error, this branch already exists.", "warning")
-                return redirect(url_for("edit_branch", branches=all_branches, branch=original_branch.id))
+                return render_template("edit/edit_branch.html", edit_branch=original_branch, branches=all_branches)
             branch_edits["name"] = branch_name
             branch_edits["image"] = str(branch_name.lower().replace(" ", "_") + ".jpg")
 
@@ -148,7 +138,7 @@ class EditRoutes:
                 branch_description, "Branch Description", 10, 200, "text")
             if not valid:
                 flash(error, "warning")
-                return redirect(url_for("edit_branch", branches=all_branches, branch=original_branch.id))
+                return render_template("edit/edit_branch.html", edit_branch=original_branch, branches=all_branches)
             branch_edits["description"] = branch_description
 
         parent_id = Validate.make_objectid(request.form.get("select_parent_id"))
@@ -157,7 +147,7 @@ class EditRoutes:
 
         if len(branch_edits) == 1: # No edits made.
             flash("No changes made. No edits saved.", "warning")
-            return redirect(url_for("show_branch", branch=original_branch.id))
+            return render_template("edit/edit_branch.html", edit_branch=original_branch, branches=all_branches)
 
         branch_author = current_user.id
         branch_edits["author_id"] = branch_author
@@ -212,7 +202,6 @@ class EditRoutes:
     @UserManager.role_required("admin", "editor")
     def do_disable_branch():
         """ Disables branch."""
-
         branch_id = Validate.make_objectid(request.form.get("branch_id"))
         if not branch_id:
             flash("Error. No branch selected.", "warning")
@@ -228,7 +217,7 @@ class EditRoutes:
     @login_required
     @UserManager.role_required("admin", "editor")
     def edit_leaf():
-        """ Leaf editing router.
+        """ Sets up leaf edit page.
 
         Either clone, edit, or create new.
 
@@ -236,27 +225,27 @@ class EditRoutes:
         source_branch: branch the leaf is sourced from, or being edited, or None.
         target_branch: branch_id for this leaf. this is selected in step 1. if this matches source, you're editing
         category_name: if creating a new subcat, this will exist. there will be no leaf_id or source branch.
+
+        from leaf.html in edit mode:
+         <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
+         <input type="hidden" name="branch_id" value="{{ branch.id }}">
+         <input type="hidden" name="leaf_id" value="{{ leaf.id }}">
         """
 
-
-        target_branch_id_form = Validate.make_objectid(request.form.get("target_branch_id"))
-        target_branch_id_arg = Validate.make_objectid(request.args.get("target_branch_id"))
-        target_branch_id = target_branch_id_form if target_branch_id_form else target_branch_id_arg
+        target_branch_id = Validate.make_objectid(request.form.get("target_branch_id"))
         target_branch = TreeEngine.lookup_branch(target_branch_id)
         if not target_branch:
             flash("Error. No target branch selected.", "warning")
             return redirect(url_for("homepage"))
 
-        leaf_id_form = Validate.make_objectid(request.form.get("leaf_id"))
-        leaf_id_arg = Validate.make_objectid(request.args.get("leaf_id"))
-        leaf_id = leaf_id_form if leaf_id_form else leaf_id_arg
+        leaf_id = Validate.make_objectid(request.form.get("leaf_id"))
         leaf = TreeEngine.lookup_leaf(leaf_id)
         if leaf:
             source_branch_id = leaf.branch_id
             source_branch = TreeEngine.lookup_branch(source_branch_id)
         else:
             source_branch = None
-        category_name = request.form.get("category_name")
+        category_name = request.form.get("category_name") # If this is detected on the edit_leaf page, it goes into subcat creation mode.
 
         return render_template("edit/edit_leaf.html", leaf=leaf, source_branch=source_branch,
                                target_branch=target_branch, category_name=category_name)
@@ -267,7 +256,6 @@ class EditRoutes:
     @UserManager.role_required("admin", "editor")
     def do_edit_leaf():
         """
-        FIXME almost done, redirects are not good.
 
         Leaf editor.
         leaf_id is added if it is existing. Then in save_leaf, it uses that to determine different approach.
@@ -277,16 +265,37 @@ class EditRoutes:
         There are four possible entries, each one is checked for phases and text is validated. """
 
         leaf_id = Validate.make_objectid(request.form.get("leaf_id"))
-        branch_id = Validate.make_objectid(request.form.get("branch_id"))
+        leaf = TreeEngine.lookup_leaf(leaf_id)
+
+        branch_id = Validate.make_objectid(request.form.get("branch_id")) # target branch?
+        branch = TreeEngine.lookup_branch(branch_id)
+
+        source_branch_id = Validate.make_objectid(request.form.get("source_branch_id"))
+        source_branch = TreeEngine.lookup_branch(source_branch_id)
+
         if not branch_id:
             flash("Error. No branch selected.", "warning")
             return redirect(url_for("homepage"))
 
         category = request.form.get("category")
+        category_arg = request.form.get("category_arg") # This is used to reset redirect. It is complicated, but
+        # when a category is sent it makes the leaf go into new subcategory mode, so I only want to send one when
+        # one was originally sent.
         subcategory = request.form.get("subcategory")
+        print(f"{subcategory=}")
+        if subcategory:
+            valid, subcategory, error = Validate.validate_input(subcategory, "Subcategory", 5, 30, "title" )
+            if not valid:
+                flash(error, "warning")
+                return render_template("edit/edit_leaf.html",
+                                       leaf=leaf,
+                                       source_branch=source_branch,
+                                       target_branch=branch,
+                                       category_name=category_arg)
+
         if not (category or subcategory):
             flash("Error, missing necessary category/subcategory.", "warning")
-            return redirect(url_for("edit_leaf", leaf_id=leaf_id, target_branch_id=branch_id))
+            return redirect(url_for("show_branch", branch=branch_id))
 
         author_id = current_user.id  # Eventually, a more robust editor tracking system could be used. Now, last editor rewrites creator.
         season= request.form.get("season")
@@ -295,6 +304,7 @@ class EditRoutes:
             seasons = ['Spring', 'Summer', 'Fall', 'Winter']
         elif season is None:
             seasons = [] # FIXME this is how killswitch currently works but I don't like it.
+            # FIXME even worse i think i also allow 0 entry files. so figure that out.
         else:
             seasons = [season]
 
@@ -312,13 +322,21 @@ class EditRoutes:
                     phases.append("3rd+")
                 if len(phases) == 0:
                     flash("Must select at least one phase.", "warning")
-                    return redirect(url_for("edit_leaf", leaf_id=leaf_id, target_branch_id=branch_id))
+                    return render_template("edit/edit_leaf.html",
+                                           leaf=leaf,
+                                           source_branch=source_branch,
+                                           target_branch=branch,
+                                           category_name=category_arg)
                 entry_text = request.form.get("entry_text_" + str(i))
                 valid, entry, error = Validate.validate_input(entry_text, "Entry " + str(i),
                                                               0, 400, kind="text")
                 if not valid:
                     flash(error, "warning")
-                    return redirect(url_for("edit_leaf", leaf_id=leaf_id, target_branch_id=branch_id))
+                    return render_template("edit/edit_leaf.html",
+                                           leaf=leaf,
+                                           source_branch=source_branch,
+                                           target_branch=branch,
+                                           category_name=category_arg)
                 entry = {"text": entry_text, "phases": phases}
                 entries.append(entry)
 

@@ -4,10 +4,14 @@
 
     <div class="container my-2 col-md-8 col-10 d-flex-vertical">
         <form method="POST" action="/do_edit_leaf">
+            <input type="hidden" name="branch_id" value="{{ target_branch.id }}"/>
+
             <h3 class="col-lg-8">Leaf Editor </h3>
             {% if category_name is none and source_branch.id != target_branch.id %}
-                <!-- if making a NEW leaf that is inherited/vs actually editing. -->
+                <!-- if cloning a NEW leaf that is inherited vs editing an existing leaf. -->
                 <!-- passes on the target_branch_id, and original category/subcategory. -->
+                <input type="hidden" name="leaf_id" value="{{ leaf.id }}"/>
+                <input type="hidden" name="source_branch_id" value="{{ source_branch.id }}"/>
 
                 <h5>Cloning: '{{ leaf.category }}: {{ leaf.subcategory }}' Leaf
                     for {{ target_branch.name }}.</h5>
@@ -17,21 +21,20 @@
             {% elif category_name is none and source_branch.id == target_branch.id %}
                 <!-- Editing existing. Passing on leaf_id -->
                 <input type="hidden" name="leaf_id" value="{{ leaf.id }}"/>
+                <input type="hidden" name="source_branch_id" value="{{ source_branch.id }}"/>
                 <h5>Editing: '{{ leaf.category }}: {{ leaf.subcategory }}' Leaf
                     for {{ target_branch.name }}.</h5>
                 <span class="text-info">You are editing the existing leaf for {{ target_branch.name }}.</span>
 
             {% elif category_name is not none %}
-                {# FIXME is this a new category, or new subcategory? How do you get here? #}
+                <!-- Category was sent, so no source branch or leaf id. Making new leaf/subcat. -->
                 <h5>Creating a new subcategory in '{{ category_name }}'
                     for {{ target_branch.name }}.</h5>
                 <span class="text-info">You are creating a new leaf with a new subcategory for {{ target_branch.name }}.
                     This new subcategory will form a new chain of inheritance for all children.
                     Use this option sparingly. </span>
-
             {% endif %}
 
-            <input type="hidden" name="branch_id" value="{{ target_branch.id }}">
             <div class="input-group my-3 w-50">
                 <span class="input-group-text" id="branch-name">Branch Name:</span>
                 <input type="text" class="form-control" name="branch_name" value="{{ target_branch.name }}" readonly
@@ -39,7 +42,9 @@
             </div>
 
             {% if category_name is not none %}
+                <!-- No leaf or source branch. Making new subcat -->
                 <input type="hidden" name="category" value="{{ category_name }}">
+                <input type="hidden" name="category_arg" value="{{ category_name }}">
                 <div class="input-group mb-3 w-50">
                     <span class="input-group-text" id="category">Category:</span>
                     <input type="text" class="form-control" value="{{ category_name }}"
@@ -47,15 +52,14 @@
                 </div>
                 <div class="input-group mb-4 w-50">
                     <span class="input-group-text" id="subcategory">Subcategory:</span>
-                    <input type="text" class="form-control" name="subcategory" placeholder="Enter new subcategory"
-                           required>
+                    <input type="text" class="form-control" name="subcategory" placeholder="Enter subcategory" required>
                 </div>
             {% else %}
-                <input type="hidden" name="category" value="{{ leaf.category }}">
+                <!-- cloning/editing a leaf. -->
+                <input type="hidden" name="category" value="{{ leaf.category }}"/>
                 <div class="input-group mb-3 w-50">
                     <span class="input-group-text" id="category">Category:</span>
-                    <input type="text" class="form-control" value="{{ leaf.category }}"
-                           readonly disabled>
+                    <input type="text" class="form-control" value="{{ leaf.category }}" readonly disabled/>
                 </div>
                 <input type="hidden" name="subcategory" value="{{ leaf.subcategory }}">
                 <div class="input-group mb-4 w-50">
@@ -63,18 +67,15 @@
                     <input type="text" class="form-control" value="{{ leaf.subcategory }}"
                            readonly disabled>
                 </div>
-
-
-                <!-- original entries -->
-
-                <p class="mb-3">Leaves should apply to either every season as general info, or a single season.
-                    Each leaf can have multiple entries for different phases. Any and all existing entries will be
-                    overwritten when submitting this form.
-                    <span class="text-danger">In the case where you want to "end the chain" and stop inheriting a leaf
+            {% endif %}
+            <p class="mb-3">Leaves should apply to either every season as general info, or a single season.
+                Each leaf can have multiple entries for different phases. Any and all existing entries will be
+                overwritten when submitting this form.
+                <span class="text-danger">In the case where you want to "end the chain" and stop inheriting a leaf
                         for a subcategory, submit this form with no entries selected. The subcategory will not show up
                         on the selected branch page or any children.</span>
-                </p>
-            {% endif %}
+            </p>
+
 
             {#        NEW ENTRY EDITOR#}
 
@@ -90,7 +91,8 @@
 
                             <label class="btn btn-group-text-primary disabled">Season(s):</label>
                             {% for season in ["Spring", "Summer", "Fall", "Winter"] %}
-                                <input type="radio" class="btn-check" id="{{ season }}" value="{{ season }}" autocomplete="off"
+                                <input type="radio" class="btn-check" id="{{ season }}" value="{{ season }}"
+                                       autocomplete="off"
                                        name="season" {% if season in leaf.seasons %}checked{% endif %}>
                                 <label class="btn
                                     {% if season == "Spring" %}
@@ -104,15 +106,16 @@
                                     {% endif %}
                                     " for="{{ season }}">{{ season }}</label>
                             {% endfor %}
-                            <input type="radio" class="btn-check" id="all_seasons" value="all_seasons" autocomplete="off" name="season"
-                                   {% if leaf.seasons|length == 4 %}checked{% endif %}>
+                            <input type="radio" class="btn-check" id="all_seasons" value="all_seasons"
+                                   autocomplete="off" name="season"
+                                   {% if leaf.seasons|length == 4 or leaf is none %}checked{% endif %}>
                             <label class="btn btn-outline-primary" for="all_seasons">All Seasons</label>
                         </div>
                     </li>
                     {% for new_entry in [1,2,3,4] %} <!-- Entry loop -->
                         <li class="list-group-item">
                             <div class="row g-3 align-items-baseline">
-                                {#                            Entry enabled switch#}
+                                {# Entry enabled switch#}
                                 <div class="form-check form-switch col-auto">
                                     <label class="form-check-label col-form-label"
                                            for="entry_enabled_{{ loop.index }}">Entry {{ loop.index }}
@@ -120,7 +123,7 @@
                                     <input class="form-check-input" type="checkbox" role="switch"
                                            id="entry_enabled_{{ loop.index }}"
                                            name="entry_enabled_{{ loop.index }}"
-                                            {% if leaf.entries|length >= loop.index %} checked{% endif %}>
+                                            {% if leaf.entries|length >= loop.index or (leaf is none and loop.index==1) %} checked{% endif %}>
                                 </div>
                                 {#                            Entry Phase Toggles#}
                                 <div class="btn-group btn-group-sm p-2 col-auto" data-toggle="buttons" role="group">
