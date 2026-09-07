@@ -5,7 +5,8 @@
 
     {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
         <div class="container sticky-top col-6">
-      <div class="p-4"></div> {#  Keep. Prevents alert from scrolling behind navbar #}
+            <div class="p-4"></div>
+            {#  Keep. Prevents alert from scrolling behind navbar #}
             <div class="alert alert-info d-flex justify-content-between align-items-baseline mt-3" role="alert">
                 <span><strong>EDIT MODE</strong> is active.</span>
                 <a class="btn btn-outline-info btn-sm"
@@ -15,7 +16,7 @@
     {% endif %}
 
     <!-- Hero -->
-    <div class="container col-md-9 px-4 {# py-5 #}">
+    <div class="container col-md-8 px-4 mb-4">
         {% if branch_has_image %}
             <div class="row flex-lg-row-reverse align-items-center g-5 pt-3 pb-5">
 
@@ -89,92 +90,97 @@
                     </form>
                 </div>
             {% endif %}
-
         </div>
         </div>
         </div>
 
-
-        <div class="container my-2"> <!-- page body container -->
-            <!-- Filter Form -->
-            <div class="card shadow-sm mb-2">
-                <form method="GET" action="/show_branch">
-                    <input type="hidden" name="branch" value="{{ branch.id }}"/>
-
-                    <div class="card-header d-flex justify-content-start flex-wrap gap-2 align-items-center">
-                        <h4 class="h5 mb-0">Filters:</h4>
-                        <div class="btn-group btn-group-sm" data-toggle="buttons" role="group">
-                            <label class="btn btn-group-text-primary disabled">Phase:</label>
-                            {% if "1st" in phases %}
-                                <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st" checked>
-                            {% else %}
-                                <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st">
-                            {% endif %}
-                            <label class="btn btn-outline-primary" for="1st">1st</label>
-                            {% if "2nd" in phases %}
-                                <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd" checked>
-                            {% else %}
-                                <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd">
-                            {% endif %}
-                            <label class="btn btn-outline-primary" for="2nd">2nd</label>
-                            {% if "3rd+" in phases %}
-                                <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+"
-                                       checked>
-                            {% else %}
-                                <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+">
-                            {% endif %}
-                            <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
-                        </div>
-                        <button type="submit" class="btn btn-outline-primary btn-sm">Apply</button>
-                    </div>
-                </form>
-            </div>
-
-            {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
+        </div>
+        <div class="container col-md-11 px-4">
+            <div class="container my-2"> <!-- page body container -->
+                <!-- Filter Form -->
                 <div class="card shadow-sm mb-2">
-                    <div class="card-body">
-                        <form method="POST" action="/edit_leaf" class="mb-4">
-                            <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
-                            <h5 class="mb-2">Create a new subcategory for this branch.</h5>
-                            <div class="text-info mb-2">Caution! This creates a new line of inheritance. Branches that
-                                are
-                                children to
-                                this one, new or existing, will begin inheriting these leaves. Only create a new
-                                subcategory
-                                if it is
-                                either highly relevant to a specific group of trees (ex: Decandling pines) or a highly
-                                specified aspect
-                                of a species that is unlikely to have many children.
+                    <form method="GET" action="/show_branch">
+                        <input type="hidden" name="branch" value="{{ branch.id }}"/>
+
+                        <div class="card-header d-flex justify-content-start flex-wrap gap-2 align-items-center">
+                            <h4 class="h5 mb-0">Filters:</h4>
+                            <div class="btn-group btn-group-sm" data-toggle="buttons" role="group">
+                                <label class="btn btn-group-text-primary disabled">Phase:</label>
+                                {% if "1st" in phases %}
+                                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st"
+                                           checked>
+                                {% else %}
+                                    <input type="checkbox" class="btn-check" id="1st" autocomplete="off" name="1st">
+                                {% endif %}
+                                <label class="btn btn-outline-primary" for="1st">1st</label>
+                                {% if "2nd" in phases %}
+                                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd"
+                                           checked>
+                                {% else %}
+                                    <input type="checkbox" class="btn-check" id="2nd" autocomplete="off" name="2nd">
+                                {% endif %}
+                                <label class="btn btn-outline-primary" for="2nd">2nd</label>
+                                {% if "3rd+" in phases %}
+                                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+"
+                                           checked>
+                                {% else %}
+                                    <input type="checkbox" class="btn-check" id="3rd+" autocomplete="off" name="3rd+">
+                                {% endif %}
+                                <label class="btn btn-outline-primary" for="3rd+">3rd+</label>
                             </div>
-
-
-                            <select class="form-select mb-2 w-auto" aria-label="Select category" name="category_name"
-                                    required>
-                                <option selected value="">Select category</option>
-                                {% for category in category_list %}
-                                    <option value="{{ category }}">{{ category }}</option>
-                                {% endfor %}
-                            </select>
-
-                            <div class="row">
-                                <div class="col 1">
-                                    <button type="submit" class="btn btn-primary">Create</button>
-                                    <a href="/">Cancel</a>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Apply</button>
+                        </div>
+                    </form>
                 </div>
 
-            {% endif %}
+                {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
+                    <div class="card shadow-sm mb-2">
+                        <div class="card-body">
+                            <form method="POST" action="/edit_leaf" class="mb-4">
+                                <input type="hidden" name="target_branch_id" value="{{ branch.id }}">
+                                <h5 class="mb-2">Create a new subcategory for this branch.</h5>
+                                <div class="text-info mb-2">Caution! This creates a new line of inheritance. Branches
+                                    that
+                                    are
+                                    children to
+                                    this one, new or existing, will begin inheriting these leaves. Only create a new
+                                    subcategory
+                                    if it is
+                                    either highly relevant to a specific group of trees (ex: Decandling pines) or a
+                                    highly
+                                    specified aspect
+                                    of a species that is unlikely to have many children.
+                                </div>
 
-            <!--Category container -->
-            {% for category in category_list %}
-                {% if care_guide|selectattr('category','equalto', category)|list %}
-                    {% include 'components/category.html' %}
+
+                                <select class="form-select mb-2 w-auto" aria-label="Select category"
+                                        name="category_name"
+                                        required>
+                                    <option selected value="">Select category</option>
+                                    {% for category in category_list %}
+                                        <option value="{{ category }}">{{ category }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <div class="row">
+                                    <div class="col 1">
+                                        <button type="submit" class="btn btn-primary">Create</button>
+                                        <a href="/">Cancel</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                 {% endif %}
-            {% endfor %}
 
-        </div>
+                <!--Category container -->
+                {% for category in category_list %}
+                    {% if care_guide|selectattr('category','equalto', category)|list %}
+                        {% include 'components/category.html' %}
+                    {% endif %}
+                {% endfor %}
+
+            </div>
 
 {% endblock %}

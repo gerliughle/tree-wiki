@@ -142,8 +142,11 @@ class EditRoutes:
             branch_edits["description"] = branch_description
 
         parent_id = Validate.make_objectid(request.form.get("select_parent_id"))
-        if parent_id != "" and parent_id != original_branch.parent_id:
+        if parent_id is not None and parent_id != original_branch.parent_id:
+            print("Parent id updated")
             branch_edits["parent_id"] = parent_id
+        else:
+            print("Parent id not updated")
 
         if len(branch_edits) == 1: # No edits made.
             flash("No changes made. No edits saved.", "warning")
