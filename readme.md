@@ -94,23 +94,36 @@ Done:
 
 To-Do:
 
+* P00:
+  * Think simpler entries focused on timing, with expandable info. The default layout should be more like a calendar
+  * Dead end/killswitch logic
+  * Probably data validation
+  * 
 PO:
 * Data validation:
   * Client side form validation, and field tuning (autocomplete, etc).
   * jinja escapes check
   * Honeypot field for login, edit forms.
   * Commented out logic-level ObjectId validations. If that works after a while, can delete.
-* Mobile menu fix.. logout/dark toggle.
-* if logged out, can i redirect to homepage when accessing bad page? 
-* redo 404/etc pages? 
+
 * Homepage
 * About page
 * pictures solution
 
+P1:
+* Mobile menu fix.. logout/dark toggle.
+* if logged out, can i redirect to homepage when accessing bad page? 
+* redo 404/etc pages? 
 * Cat/Leaf Schema
+* Can i fully collapse into like, 'wire' in the season one line? Or is this even another section of the page? 
 * How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
   * I think leaf 'breadcrumb' would be nice, to expand, trace back.. and i wonder if that helps with a killswitch..
   * I removed leaf breadcrumb, it would be cool to have a chain of subcat edits, but need leaf-specific breadcrumbs
+  * What if there is a killswitch indicator on a leaf in edit mode. if disable-inherit is toggled, then later ones dont have it. normally
+  * it isn't shown, but when it is toggled, it has a visible flag. then require all leaves to be legal with at least one season and phase
+    * disable inheritance
+    * end chain
+    * not inherited
 
 Later:
 * TBH, the whole revert thing... it probably just makes sense to go full git, and save versions of everything. 

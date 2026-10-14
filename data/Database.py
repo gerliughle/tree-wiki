@@ -349,6 +349,14 @@ class Database:
         cls.update_class(cls.__branches, property_dict)
 
     @classmethod
+    def add_end_chain(cls):
+        """ Used to ensure all leaves had end chain property. """
+        cls.connect()
+        property_dict = {"end_chain": False}
+
+        cls.update_class(cls.__leaves, property_dict)
+
+    @classmethod
     def migration_error_check(cls):
         cls.connect()
         all_leaves = list(cls.__leaves.find())

@@ -68,13 +68,6 @@
                            readonly disabled>
                 </div>
             {% endif %}
-            <p class="mb-3">Leaves should apply to either every season as general info, or a single season.
-                Each leaf can have multiple entries for different phases. Any and all existing entries will be
-                overwritten when submitting this form.
-                <span class="text-danger">In the case where you want to "end the chain" and stop inheriting a leaf
-                        for a subcategory, submit this form with no entries selected. The subcategory will not show up
-                        on the selected branch page or any children.</span>
-            </p>
 
 
             {#        NEW ENTRY EDITOR#}
@@ -83,18 +76,22 @@
                 <div class="card-header p-2">
                     <h5>Leaf entry editor:</h5>
                 </div>
+
                 <ul class="list-group list-group-flush">
+                    <!-- Season Selector -->
                     <li class="list-group-item">
-                        <!-- Season Selector -->
+                    <p>Leaves should apply to either a single season or all season for general, year-round info.
+                        Each leaf can have multiple entries for different phases.</p>
+                        <div class="flex-row">
 
-                        <div class="btn-group p-2 mb-3" data-toggle="buttons" role="group">
+                            <div class="btn-group p-2 mb-3" data-toggle="buttons" role="group">
 
-                            <label class="btn btn-group-text-primary disabled">Season(s):</label>
-                            {% for season in ["Spring", "Summer", "Fall", "Winter"] %}
-                                <input type="radio" class="btn-check" id="{{ season }}" value="{{ season }}"
-                                       autocomplete="off"
-                                       name="season" {% if season in leaf.seasons %}checked{% endif %}>
-                                <label class="btn
+                                <label class="btn btn-group-text-primary disabled">Season(s):</label>
+                                {% for season in ["Spring", "Summer", "Fall", "Winter"] %}
+                                    <input type="radio" class="btn-check" id="{{ season }}" value="{{ season }}"
+                                           autocomplete="off"
+                                           name="season" {% if season in leaf.seasons %}checked{% endif %}>
+                                    <label class="btn
                                     {% if season == "Spring" %}
                                         btn-outline-success
                                     {% elif season == "Summer" %}
@@ -105,85 +102,110 @@
                                         btn-outline-info
                                     {% endif %}
                                     " for="{{ season }}">{{ season }}</label>
-                            {% endfor %}
-                            <input type="radio" class="btn-check" id="all_seasons" value="all_seasons"
-                                   autocomplete="off" name="season"
-                                   {% if leaf.seasons|length == 4 or leaf is none %}checked{% endif %}>
-                            <label class="btn btn-outline-primary" for="all_seasons">All Seasons</label>
+                                {% endfor %}
+                                <input type="radio" class="btn-check" id="all_seasons" value="all_seasons"
+                                       autocomplete="off" name="season"
+                                       {% if leaf.seasons|length == 4 or leaf is none %}checked{% endif %}>
+                                <label class="btn btn-outline-primary" for="all_seasons">All Seasons</label>
+                            </div>
+                        </div>
+
+
+                        <!-- Allow Inheritance Selector -->
+                    <p>Enabled by default. BonsaiTree.wiki generally works by having each leaf be displayed by trees
+                    further down the line, unless they have updated information. In the uncommon scenario when you do
+                        not want this to happen you can disable inheritance for this leaf and other trees will not
+                        display it. This would be the case if care was very specific to this species and not
+                        its children.</p>
+                        <div class="flex-row">
+                            <div class="btn-group p-2 mb-3" data-toggle="buttons" role="group">
+
+                                <label class="btn btn-group-text-primary disabled">Allow Inheriting:</label>
+                                <input type="radio" class="btn-check" id="True" value="True"
+                                       autocomplete="off"
+                                       name="allow_inherit" checked>
+                                <label class="btn btn-outline-primary" for="True">True</label>
+                                <input type="radio" class="btn-check" id="False" value="False"
+                                       autocomplete="off"
+                                       name="allow_inherit">
+                                <label class="btn btn-outline-primary" for="False">False</label>
+                            </div>
                         </div>
                     </li>
-                    {% for new_entry in [1,2,3,4] %} <!-- Entry loop -->
-                        <li class="list-group-item">
-                            <div class="row g-3 align-items-baseline">
-                                {# Entry enabled switch#}
-                                <div class="form-check form-switch col-auto">
-                                    <label class="form-check-label col-form-label"
-                                           for="entry_enabled_{{ loop.index }}">Entry {{ loop.index }}
-                                        Enabled</label>
-                                    <input class="form-check-input" type="checkbox" role="switch"
-                                           id="entry_enabled_{{ loop.index }}"
-                                           name="entry_enabled_{{ loop.index }}"
-                                            {% if leaf.entries|length >= loop.index or (leaf is none and loop.index==1) %} checked{% endif %}>
-                                </div>
-                                {#                            Entry Phase Toggles#}
-                                <div class="btn-group btn-group-sm p-2 col-auto" data-toggle="buttons" role="group">
-                                    <label class="btn btn-group-text-primary disabled">Phase:</label>
-                                    <input type="checkbox" class="btn-check" id="phase_1st_{{ loop.index }}"
-                                           autocomplete="off" name="phase_1st_{{ loop.index }}"
-                                            {% if leaf.entries|length >= loop.index %}
-                                                {% if "1st" in leaf.entries[loop.index0]["phases"] %}
-                                           checked
-                                                {% endif %}
-                                            {% endif %}>
-                                    <label class="btn btn-outline-primary col"
-                                           for="phase_1st_{{ loop.index }}">1st</label>
 
-                                    <input type="checkbox" class="btn-check" id="phase_2nd_{{ loop.index }}"
-                                           autocomplete="off" name="phase_2nd_{{ loop.index }}"
-                                            {% if leaf.entries|length >= loop.index %}
-                                                {% if "2nd" in leaf.entries[loop.index0]["phases"] %}
-                                           checked
-                                                {% endif %}
-                                            {% endif %}>
+            {% for new_entry in [1,2,3,4] %} <!-- Entry loop -->
+                <li class="list-group-item">
+                    <div class="row g-3 align-items-baseline">
+                        {# Entry enabled switch#}
+                        <div class="form-check form-switch col-auto">
+                            <label class="form-check-label col-form-label"
+                                   for="entry_enabled_{{ loop.index }}">Entry {{ loop.index }}
+                                Enabled</label>
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                   id="entry_enabled_{{ loop.index }}"
+                                   name="entry_enabled_{{ loop.index }}"
+                                    {% if leaf.entries|length >= loop.index or (leaf is none and loop.index==1) %}
+                                   checked{% endif %}>
+                        </div>
+                        {#Entry Phase Toggles#}
+                        <div class="btn-group btn-group-sm p-2 col-auto" data-toggle="buttons" role="group">
+                            <label class="btn btn-group-text-primary disabled">Phase:</label>
+                            <input type="checkbox" class="btn-check" id="phase_1st_{{ loop.index }}"
+                                   autocomplete="off" name="phase_1st_{{ loop.index }}"
+                                    {% if leaf.entries|length >= loop.index %}
+                                        {% if "1st" in leaf.entries[loop.index0]["phases"] %}
+                                   checked
+                                        {% endif %}
+                                    {% endif %}>
+                            <label class="btn btn-outline-primary col"
+                                   for="phase_1st_{{ loop.index }}">1st</label>
 
-                                    <label class="btn btn-outline-primary"
-                                           for="phase_2nd_{{ loop.index }}">2nd</label>
+                            <input type="checkbox" class="btn-check" id="phase_2nd_{{ loop.index }}"
+                                   autocomplete="off" name="phase_2nd_{{ loop.index }}"
+                                    {% if leaf.entries|length >= loop.index %}
+                                        {% if "2nd" in leaf.entries[loop.index0]["phases"] %}
+                                   checked
+                                        {% endif %}
+                                    {% endif %}>
 
-                                    <input type="checkbox" class="btn-check" id="phase_3rd+_{{ loop.index }}"
-                                           autocomplete="off" name="phase_3rd+_{{ loop.index }}"
-                                            {% if leaf.entries|length >= loop.index %}
-                                                {% if "3rd+" in leaf.entries[loop.index0]["phases"] %}
-                                           checked
-                                                {% endif %}
-                                            {% endif %}>
+                            <label class="btn btn-outline-primary"
+                                   for="phase_2nd_{{ loop.index }}">2nd</label>
 
-                                    <label class="btn btn-outline-primary"
-                                           for="phase_3rd+_{{ loop.index }}">3rd+</label>
-                                </div>
-                            </div>
-                            {# Entry Text #}
-                            <div class="row">
-                                <label for="entry_text_{{ loop.index }}"
-                                       class="form-label">Entry {{ loop.index }} Text:</label>
-                                <textarea class="form-control" id="entry_text_{{ loop.index }}"
-                                          name="entry_text_{{ loop.index }}"
-                                          rows="4">{% if leaf.entries|length >= loop.index %}{{ leaf.entries[loop.index0]["text"] }}{% endif %}</textarea>
-                                {# IMPORTANT Do not let this auto wrap #}
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
+                            <input type="checkbox" class="btn-check" id="phase_3rd+_{{ loop.index }}"
+                                   autocomplete="off" name="phase_3rd+_{{ loop.index }}"
+                                    {% if leaf.entries|length >= loop.index %}
+                                        {% if "3rd+" in leaf.entries[loop.index0]["phases"] %}
+                                   checked
+                                        {% endif %}
+                                    {% endif %}>
 
-            <div class="row">
-                <div class="col 1">
-                    <button type="submit" class="btn btn-primary">{% if source_branch.id != target_branch.id %}
-                        Create{% else %}Edit{% endif %} Leaf
-                    </button>
-                    <a href="/">Cancel</a>
-                </div>
-            </div>
-        </form>
+                            <label class="btn btn-outline-primary"
+                                   for="phase_3rd+_{{ loop.index }}">3rd+</label>
+                        </div>
+                    </div>
+                    {# Entry Text #}
+                    <div class="row">
+                        <label for="entry_text_{{ loop.index }}"
+                               class="form-label">Entry {{ loop.index }} Text:</label>
+                        <textarea class="form-control" id="entry_text_{{ loop.index }}"
+                                  name="entry_text_{{ loop.index }}"
+                                  rows="4">{% if leaf.entries|length >= loop.index %}{{ leaf.entries[loop.index0]["text"] }}{% endif %}</textarea>
+                        {# IMPORTANT Do not let this auto wrap #}
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+    </div>
+
+    <div class="row">
+        <div class="col 1">
+            <button type="submit" class="btn btn-primary">{% if source_branch.id != target_branch.id %}
+                Create{% else %}Edit{% endif %} Leaf
+            </button>
+            <a href="/">Cancel</a>
+        </div>
+    </div>
+    </form>
     </div>
 
 {% endblock %}

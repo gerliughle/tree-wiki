@@ -306,10 +306,16 @@ class EditRoutes:
         if season == "all_seasons":
             seasons = ['Spring', 'Summer', 'Fall', 'Winter']
         elif season is None:
-            seasons = [] # FIXME this is how killswitch currently works but I don't like it.
-            # FIXME even worse i think i also allow 0 entry files. so figure that out.
+            flash("Error, select either one season or All Seasons.", "warning")
+            return render_template("edit/edit_leaf.html",
+                                   leaf=leaf,
+                                   source_branch=source_branch,
+                                   target_branch=branch,
+                                   category_name=category_arg)
         else:
             seasons = [season]
+
+        end_chain = False if request.form.get("allow_inherit") else True
 
         # Entry loop. Each leaf can have up to 4 entries for different phases.
 
@@ -350,7 +356,8 @@ class EditRoutes:
             "category": category,
             "subcategory": subcategory,
             "seasons": seasons,
-            "entries": entries
+            "entries": entries,
+            "end_chain": end_chain,
         }
         if leaf_id:
             leaf_dict["_id"] = leaf_id

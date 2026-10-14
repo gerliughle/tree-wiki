@@ -10,6 +10,7 @@ class Leaf:
                  subcategory,
                  seasons,
                  entries,
+                 end_chain,
                  leaf_map):
         self._id = _id
         self.is_active = is_active
@@ -19,6 +20,7 @@ class Leaf:
         self.subcategory = subcategory
         self.seasons = seasons
         self.entries = entries
+        self.end_chain = end_chain
         leaf_map[_id] = self
 
     @classmethod
@@ -33,6 +35,7 @@ class Leaf:
             leaf_dict["subcategory"],
             leaf_dict["seasons"],
             leaf_dict["entries"],
+            leaf_dict["end_chain"],
             leaf_map
         )
 
@@ -45,7 +48,8 @@ class Leaf:
             "category": self.category,
             "subcategory": self.subcategory,
             "seasons": self.seasons,
-            "entries": self.entries
+            "entries": self.entries,
+            "end_chain": self.end_chain,
         }
 
     @property
