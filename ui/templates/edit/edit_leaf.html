@@ -145,7 +145,8 @@
                                    id="entry_enabled_{{ loop.index }}"
                                    name="entry_enabled_{{ loop.index }}"
                                     {% if leaf.entries|length >= loop.index or (leaf is none and loop.index==1) %}
-                                   checked{% endif %}>
+                                   checked{% endif %}
+                                    {% if loop.index==1 %}disabled{% endif %}>
                         </div>
                         {#Entry Phase Toggles#}
                         <div class="btn-group btn-group-sm p-2 col-auto" data-toggle="buttons" role="group">
@@ -167,7 +168,6 @@
                                    checked
                                         {% endif %}
                                     {% endif %}>
-
                             <label class="btn btn-outline-primary"
                                    for="phase_2nd_{{ loop.index }}">2nd</label>
 
@@ -178,7 +178,6 @@
                                    checked
                                         {% endif %}
                                     {% endif %}>
-
                             <label class="btn btn-outline-primary"
                                    for="phase_3rd+_{{ loop.index }}">3rd+</label>
                         </div>
@@ -194,6 +193,7 @@
                     </div>
                 </li>
             {% endfor %}
+                <input type="hidden" name="entry_enabled_1" value="entry_enabled_1"/>
             </ul>
     </div>
 

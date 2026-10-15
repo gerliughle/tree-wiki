@@ -315,22 +315,20 @@ class EditRoutes:
         else:
             seasons = [season]
 
-        end_chain = False if request.form.get("allow_inherit") else True
+        end_chain = False if request.form.get("allow_inherit") == False else True
 
         # Entry loop. Each leaf can have up to 4 entries for different phases.
 
         entries = []
         for i in range(1, 5):
-            if 'entry_enabled_' + str(i) in request.form:
+            if request.form.get(f"entry_enabled_{i}"):
                 phases = []
-                if 'phase_1st_' + str(i) in request.form:
-                    phases.append("1st")
-                if 'phase_2nd_' + str(i) in request.form:
-                    phases.append("2nd")
-                if 'phase_3rd+_' + str(i) in request.form:
-                    phases.append("3rd+")
+                for phase in ["1st", "2nd", "3rd+"]:
+                    if request.form.get(f"phase_{phase}_{i}"):
+                        phases.append(phase)
+                print(f"Phases {i}: {phases}")
                 if len(phases) == 0:
-                    flash("Must select at least one phase.", "warning")
+                    flash(f"Error in Entry {i}. Must select at least one phase.", "warning")
                     return render_template("edit/edit_leaf.html",
                                            leaf=leaf,
                                            source_branch=source_branch,

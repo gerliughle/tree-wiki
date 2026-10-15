@@ -91,12 +91,17 @@ Done:
 * Removed lots of old edit pages/code that are obsolete from Edit Mode.
 * Removed confirmation pages due to flash messaging
 *   * ObjectId validation function.
+* Major change to 'killswitch'. All leaves now must be valid with at least 1 season, entry, and phase per entry. 
+  * If you want to stop a leaf from being inherited, you can toggle "Allow Inheriting" on the edit page. 
+  * This prevents child branches from using this leaf in their care guides. A badge will be shown on leaves like this. 
+  * You can toggle this back on later. This allows visibility of killswitches. There may be some old leaves that break rules. 
+  * I also don't think you need entry text, for example, if you just want to say 'wire' in 'winter' for 'all phases'
 
 To-Do:
 
-* P00:
-  * Think simpler entries focused on timing, with expandable info. The default layout should be more like a calendar
-  * Dead end/killswitch logic
+* P0:
+  * Think simpler entries focused on timing, with expandable info. The default layout should be more like a calendar. 
+    * Not far off from this really, just cut all unnecessary info, maybe make the view more compact
   * Probably data validation
   * 
 PO:
@@ -115,15 +120,7 @@ P1:
 * if logged out, can i redirect to homepage when accessing bad page? 
 * redo 404/etc pages? 
 * Cat/Leaf Schema
-* Can i fully collapse into like, 'wire' in the season one line? Or is this even another section of the page? 
-* How do i disable leaves that have no-phase killswitches? Re-think these, they are hidden and not really possible for users to work with.
-  * I think leaf 'breadcrumb' would be nice, to expand, trace back.. and i wonder if that helps with a killswitch..
-  * I removed leaf breadcrumb, it would be cool to have a chain of subcat edits, but need leaf-specific breadcrumbs
-  * What if there is a killswitch indicator on a leaf in edit mode. if disable-inherit is toggled, then later ones dont have it. normally
-  * it isn't shown, but when it is toggled, it has a visible flag. then require all leaves to be legal with at least one season and phase
-    * disable inheritance
-    * end chain
-    * not inherited
+* Can i fully collapse into like, 'wire' in the season one line? Or is this even another section of the page?
 
 Later:
 * TBH, the whole revert thing... it probably just makes sense to go full git, and save versions of everything. 
