@@ -1,0 +1,145 @@
+{% extends "template.html" %}
+{% block title %}Review Images{% endblock %}
+{% block content %}
+
+    <div class="container my-2 col-10 d-flex-vertical">
+        {% if current_user.role == "admin" %}
+            <h2>Image Moderation</h2>
+
+            {# make a table to have a dashboard, make it blank for now #}
+            {# make a list of images, each one is a table row #}
+            {# for each image in image queue, if it passes filters #}
+            {# header image name. print date/time from id #}
+            {# display image on left cell with caption #}
+            {# On right cell display stats at top. Branch and user images #}
+            {# then a form to approve, disable, delete, set quality, and edit caption
+            {#  #}
+
+            <table class="table table-hover table-sm">
+                {% for image in image_list %}
+
+                    <th colspan="2">
+                        <h6>{{ image.name }}
+                            <small class="text-body-secondary">{{ image.id.generation_time }}</small>
+                        </h6>
+                    </th>
+                    <tr>
+                        <td>
+                            <img src="{{ url_for('static', filename='assets/USER_IMAGES/branch_images/' ~ image.id ~ image.ext) }}"
+                                 alt="{{ image.name }}" width="400">
+                        </td>
+                        <td>
+                            {% set ns = namespace(
+                        branch_approved = 0,
+                        branch_total = 0,
+                        user_approved = 0,
+                        user_total = 0) %}
+                            {% for check_image in image_list %}
+                                {% if image.branch_id == check_image.branch_id %}
+                                    {% if check_image.is_approved %}
+                                        {% set ns.branch_approved = ns.branch_approved + 1 %}
+                                    {% endif %}
+                                    {% set ns.branch_total = ns.branch_total + 1 %}
+                                {% endif %}
+                                {% if image.author_id == check_image.author_id %}
+                                    {% if check_image.is_approved %}
+                                        {% set ns.user_approved = ns.user_approved +1 %}
+                                    {% endif %}
+                                    {% set ns.user_total = ns.user_total + 1 %}
+                                {% endif %}
+                            {% endfor %}
+
+                            <p>Approved / Total Images for {{ image.branch_name }}: {{ ns.branch_approved }}
+                                / {{ ns.branch_total }}</p>
+                            <p>Approved / Total Images for {{ image.author_username }}: {{ ns.user_approved }}
+                                / {{ ns.user_total }}</p>
+
+
+                            <div>Approved Status:
+                                {% if image.is_approved %}
+                                    <span class="badge text-bg-success">Approved</span>
+                                {% else %}
+                                    <span class="badge text-bg-warning">Needs Approval</span>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">Active Status:
+                                {% if image.is_active %}
+                                    <span class="badge text-bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge text-bg-warning">Deactivated</span>
+                                {% endif %}
+                            </div>
+
+                            <form method="POST" action="/do_edit_image">
+                                <input type="hidden" name="image_id" value="{{ image.id }}">
+                                <div class="mb-12">Image Options:</div>
+                                <label for="image_quality">Quality Level: 1-5</label>
+                                <input type="range" class="form-range" min="1" max="5" id="image_quality"
+                                       name="image_quality"/>
+                                {% if image.is_approved == false %}
+                                    <button type="submit" class="btn btn-primary">Approve</button>
+                                {% elif image.is_approved == true %}
+                                    <button type="submit" formaction="/do_unapprove_image" class="btn btn-warning">
+                                        Unapprove
+                                    </button>
+                                {% endif %}
+
+                                <div class="btn-group btn-group" role="group">
+                                    {% if image.is_active == false %}
+                                        <button type="submit" formaction="/do_activate_image"
+                                                class="btn btn-outline-success py-0 px-1">Reactivate
+                                        </button>
+                                    {% elif image.is_active == true %}
+                                        <button type="submit" formaction="/do_deactivate_image"
+                                                class="btn btn-outline-warning py-0 px-1">Deactivate
+                                        </button>
+                                    {% endif %}
+
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#checkDeleteImage"
+                                            class="btn btn-outline-danger py-0 px-1">Delete
+                                    </button>
+                                    <a class="button btn btn-outline-info py-0 px-1">Manage User</a>
+                                </div>
+
+
+                                <div class="modal fade" id="checkDeleteImage" tabindex="-1"
+                                     aria-labelledby="checkDeleteImageLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <form method="POST" class="my-2" action="/do_delete_image">
+                                                <input type="hidden" name="image_id" value="{{ image.id }}"/>
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="checkDeleteImageLabel">Are you
+                                                        sure?</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div>This will permanently delete {{ image.name }}? Are you sure?
+                                                    </div>
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                            aria-label="Cancel">Cancel
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+
+
+        {% else %}
+            <h3>Access Denied.</h3>
+            <span><a href="/ui/static">Return Home</a></span>
+        {% endif %}
+    </div>
+
+{% endblock %}

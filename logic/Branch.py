@@ -54,7 +54,7 @@ class Branch:
         return f"Branch object: {self.name}. Id: {self._id}"
 
     @property
-    def has_image(self):
+    def has_image(self): # FIXME probably
         file_path = os.path.join("ui","static","assets","branch_img",self.image)
         return os.path.exists(file_path)
 

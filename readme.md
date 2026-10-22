@@ -96,24 +96,67 @@ Done:
   * This prevents child branches from using this leaf in their care guides. A badge will be shown on leaves like this. 
   * You can toggle this back on later. This allows visibility of killswitches. There may be some old leaves that break rules. 
   * I also don't think you need entry text, for example, if you just want to say 'wire' in 'winter' for 'all phases'
+  * User-uploaded branch images:
+    * image is uploaded
+    * check rules (size, hd space. later, # of submissions?)
+    * validate extension/header
+    * save database entry
+    * save image with id filename
+    * check logs and log display
+
 
 To-Do:
 
 * P0:
   * Think simpler entries focused on timing, with expandable info. The default layout should be more like a calendar. 
-    * Not far off from this really, just cut all unnecessary info, maybe make the view more compact
-  * Probably data validation
-  * 
-PO:
+    * Not far off from this really, just cut all unnecessary info, maybe make the view more compact. Altho it would
+    * be cool to hide title, and really just have task arranged by season.
+    * Tricky to also manage the mobile view with this though
+    * You had an airtable-esque idea of like limiting the length of text. and then being able to click leaves
+    * and it pops up a modal or something to see it all. 
 * Data validation:
   * Client side form validation, and field tuning (autocomplete, etc).
   * jinja escapes check
   * Honeypot field for login, edit forms.
   * Commented out logic-level ObjectId validations. If that works after a while, can delete.
+* pictures solution / carousel - how to host
+  * I can store on my pi
+  * Add the add photo form direct to edit view
+  * image uploads and saves into folder named after an object id
+  * then in database its saved with its id, branch_id, uploader, approved, and is_active
+  * then an admin page shows all the to_approve images and i can approve, not approve, or disable user.
+  * then on the index page it looks for any image with branch_id match and puts it in carousel
+  * parents that have less than 5 images can pull from children? p2
 
+
+  * Steps:
+  * add photo captions
+    * build moderation page
+      * filter view: show active/inactive and approved/needs_approval/unapproved
+      * display images by date in id
+      * show branch name and # of submitted/approved images it has
+      * show author name and number of submitted/approved images they have
+      * set quality slider
+    * disable, delete, edit methods (& moderation tasks)
+      * check_delete_image.html
+
+    * then build page logic (check if images, then send the top 5 highest quality)
+    * Fixme in image display
+    * fixme in has_image
+    * fixme in page context
+    * then create carousel
+    * then clean up db/images, delete old static images, upload a few new ones
+    * backup db
+    * fix size error 413 thing
+    * image resizing
+    * form modal
+
+    * 
+* Paginate admin log
+* Clean up branch edit buttons
 * Homepage
 * About page
-* pictures solution
+
 
 P1:
 * Mobile menu fix.. logout/dark toggle.
@@ -121,6 +164,8 @@ P1:
 * redo 404/etc pages? 
 * Cat/Leaf Schema
 * Can i fully collapse into like, 'wire' in the season one line? Or is this even another section of the page?
+* log filters/searching
+* site searching
 
 Later:
 * TBH, the whole revert thing... it probably just makes sense to go full git, and save versions of everything. 
@@ -130,7 +175,6 @@ Later:
 * User stats, awards, gamification, authorship.
 * Can likely make check_disable/delete_branch/leaf page a single smart template.
 * Mod role: Editors edit pages, mods can revert/disable, and admins can manage users
-* Admin Log - pagination
 * Tree View. Started, but ugly
 * About page/legend/guide/phase description
 * change password (require fresh login)

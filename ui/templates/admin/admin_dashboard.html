@@ -39,6 +39,8 @@
                                     <input type="hidden" name="user_selection" value="{{ log.target_name }}">
                                     <button class="btn" type="submit">{{ log["target_name"] }}</button>
                                 </form>
+                            {% elif log["obj_type"] == "Image" %}
+                                {{ log["target_name"] }}
                             {% endif %}
                         </td>
                         <td>

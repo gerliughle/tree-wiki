@@ -15,6 +15,11 @@ class WebUI:
     login_manager.init_app(__app)
     APP_NAME = "bonsaitree"
 
+    MAX_IMAGE_SIZE_MB = 5
+    USER_IMAGES_PATH = "ui/static/assets/USER_IMAGES/branch_images"
+    MIN_HD_SPACE_GB = 10
+    MAX_CAROUSEL_SIZE = 5
+
     @classmethod
     def init(cls):
         cls.engine = TreeEngine()
@@ -45,6 +50,9 @@ class WebUI:
         cls.__app.config["SESSION_COOKIE_SECURE"] = env == "production"
         cls.__app.config["SESSION_COOKIE_HTTPONLY"] = True
         cls.__app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+
+        cls.__app.config["UPLOAD_FOLDER"] = cls.USER_IMAGES_PATH
+        cls.__app.config["MAX_CONTENT_LENGTH"] = cls.MAX_IMAGE_SIZE_MB * 1024**2
 
         return cls.__app
 
@@ -105,8 +113,41 @@ class WebUI:
                 }
                 filtered_care_guide.append(filtered_leaf)
 
-        branch_has_image = branch.has_image
-        # print(f"{branch.name} has image: {branch_has_image}")
+        # branch_has_image = branch.has_image
+
+        # PROCESS IMAGE UPLOADS
+        if request.method == 'POST':
+            uploaded_branch_img = request.files["branch_img"]
+            if uploaded_branch_img.filename != '':
+                valid, image_ext, error = Validate.validate_image(uploaded_branch_img)
+                if not valid:
+                    flash(error, "warning")
+                    return redirect(url_for("show_branch"))
+
+                caption = request.form.get("image_caption")
+                valid, caption, error = Validate.validate_input(
+                    caption, "Image Caption", 0, 100, "text")
+                if not valid:
+                    flash(error, "warning")
+                    return redirect(url_for("show_branch"))
+
+                image_dict = {
+                    "is_active": True,
+                    "author_id": current_user.id,
+                    "branch_id": branch_id,
+                    "ext": image_ext,
+                    "is_approved": False,
+                    "quality": 0,
+                    "caption": caption,
+                    "name": str(f"'{branch.name}' Image by {current_user.username}"),
+                }
+                os.makedirs(WebUI.USER_IMAGES_PATH, exist_ok=True)
+                user_image = TreeEngine.save_image(image_dict, "create")
+                print(f"Image saved: {user_image.name}")
+                uploaded_branch_img.save(os.path.join(WebUI.USER_IMAGES_PATH, str(user_image.id) + image_ext))
+                flash(f"{user_image.name} uploaded. Awaiting moderation approval.", "success")
+
+
         children = TreeEngine.get_children_of_branch(branch.id)
         all_seasons = ["Spring", "Summer", "Fall", "Winter"]
         page_context = {
@@ -117,7 +158,7 @@ class WebUI:
             "phases": phases,
             "children": children,
             "all_seasons": all_seasons,
-            "branch_has_image": branch_has_image
+            # "branch_has_image": branch_has_image #
         }
         if current_user.is_authenticated:
             print(f"View: '{branch.name}' by '{current_user.username}'. Guide: {len(filtered_care_guide)} leaves.")

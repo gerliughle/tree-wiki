@@ -22,13 +22,13 @@
 
             <div class="col-10 col-sm-8 col-lg-6">
                 <img
-                        src="../static/assets/branch_img/{{ branch.image }}"
+                        src="../static/assets/branch_img/{{ branch.image }}"  {# FIXME #}
                         class="d-block mx-lg-auto img-fluid"
                         alt="{{ branch.name }} image"
                         width="700"
-                        height="500"
                         loading="lazy"
                 />
+
             </div>
             <div class="col-lg-6">
         {% else %}
@@ -46,7 +46,7 @@
                     <li class="breadcrumb-item"></li>
                 </ol>
             </nav>
-            <h1 class="display-3  lh-1 mb-3">
+            <h1 class="display-3 lh-1 mb-3">
                 {{ branch.name }}
             </h1>
             <p class="lead">
@@ -88,6 +88,12 @@
                             </div>
                         {% endif %}
                     </form>
+                    {% if is_edit_mode and (current_user.role == 'admin' or current_user.role == 'editor') %}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#branchImgModal">Upload Image
+                        </button>
+
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
@@ -182,5 +188,37 @@
                 {% endfor %}
 
             </div>
+
+
+            <div class="modal fade" id="branchImgModal" tabindex="-1"
+                 aria-labelledby="branchImgModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form method="POST" enctype="multipart/form-data" class="my-2">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="branchImgModalLabel">Upload Image</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="branch_img" class="form-label">All images require admin approval.
+                                    Limit 5MB.</label>
+                                <input class="form-control col-auto" type="file" id="branch_img"
+                                       name="branch_img" accept=".jpg, .jpeg, .png"/>
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="image_caption" name="image_caption"
+                                              placeholder="Caption"></textarea>
+                                    <label for="image_caption">Optional: Add image caption for additional
+                                        context.</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary col-auto">Upload</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
 
 {% endblock %}

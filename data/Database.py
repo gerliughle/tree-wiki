@@ -14,12 +14,14 @@ from logic.Leaf import Leaf
 from logic.User import User
 from logic.TreeEngine import TreeEngine
 from logic.UserManager import UserManager
+from logic.UserImage import UserImage
 
 
 class Database:
     __connection = None
     __branches = None
     __leaves = None
+    __user_images = None
     __users = None
     __audit_log = None
 
@@ -45,6 +47,7 @@ class Database:
             cls.__database = cls.__connection.BonsaiTree
             cls.__branches = cls.__database.Branches
             cls.__leaves = cls.__database.Leaves
+            cls.__user_images = cls.__database.UserImages
             cls.__users = cls.__database.Users
             cls.__audit_log = cls.__database.AuditLog
 
@@ -67,7 +70,14 @@ class Database:
         leaves = [Leaf.build(leaf, leaf_map) for leaf in leaf_dicts]
         active_leaves = [leaf for leaf in leaves if leaf.is_active]
 
-        return branches, active_branches, branch_map, leaves, active_leaves, leaf_map
+        image_map = {}
+        image_dicts = list(cls.__user_images.find())
+        user_images = [UserImage.build(img, image_map) for img in image_dicts]
+        active_images = [img for img in user_images if img.is_active]
+
+        return (branches, active_branches, branch_map,
+                leaves, active_leaves, leaf_map,
+                user_images, active_images, image_map)
 
     @classmethod
     def read_users(cls):
@@ -110,7 +120,7 @@ class Database:
         Rather than figuring it out by analyzing the dict, just ask the caller.
         save_dict should have _id if existing, if not it will create. otherwise have all changes
         save_type should be "create", "edit", "disable", enable"
-        obj_type should be "user", "branch" or "leaf"
+        obj_type should be "user", "branch", "leaf" or "image"
         Deleting is handled separately.
         """
 
@@ -124,10 +134,9 @@ class Database:
         cls.connect()
         print(f"Processing {save_type=} request for {obj_type=}")
 
-
         if save_type == "create":
             query_filter["_id"] = ObjectId()
-            obj_name = save_dict.get("name", save_dict.get("username", "New"))
+            obj_name = save_dict.get("name", save_dict.get("username", "New")) # FIXME new things have names?
         else:
             print(f"Debug {save_dict=}")
             save_id = save_dict["_id"]
@@ -139,6 +148,8 @@ class Database:
                 save_obj = TreeEngine.lookup_branch(save_id)
             elif obj_type == "leaf":
                 save_obj = TreeEngine.lookup_leaf(save_id)
+            elif obj_type == "image":
+                save_obj = TreeEngine.lookup_image(save_id)
             obj_name = save_obj.name
 
         if obj_type == "user":
@@ -147,6 +158,8 @@ class Database:
             obj_db = cls.__branches
         if obj_type == "leaf":
             obj_db = cls.__leaves
+        if obj_type == "image":
+            obj_db = cls.__user_images
 
         update_payload = {
             "$set": save_dict
@@ -194,9 +207,12 @@ class Database:
         elif obj_type == "branch":
             print("Successfully updated branch.")
             return Branch.build(new_obj_doc, obj_map)
-        elif obj_type == "leaf":
+        if obj_type == "leaf":
             print("Successfully updated leaf.")
             return Leaf.build(new_obj_doc, obj_map)
+        elif obj_type == "image":
+            print("Successfully updated image.")
+            return UserImage.build(new_obj_doc, obj_map)
         print("Error, did not complete save method.")
         return None
 

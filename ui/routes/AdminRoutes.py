@@ -1,6 +1,8 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required
 from bson import ObjectId
+
+import os
 
 from ui.WebUI import WebUI
 from logic.User import User
@@ -43,6 +45,10 @@ class AdminRoutes:
                 delete_user = UserManager.lookup_user_id(target_id)
                 print(f"{delete_user=}")
                 return render_template("admin/check_delete_user.html", user=delete_user)
+            elif obj_type == "Image":
+                delete_image = TreeEngine.lookup_image(target_id)
+                print(f"{delete_image=}")
+                return render_template("admin/check_delete_image.html", user=delete_image)
         elif action == "log_revert":
             print("Log Revert Selected")
             obj_dict = log["edit"]["before"]
@@ -54,6 +60,8 @@ class AdminRoutes:
                 TreeEngine.save_leaf(obj_dict, "edit")
             elif obj_type == "User":
                 UserManager.save_user(obj_dict, "edit")
+            elif obj_type == "Image":
+                TreeEngine.save_image(obj_dict, "edit")
 
         elif action == "log_enable":
             obj_dict["is_active"] = True
@@ -71,6 +79,8 @@ class AdminRoutes:
                 TreeEngine.save_branch(obj_dict, save_type)
             if obj_type == "Leaf":
                 TreeEngine.save_leaf(obj_dict, save_type)
+            if obj_type == "Image":
+                TreeEngine.save_image(obj_dict, save_type)
 
         return redirect(url_for("admin_dashboard"))
 
@@ -200,3 +210,12 @@ class AdminRoutes:
         else:
             flash("Error. User does not exist.", "warning")
         return redirect(url_for("homepage"))
+
+    @staticmethod
+    @__app.route("/review_images")
+    @login_required
+    @UserManager.role_required("admin")
+    def review_images():
+        """ Sends image list to moderation page """
+        image_list = TreeEngine.get_all_user_images()
+        return render_template("admin/review_images.html", image_list=image_list)

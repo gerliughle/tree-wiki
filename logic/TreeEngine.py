@@ -6,10 +6,13 @@ from logic.Validate import Validate
 class TreeEngine:
     all_branches = []
     active_branches = []
+    branch_map = None
     all_leaves = []
     active_leaves = []
-    branch_map = None
     leaf_map = None
+    user_images = []
+    active_user_images = []
+    image_map = None
 
     CATEGORIES = [
         "Environment",
@@ -33,7 +36,8 @@ class TreeEngine:
     def read_data(cls):
         from data.Database import Database
         (cls.active_branches, cls.active_branches, cls.branch_map,
-         cls.active_leaves, cls.active_leaves, cls.leaf_map) \
+         cls.active_leaves, cls.active_leaves, cls.leaf_map,
+         cls.user_images, cls.active_user_images, cls.image_map) \
             = Database.read_data()
 
 
@@ -95,7 +99,6 @@ class TreeEngine:
             current_leaves = cls.get_leaves_for_branch(current_branch.id)
 
             for leaf in current_leaves:
-                print(f"Debug: {leaf.name=}, {leaf.end_chain=}, {len(breadcrumbs)=}")
                 if not (leaf.end_chain is True and len(breadcrumbs) > 1):
 
                     if leaf.subcategory not in subcategory_list:
@@ -170,3 +173,25 @@ class TreeEngine:
         Database.delete_leaf(delete_leaf)
         cls.read_data()
 
+    @classmethod
+    def lookup_image(cls, image_id):
+        if image_id in cls.image_map:
+            return cls.image_map[image_id]
+        return None
+
+    @classmethod
+    def save_image(cls, img_dict, save_type):
+        """ Take a new image, create database entry, name & save image."""
+        from data.Database import Database
+        user_image = Database.db_save(img_dict, save_type, "image", cls.image_map)
+
+        cls.read_data()
+        return user_image
+
+    @classmethod
+    def get_active_user_images(cls):
+        return cls.active_user_images
+
+    @classmethod
+    def get_all_user_images(cls):
+        return cls.user_images

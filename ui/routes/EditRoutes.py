@@ -63,7 +63,6 @@ class EditRoutes:
             flash("Error, this branch already exists!", "warning")
             return render_template("edit/create_branch.html", branches=all_branches, branch=parent_branch)
 
-        branch_image = str(branch_name.lower().replace(" ", "_") + ".jpg")
         branch_description = request.form.get("branch_description")
         valid, branch_description, error = Validate.validate_input(
             branch_description, "Branch Description", 10, 200, "text")

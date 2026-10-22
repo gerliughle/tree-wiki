@@ -1,3 +1,6 @@
+import os
+import shutil
+import imghdr
 from profanity_check import predict
 from wordsegment import load, segment
 from better_profanity import profanity
@@ -10,7 +13,7 @@ class Validate:
     load()
     profanity.load_censor_words()
     USERNAME_CHARS = set(string.ascii_lowercase + string.digits + "-_")
-
+    UPLOAD_EXTENSIONS = [".jpg", ".png", ".jpeg"]
 
     @staticmethod
     def make_objectid(obj_id):
@@ -66,7 +69,7 @@ class Validate:
                        clean=True):
         """ Validates strings for user inputs to accept or reject inputs.
 
-        Returns tuple: True/False if passes validation and an error message.
+        Returns: True/False if passes validation, the text, and an error message.
 
         text: the text string to be validated
         field_name: The field the text is for, to return appropriate error.
@@ -146,4 +149,39 @@ class Validate:
             text = text.capitalize()
 
         return text
+
+    @staticmethod
+    def get_free_disk_gb(path):
+        total, used, free = shutil.disk_usage(path)
+        return free / (1024 ** 3)
+
+
+    @classmethod
+    def validate_image(cls, image_file):
+        """ Validates strings for user inputs to accept or reject inputs.
+
+        Returns tuple: True/False if passes validation, the image extension and an error message.
+
+        image_file should be the image from the form.
+        Checks that there is HD space available.
+        Checks that it has a valid image extension
+        Checks that the file header matches the extension
+        """
+        from ui.WebUI import WebUI
+        if cls.get_free_disk_gb(WebUI.USER_IMAGES_PATH) < WebUI.MIN_HD_SPACE_GB*3:
+            return False, None, "Error, disk space full. Please contact site admin."
+
+        image_ext = os.path.splitext(image_file.filename)[1]
+        stream = image_file.stream
+        if image_ext not in cls.UPLOAD_EXTENSIONS:
+            return False, image_ext, f"Image extension {image_ext} not supported."
+        header = stream.read(512)
+        stream.seek(0)
+        img_format = imghdr.what(None, header)
+        if not img_format:
+            return False, "Error with image. Please try again."
+        return True, image_ext,""
+
+
+
 
