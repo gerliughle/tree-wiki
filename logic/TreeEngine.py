@@ -35,7 +35,7 @@ class TreeEngine:
     @classmethod
     def read_data(cls):
         from data.Database import Database
-        (cls.active_branches, cls.active_branches, cls.branch_map,
+        (cls.all_branches, cls.active_branches, cls.branch_map,
          cls.active_leaves, cls.active_leaves, cls.leaf_map,
          cls.user_images, cls.active_user_images, cls.image_map) \
             = Database.read_data()
@@ -184,7 +184,6 @@ class TreeEngine:
         """ Take a new image, create database entry, name & save image."""
         from data.Database import Database
         user_image = Database.db_save(img_dict, save_type, "image", cls.image_map)
-
         cls.read_data()
         return user_image
 
@@ -195,3 +194,19 @@ class TreeEngine:
     @classmethod
     def get_all_user_images(cls):
         return cls.user_images
+
+    @classmethod
+    def get_branch_images(cls, branch_id):
+        """Creates list of top images for a branch.
+
+        Only returns approved, active images.
+        Limit to 5
+        Sorts by quality
+        """
+        approved_images = {}
+        for image in cls.active_user_images:
+            if image.is_approved and image.branch_id == branch_id:
+                approved_images[image] = image.quality
+        approved_images_list = sorted(approved_images, key=lambda x: approved_images[x], reverse=True)
+        approved_images_list = approved_images_list[:5]
+        return approved_images_list

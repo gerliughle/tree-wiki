@@ -17,24 +17,17 @@
 
     <!-- Hero -->
     <div class="container col-md-8 px-4 mb-4">
-        {% if branch_has_image %}
-            <div class="row flex-lg-row-reverse align-items-center g-5 pt-3 pb-5">
 
-            <div class="col-10 col-sm-8 col-lg-6">
-                <img
-                        src="../static/assets/branch_img/{{ branch.image }}"  {# FIXME #}
-                        class="d-block mx-lg-auto img-fluid"
-                        alt="{{ branch.name }} image"
-                        width="700"
-                        loading="lazy"
-                />
-
-            </div>
+        {% if branch_images|length > 0 %}
+            <div class="row flex-lg-row-reverse align-items-center g-5 pt-3 pb-5"> <!-- div if image -->
+                <div class="col-10 col-sm-8 col-lg-6"><!-- image box -->
+                        {% include 'components/branch_carousel.html' %}
+                </div>
             <div class="col-lg-6">
         {% else %}
-            <div class="row align-items-center g-5 py-5">
+            <div class="row align-items-center g-5 py-5"> <!-- div no image -->
         {% endif %}
-        <div class="col-10">
+        <div class="col-10"> <!-- Branch header title/form -->
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     {% for crumb in breadcrumbs[:-1] %}
@@ -101,6 +94,9 @@
         </div>
 
         </div>
+    </div>
+
+
         <div class="container col-md-11 px-4">
             <div class="container my-2"> <!-- page body container -->
                 <!-- Filter Form -->

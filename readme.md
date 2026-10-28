@@ -96,13 +96,25 @@ Done:
   * This prevents child branches from using this leaf in their care guides. A badge will be shown on leaves like this. 
   * You can toggle this back on later. This allows visibility of killswitches. There may be some old leaves that break rules. 
   * I also don't think you need entry text, for example, if you just want to say 'wire' in 'winter' for 'all phases'
-  * User-uploaded branch images:
-    * image is uploaded
-    * check rules (size, hd space. later, # of submissions?)
-    * validate extension/header
-    * save database entry
-    * save image with id filename
-    * check logs and log display
+* User-uploaded branch images:
+  * image is uploaded, using modal form
+  * Validate rules (size, hd space. later, # of submissions?)
+  * validate extension/header
+  * save database entry
+  * save image with id filename
+  * check logs and log display
+  * Photos can have captions
+* Image moderation
+  * Page and route built, access control
+  * Set quality/caption/save routes
+  * Sort by date
+  * Show branch & user image stats
+* Image Carousel
+  * Get up to 5 approved images, sorted by quality
+  * Display them in a carousel
+  * If 1 image, remove buttons
+  * Auto crop images, rounded corners.
+  * If caption, display with a backdrop
 
 
 To-Do:
@@ -119,43 +131,23 @@ To-Do:
   * jinja escapes check
   * Honeypot field for login, edit forms.
   * Commented out logic-level ObjectId validations. If that works after a while, can delete.
-* pictures solution / carousel - how to host
-  * I can store on my pi
-  * Add the add photo form direct to edit view
-  * image uploads and saves into folder named after an object id
-  * then in database its saved with its id, branch_id, uploader, approved, and is_active
-  * then an admin page shows all the to_approve images and i can approve, not approve, or disable user.
-  * then on the index page it looks for any image with branch_id match and puts it in carousel
-  * parents that have less than 5 images can pull from children? p2
 
 
-  * Steps:
-  * add photo captions
-    * build moderation page
-      * filter view: show active/inactive and approved/needs_approval/unapproved
-      * display images by date in id
-      * show branch name and # of submitted/approved images it has
-      * show author name and number of submitted/approved images they have
-      * set quality slider
+* Photos
+  * build moderation page
+    * filter view: show active/inactive and approved/needs_approval/unapproved
     * disable, delete, edit methods (& moderation tasks)
-      * check_delete_image.html
-
-    * then build page logic (check if images, then send the top 5 highest quality)
-    * Fixme in image display
-    * fixme in has_image
-    * fixme in page context
-    * then create carousel
+      * Need to have edit button separate from approve, for making qual/caption edits. 
+      * Whole form is so ugly.
     * then clean up db/images, delete old static images, upload a few new ones
     * backup db
     * fix size error 413 thing
     * image resizing
-    * form modal
-
-    * 
 * Paginate admin log
-* Clean up branch edit buttons
+* Clean up branch edit button forms
 * Homepage
 * About page
+* Logo
 
 
 P1:

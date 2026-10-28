@@ -15,7 +15,7 @@
             {# then a form to approve, disable, delete, set quality, and edit caption
             {#  #}
 
-            <table class="table table-hover table-sm">
+            <table class="table table-sm">
                 {% for image in image_list %}
 
                     <th colspan="2">
@@ -43,7 +43,7 @@
                                 {% endif %}
                                 {% if image.author_id == check_image.author_id %}
                                     {% if check_image.is_approved %}
-                                        {% set ns.user_approved = ns.user_approved +1 %}
+                                        {% set ns.user_approved = ns.user_approved + 1 %}
                                     {% endif %}
                                     {% set ns.user_total = ns.user_total + 1 %}
                                 {% endif %}
@@ -73,9 +73,19 @@
                             <form method="POST" action="/do_edit_image">
                                 <input type="hidden" name="image_id" value="{{ image.id }}">
                                 <div class="mb-12">Image Options:</div>
-                                <label for="image_quality">Quality Level: 1-5</label>
-                                <input type="range" class="form-range" min="1" max="5" id="image_quality"
-                                       name="image_quality"/>
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="image_caption" name="image_caption"
+                                              placeholder="Caption">{{ image.caption }}</textarea>
+                                    <label for="image_caption">Edit image caption</label>
+                                </div>
+
+                                <div>
+                                    <label for="image_quality" class="form-label">Quality Level (1-5):</label>
+                                    <input type="range" class="form-range w-25" min="1" max="5"
+                                           id="image_quality"
+                                           name="image_quality" value="{{ image.quality }}">
+                                </div>
+
                                 {% if image.is_approved == false %}
                                     <button type="submit" class="btn btn-primary">Approve</button>
                                 {% elif image.is_approved == true %}
@@ -118,7 +128,8 @@
                                                     <div>This will permanently delete {{ image.name }}? Are you sure?
                                                     </div>
                                                     <button type="submit" class="btn btn-danger">Delete</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal"
                                                             aria-label="Cancel">Cancel
                                                     </button>
                                                 </div>

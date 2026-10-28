@@ -54,11 +54,6 @@ class Branch:
         return f"Branch object: {self.name}. Id: {self._id}"
 
     @property
-    def has_image(self): # FIXME probably
-        file_path = os.path.join("ui","static","assets","branch_img",self.image)
-        return os.path.exists(file_path)
-
-    @property
     def parent_id(self):
         parent = TreeEngine.lookup_branch(self.__parent_id)
         while parent and not parent.is_active: # if the parent is disabled, look up its parent.

@@ -137,7 +137,7 @@ class WebUI:
                     "branch_id": branch_id,
                     "ext": image_ext,
                     "is_approved": False,
-                    "quality": 0,
+                    "quality": 3,
                     "caption": caption,
                     "name": str(f"'{branch.name}' Image by {current_user.username}"),
                 }
@@ -147,6 +147,7 @@ class WebUI:
                 uploaded_branch_img.save(os.path.join(WebUI.USER_IMAGES_PATH, str(user_image.id) + image_ext))
                 flash(f"{user_image.name} uploaded. Awaiting moderation approval.", "success")
 
+        branch_images = TreeEngine.get_branch_images(branch.id) # returns list of top 5 images (by qual) filenames
 
         children = TreeEngine.get_children_of_branch(branch.id)
         all_seasons = ["Spring", "Summer", "Fall", "Winter"]
@@ -158,7 +159,7 @@ class WebUI:
             "phases": phases,
             "children": children,
             "all_seasons": all_seasons,
-            # "branch_has_image": branch_has_image #
+            "branch_images": branch_images
         }
         if current_user.is_authenticated:
             print(f"View: '{branch.name}' by '{current_user.username}'. Guide: {len(filtered_care_guide)} leaves.")

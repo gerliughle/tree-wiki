@@ -85,11 +85,11 @@ class Database:
         user_dict = list(cls.__users.find())
         users = [User.build(user) for user in user_dict]
         return users
-
-    @classmethod
-    def read_audit(cls): # FIXME is this unused?
-        cls.connect()
-        return cls.__audit_log
+    #
+    # @classmethod
+    # def read_audit(cls): # FIXME is this unused?
+    #     cls.connect()
+    #     return cls.__audit_log
 
     @classmethod
     def get_audit_log(cls):
@@ -136,7 +136,7 @@ class Database:
 
         if save_type == "create":
             query_filter["_id"] = ObjectId()
-            obj_name = save_dict.get("name", save_dict.get("username", "New")) # FIXME new things have names?
+            obj_name = save_dict.get("name", save_dict.get("username", "New"))
         else:
             print(f"Debug {save_dict=}")
             save_id = save_dict["_id"]
