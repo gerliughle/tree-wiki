@@ -13,7 +13,7 @@
         {% for image in branch_images %}
             <div class="carousel-item {% if loop.first %}active{% endif %}">
                 <img src="{{ url_for('static', filename='assets/USER_IMAGES/branch_images/' ~ image.id ~ image.ext) }}"
-                     class="d-block w-100" alt="{{ image.name }}"
+                     class="d-block w-100" alt="{{ image.name }}" loading="lazy"
                      style="height: 500px; object-fit: cover; object-position: center;">
                 {% if image.caption %}
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded shadow-sm p-3  ">

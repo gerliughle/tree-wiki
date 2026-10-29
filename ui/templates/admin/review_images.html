@@ -26,7 +26,7 @@
                     <tr>
                         <td>
                             <img src="{{ url_for('static', filename='assets/USER_IMAGES/branch_images/' ~ image.id ~ image.ext) }}"
-                                 alt="{{ image.name }}" width="400">
+                                 alt="{{ image.name }}" width="400" loading="lazy">
                         </td>
                         <td>
                             {% set ns = namespace(
@@ -66,18 +66,14 @@
                                 {% if image.is_active %}
                                     <span class="badge text-bg-success">Active</span>
                                 {% else %}
-                                    <span class="badge text-bg-warning">Deactivated</span>
+                                    <span class="badge text-bg-danger">Deactivated</span>
                                 {% endif %}
                             </div>
 
                             <form method="POST" action="/do_edit_image">
                                 <input type="hidden" name="image_id" value="{{ image.id }}">
+
                                 <div class="mb-12">Image Options:</div>
-                                <div class="form-floating mb-3">
-                                    <textarea class="form-control" id="image_caption" name="image_caption"
-                                              placeholder="Caption">{{ image.caption }}</textarea>
-                                    <label for="image_caption">Edit image caption</label>
-                                </div>
 
                                 <div>
                                     <label for="image_quality" class="form-label">Quality Level (1-5):</label>
@@ -86,15 +82,23 @@
                                            name="image_quality" value="{{ image.quality }}">
                                 </div>
 
-                                {% if image.is_approved == false %}
-                                    <button type="submit" class="btn btn-primary">Approve</button>
-                                {% elif image.is_approved == true %}
-                                    <button type="submit" formaction="/do_unapprove_image" class="btn btn-warning">
-                                        Unapprove
-                                    </button>
-                                {% endif %}
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" id="image_caption" name="image_caption"
+                                              placeholder="Caption">{{ image.caption }}</textarea>
+                                    <label for="image_caption">Edit image caption</label>
+                                </div>
 
-                                <div class="btn-group btn-group" role="group">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="approve_switch"
+                                           name="approve_switch"
+                                           {% if image.is_approved %}checked{% endif %}>
+                                    <label class="form-check-label" for="approve_switch">Approved for display</label>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary mb-3">Apply</button>
+                                <div></div> <!-- to get line separation. probably better way. -->
+
+                                <div class="btn-group btn-group mb-3" role="group">
                                     {% if image.is_active == false %}
                                         <button type="submit" formaction="/do_activate_image"
                                                 class="btn btn-outline-success py-0 px-1">Reactivate
@@ -105,19 +109,19 @@
                                         </button>
                                     {% endif %}
 
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#checkDeleteImage"
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#checkDeleteImage_{{ image.id }}"
                                             class="btn btn-outline-danger py-0 px-1">Delete
                                     </button>
                                     <a class="button btn btn-outline-info py-0 px-1">Manage User</a>
                                 </div>
 
 
-                                <div class="modal fade" id="checkDeleteImage" tabindex="-1"
+                                <div class="modal fade" id="checkDeleteImage_{{ image.id }}" tabindex="-1"
                                      aria-labelledby="checkDeleteImageLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
-                                            <form method="POST" class="my-2" action="/do_delete_image">
-                                                <input type="hidden" name="image_id" value="{{ image.id }}"/>
+{#                                            <form method="POST" class="my-2" action="/do_delete_image">#}
+{#                                                <input type="hidden" name="image_id" value="{{ image.id }}"/>#}
                                                 <div class="modal-header">
                                                     <h1 class="modal-title fs-5" id="checkDeleteImageLabel">Are you
                                                         sure?</h1>
@@ -127,17 +131,16 @@
                                                 <div class="modal-body">
                                                     <div>This will permanently delete {{ image.name }}? Are you sure?
                                                     </div>
-                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                    <button type="submit" class="btn btn-danger" formaction="/do_delete_image">Delete</button>
                                                     <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal"
                                                             aria-label="Cancel">Cancel
                                                     </button>
                                                 </div>
-                                            </form>
+{#                                            </form>#}
                                         </div>
                                     </div>
                                 </div>
-
 
                             </form>
                         </td>

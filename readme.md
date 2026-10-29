@@ -109,6 +109,7 @@ Done:
   * Set quality/caption/save routes
   * Sort by date
   * Show branch & user image stats
+  * Approval switch, disable, delete routes
 * Image Carousel
   * Get up to 5 approved images, sorted by quality
   * Display them in a carousel
@@ -136,13 +137,10 @@ To-Do:
 * Photos
   * build moderation page
     * filter view: show active/inactive and approved/needs_approval/unapproved
-    * disable, delete, edit methods (& moderation tasks)
-      * Need to have edit button separate from approve, for making qual/caption edits. 
-      * Whole form is so ugly.
-    * then clean up db/images, delete old static images, upload a few new ones
+    * Images for parents without images
+    * Random selection for more than 5 valid choices
     * backup db
     * fix size error 413 thing
-    * image resizing
 * Paginate admin log
 * Clean up branch edit button forms
 * Homepage
@@ -158,6 +156,10 @@ P1:
 * Can i fully collapse into like, 'wire' in the season one line? Or is this even another section of the page?
 * log filters/searching
 * site searching
+* Photos
+  * Thumbnails
+  * Galleries
+  * Zoom in image view
 
 Later:
 * TBH, the whole revert thing... it probably just makes sense to go full git, and save versions of everything. 

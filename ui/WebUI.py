@@ -113,9 +113,8 @@ class WebUI:
                 }
                 filtered_care_guide.append(filtered_leaf)
 
-        # branch_has_image = branch.has_image
 
-        # PROCESS IMAGE UPLOADS
+        # FIXME PROCESS IMAGE UPLOADS... move to own method
         if request.method == 'POST':
             uploaded_branch_img = request.files["branch_img"]
             if uploaded_branch_img.filename != '':

@@ -310,6 +310,28 @@ class Database:
         else:
             print("Did not complete user deletion.")
 
+    @classmethod
+    def delete_image(cls, image):
+        cls.connect()
+        delete_doc = cls.__user_images.delete_one({"_id": image.id})
+        if delete_doc.acknowledged:
+            print("Deleted image")
+            log_payload = {
+                "timestamp": datetime.now(timezone.utc),
+                "user_id": current_user.id,
+                "username": current_user.username,
+                "target_id": image.id,
+                "target_name": image.name,
+                "task": "Delete Image",
+                "edit": {
+                    "deleted_image_id": image.id,
+                }
+            }
+            print(f"{log_payload=}")
+            cls.update_log(log_payload)
+        else:
+            print("Did not complete image deletion.")
+
 
     @classmethod
     def rebuild_leaves(cls):

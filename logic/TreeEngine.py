@@ -1,5 +1,5 @@
 from bson import ObjectId
-
+import os
 from logic.Validate import Validate
 
 
@@ -31,6 +31,7 @@ class TreeEngine:
         cls.read_data()
         print(f"Branches loaded: {len(cls.active_branches)}")
         print(f"Leaves loaded: {len(cls.active_leaves)}")
+        print(f"Images loaded: {len(cls.image_map)}")
 
     @classmethod
     def read_data(cls):
@@ -210,3 +211,19 @@ class TreeEngine:
         approved_images_list = sorted(approved_images, key=lambda x: approved_images[x], reverse=True)
         approved_images_list = approved_images_list[:5]
         return approved_images_list
+
+    @classmethod
+    def delete_image(cls, image_id):
+        from data.Database import Database
+        from ui.WebUI import WebUI
+
+        delete_image = cls.lookup_image(image_id)
+        delete_name = delete_image.name
+        path = os.path.join(WebUI.USER_IMAGES_PATH, str(delete_image.id) + delete_image.ext)
+        if os.path.exists(path):
+            os.remove(os.path.join(WebUI.USER_IMAGES_PATH, str(delete_image.id) + delete_image.ext))
+            Database.delete_image(delete_image)
+            cls.read_data()
+            return delete_name
+        else:
+            return None

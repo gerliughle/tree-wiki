@@ -218,6 +218,7 @@ class AdminRoutes:
     def review_images():
         """ Sends image list to moderation page """
         image_list = TreeEngine.get_all_user_images()
+        image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)
         return render_template("admin/review_images.html", image_list=image_list)
 
     @staticmethod
@@ -235,14 +236,15 @@ class AdminRoutes:
         if not image:
             flash("Error with image identification. Edit not saved.", "warning")
             return redirect(url_for("review_images"))
-        image_edits = {"_id": image_id}
         quality_rating = request.form.get("image_quality")
         caption = request.form.get("image_caption")
+
+        approved = True if request.form.get("approve_switch") is not None else False
 
         if image and quality_rating:
             image_edits = {
                 "_id": image_id,
-                "is_approved": True,
+                "is_approved": approved,
                 "quality": quality_rating,
             }
         else:
@@ -253,5 +255,43 @@ class AdminRoutes:
 
         TreeEngine.save_image(image_edits, "edit")
         image_list = TreeEngine.get_all_user_images()
+        image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)
         flash(f"Image { image.name } edited successfully.", "success")
         return render_template("admin/review_images.html", image_list=image_list)
+
+    @staticmethod
+    @__app.route('/do_deactivate_image', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin")
+    def do_deactivate_image():
+        image_id = Validate.make_objectid(request.form.get("image_id"))
+        image = TreeEngine.lookup_image(image_id)
+        if not image:
+            flash("Error with image identification. Deactivation not saved.", "warning")
+            return redirect(url_for("review_images"))
+        image_edits = {
+            "_id": image_id,
+            "is_active": False,
+        }
+        TreeEngine.save_image(image_edits, "edit")
+        image_list = TreeEngine.get_all_user_images()
+        flash(f"Image { image.name } deactivated.", "success")
+        return redirect(url_for("review_images"))
+
+    @staticmethod
+    @__app.route('/do_delete_image', methods=['POST'])
+    @login_required
+    @UserManager.role_required("admin")
+    def do_delete_image():
+        image_id = Validate.make_objectid(request.form.get("image_id"))
+        if not image_id:
+            flash("Error with image identification. Image not deleted.", "warning")
+            return redirect(url_for("review_images"))
+        image_name = TreeEngine.delete_image(image_id)
+        if image_name:
+            flash(f"Image { image_name } deleted.", "success")
+        else:
+            flash("Error. Image not found, delete unsuccessful.", "warning")
+        return redirect(url_for("review_images"))
+
+
