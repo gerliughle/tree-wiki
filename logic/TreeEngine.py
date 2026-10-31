@@ -209,34 +209,30 @@ class TreeEngine:
         """
 
         min_list_size = 4
-        max_list_size = 5
+        max_list_size = 6
         i = 0
         j = 0
 
-        branch_id_list = []
         image_list = []
-
-        branch = cls.lookup_branch(original_id)
-        branch_list = [branch]
-
-        while len(branch_list) > 0 and len(image_list) < min_list_size: #while still children to search and no images
-
-            for branch in branch_list: # objects
-                print(f"Checking {branch.name}")
+        branch_list = [cls.lookup_branch(original_id)] # branch list starts as og branch
+        while len(branch_list) > 0 and len(image_list) < min_list_size: # while still children to search and haven't hit min size
+            for branch in branch_list: # check og branch. then check each child in the next generation
+                fetched_images = cls.fetch_branch_images([branch.id for branch in branch_list])
+                for image in fetched_images:
+                    if image not in image_list:
+                        image_list.append(image)
+                        print(f"{image_list=}")
                 new_branches = cls.get_children_of_branch(branch.id)
-                for new_branch in new_branches:
-                    if new_branch not in branch_list:
-                        branch_list.append(new_branch)
+                branch_list += new_branches
+                # for new_branch in new_branches: # there shouldn't be branch dupes, right?
+                #     if new_branch not in branch_list:
+                #         branch_list.append(new_branch)
                 branch_list.remove(branch)
                 j += 1  # Individual branch incrementer
                 print(f"Child image layer: {i}, child: {j}")
 
             i += 1  # Generation incrementer
-            fetched_images = cls.fetch_branch_images([branch.id for branch in branch_list])
-            for image in fetched_images:
-                if image not in image_list:
-                    image_list.append(image)
-                    print(f"{image_list=}")
+
 
 
         print(f"Search complete. Found {len(image_list)} images.")
