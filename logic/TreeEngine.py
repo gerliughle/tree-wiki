@@ -1,5 +1,6 @@
 from bson import ObjectId
 import os
+import random
 from logic.Validate import Validate
 
 
@@ -115,7 +116,6 @@ class TreeEngine:
     def get_children_of_branch(cls, branch_id):
         children_list = []
 
-        # branch_id = Validate.make_objectid(branch_id)
         for branch in cls.active_branches:
             if branch_id == branch.parent_id:
                 children_list.append(branch)
@@ -197,20 +197,74 @@ class TreeEngine:
         return cls.user_images
 
     @classmethod
-    def get_branch_images(cls, branch_id):
+    def get_branch_images(cls, original_id):
         """Creates list of top images for a branch.
 
         Only returns approved, active images.
         Limit to 5
         Sorts by quality
+        If NO images, then check for children images, by generation, until there are images or out of generation
+        If there are images, reprocess the list.
+
         """
-        approved_images = {}
+
+        min_list_size = 4
+        max_list_size = 5
+        i = 0
+        j = 0
+
+        branch_id_list = []
+        image_list = []
+
+        branch = cls.lookup_branch(original_id)
+        branch_list = [branch]
+
+        while len(branch_list) > 0 and len(image_list) < min_list_size: #while still children to search and no images
+
+            for branch in branch_list: # objects
+                print(f"Checking {branch.name}")
+                new_branches = cls.get_children_of_branch(branch.id)
+                for new_branch in new_branches:
+                    if new_branch not in branch_list:
+                        branch_list.append(new_branch)
+                branch_list.remove(branch)
+                j += 1  # Individual branch incrementer
+                print(f"Child image layer: {i}, child: {j}")
+
+            i += 1  # Generation incrementer
+            fetched_images = cls.fetch_branch_images([branch.id for branch in branch_list])
+            for image in fetched_images:
+                if image not in image_list:
+                    image_list.append(image)
+                    print(f"{image_list=}")
+
+
+        print(f"Search complete. Found {len(image_list)} images.")
+        if len(image_list) == 0:
+            print(f"No images found. Searched {j} children through {i} generations")
+
+        if len(image_list) > max_list_size:
+            print(f"More than {max_list_size} images found. ")
+            if image_list[5].quality == 5: # if more than max_images images with quality of 5, restrict to those images
+                print(f"More than 5 high quality images found.")
+                image_list = [x for x in image_list if x.quality == 5]
+                random.shuffle(image_list)
+                print(f"Returning {len(image_list)} images.")
+
+        return image_list[:max_list_size]
+
+    @classmethod
+    def fetch_branch_images(cls, branch_id_list):
+        """ Gets the images for a branch and returns as a list, sorted by quality """
+        approved_image_dict = {}
+        print(f"Fetching images for {len(branch_id_list)} branches")
         for image in cls.active_user_images:
-            if image.is_approved and image.branch_id == branch_id:
-                approved_images[image] = image.quality
-        approved_images_list = sorted(approved_images, key=lambda x: approved_images[x], reverse=True)
-        approved_images_list = approved_images_list[:5]
-        return approved_images_list
+            if image.is_approved and image.branch_id in branch_id_list:
+                approved_image_dict[image] = image.quality
+        print(f"Fetched {len(approved_image_dict)} images.")
+        return sorted(approved_image_dict, key=lambda x: approved_image_dict[x], reverse=True)
+
+
 
     @classmethod
     def delete_image(cls, image_id):

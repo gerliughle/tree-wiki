@@ -11,7 +11,7 @@ Structure:
 * HTML control with Jinja templates
 * CSS design framework from Bootstrap
 * Database is cloud-based, NoSQL dictionary using MongoDB Atlas
-* Web Server is Raspberry PI running on Ubuntu Server
+* Web Server is Raspberry PI running on Pi OS lite
 * Server secured with Uncomplicated Firewall (ufw) and passwordless login
 * Production server uses Gunicorn
 * Front-end routing/https uses Cloudflared tunnel
@@ -121,6 +121,7 @@ Done:
 To-Do:
 
 * P0:
+* Data schema
   * Think simpler entries focused on timing, with expandable info. The default layout should be more like a calendar. 
     * Not far off from this really, just cut all unnecessary info, maybe make the view more compact. Altho it would
     * be cool to hide title, and really just have task arranged by season.
@@ -131,16 +132,14 @@ To-Do:
   * Client side form validation, and field tuning (autocomplete, etc).
   * jinja escapes check
   * Honeypot field for login, edit forms.
-  * Commented out logic-level ObjectId validations. If that works after a while, can delete.
-
-
 * Photos
   * build moderation page
     * filter view: show active/inactive and approved/needs_approval/unapproved
-    * Images for parents without images
-    * Random selection for more than 5 valid choices
-    * backup db
-    * fix size error 413 thing
+  * Images for parents without images - functions, but doesn't sort by qual.
+  * Random selection for more than 5 valid choices - done but untested
+  * backup db
+  * fix size error 413 thing
+  * add pic icon in tree view
 * Paginate admin log
 * Clean up branch edit button forms
 * Homepage
