@@ -1,6 +1,6 @@
 import os
 import shutil
-import imghdr
+from PIL import Image
 from profanity_check import predict
 from wordsegment import load, segment
 from better_profanity import profanity
@@ -175,10 +175,11 @@ class Validate:
         stream = image_file.stream
         if image_ext not in cls.UPLOAD_EXTENSIONS:
             return False, image_ext, f"Image extension {image_ext} not supported."
-        header = stream.read(512)
-        stream.seek(0)
-        img_format = imghdr.what(None, header)
-        if not img_format:
+
+        with Image.open(image_file) as img:
+            if img.format not in cls.UPLOAD_EXTENSIONS:
+                return False, img.format, f"Image extension {img.format} not supported."
+        if not img:
             return False, "Error with image. Please try again."
         return True, image_ext,""
 
