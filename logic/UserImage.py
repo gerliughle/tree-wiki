@@ -9,7 +9,6 @@ class UserImage:
                  author_id,
                  branch_id,
                  ext,
-                 is_approved, # Bool. If false, needs to either be set to inactive, or approved.
                  quality,
                  caption,
                  image_map):
@@ -18,7 +17,6 @@ class UserImage:
         self.author_id = author_id
         self.branch_id = branch_id
         self.ext = ext
-        self.is_approved = is_approved
         self.quality = quality
         self.caption = caption
         image_map[_id] = self
@@ -32,7 +30,6 @@ class UserImage:
             img_dict["author_id"],
             img_dict["branch_id"],
             img_dict["ext"],
-            img_dict["is_approved"],
             img_dict["quality"],
             img_dict.get("caption", None),
             image_map
@@ -45,7 +42,6 @@ class UserImage:
             "author_id": self.author_id,
             "branch_id": self.branch_id,
             "ext": self.ext,
-            "approved": self.is_approved,
             "quality": self.quality,
             "caption": self.caption,
         }

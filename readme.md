@@ -104,18 +104,22 @@ Done:
   * save image with id filename
   * check logs and log display
   * Photos can have captions
+  * Removed image approval property, just use active
 * Image moderation
   * Page and route built, access control
   * Set quality/caption/save routes
   * Sort by date
   * Show branch & user image stats
   * Approval switch, disable, delete routes
+  * filter view: show active/inactive and approved/needs_approval/unapproved
 * Image Carousel
   * Get up to 5 approved images, sorted by quality
   * Display them in a carousel
   * If 1 image, remove buttons
   * Auto crop images, rounded corners.
   * If caption, display with a backdrop
+  * Images for parents without images - functions, but doesn't sort by qual.
+  * Random selection for more than 5 valid, high quality choices - done but untested
 
 
 To-Do:
@@ -128,15 +132,13 @@ To-Do:
     * Tricky to also manage the mobile view with this though
     * You had an airtable-esque idea of like limiting the length of text. and then being able to click leaves
     * and it pops up a modal or something to see it all. 
+    * Maybe it is category > action, rather than subcat, so it is naturally abbreviated. Repot, not repotting.
 * Data validation:
   * Client side form validation, and field tuning (autocomplete, etc).
   * jinja escapes check
   * Honeypot field for login, edit forms.
 * Photos
-  * build moderation page
-    * filter view: show active/inactive and approved/needs_approval/unapproved
-  * Images for parents without images - functions, but doesn't sort by qual.
-  * Random selection for more than 5 valid choices - done but untested
+
   * backup db
   * fix size error 413 thing
   * add pic icon in tree view

@@ -212,14 +212,64 @@ class AdminRoutes:
         return redirect(url_for("homepage"))
 
     @staticmethod
-    @__app.route("/review_images")
+    @__app.route("/review_images", methods=["POST", "GET"])
     @login_required
     @UserManager.role_required("admin")
     def review_images():
         """ Sends image list to moderation page """
         image_list = TreeEngine.get_all_user_images()
-        image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)
-        return render_template("admin/review_images.html", image_list=image_list)
+
+        branch_list = TreeEngine.get_branches()
+        user_list = UserManager.get_users()
+
+        # FIXME only single user/branch now, but sort of future proofing in case i make it multi-select
+
+        filter_users = []
+        filter_branches = []
+        filter_active = []
+        if request.args.get("active_true"):
+            filter_active = [True]
+        if request.args.get("active_false"):
+            filter_active.append(False)
+        if len(filter_active) == 0:
+            filter_active = [True, False]
+        print(f"{filter_active=}")
+
+        filter_branch_ids = request.args.get("filter_branches")
+        if filter_branch_ids and filter_branch_ids != "":
+                branch = TreeEngine.lookup_branch(Validate.make_objectid(filter_branch_ids))
+                filter_branches.append(branch.id)
+        else:
+            filter_branches = None
+        print(f"{filter_branches=}")
+
+        filter_user_ids = request.args.get("filter_users")
+        if filter_user_ids:
+            user = UserManager.lookup_user_id(filter_user_ids)
+            filter_users.append(user.id)
+        else:
+            filter_users = None
+        print(f"{filter_users=}")
+
+        image_list = TreeEngine.filter_image_list(image_list, filter_active, filter_users, filter_branches)
+        image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)  # FIXME reversible
+
+        page_context = {
+            "image_list": image_list,
+            "branch_list": branch_list,
+            "user_list": user_list,
+            "filter_active": filter_active,
+            "filter_users": filter_users,
+            "filter_branches": filter_branches,
+        }
+        return render_template("admin/review_images.html", **page_context)
+
+    @staticmethod
+    @__app.route("/reset_image_filters", methods=["POST", "GET"])
+    @login_required
+    @UserManager.role_required("admin")
+    def reset_image_filters():
+        return redirect(url_for("review_images"))
 
     @staticmethod
     @__app.route('/do_edit_image', methods=['POST'])
@@ -244,7 +294,7 @@ class AdminRoutes:
         if image and quality_rating:
             image_edits = {
                 "_id": image_id,
-                "is_approved": approved,
+                "is_active": approved,
                 "quality": quality_rating,
             }
         else:
@@ -256,27 +306,27 @@ class AdminRoutes:
         TreeEngine.save_image(image_edits, "edit")
         image_list = TreeEngine.get_all_user_images()
         image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)
-        flash(f"Image { image.name } edited successfully.", "success")
+        flash(f"Image {image.name} edited successfully.", "success")
         return render_template("admin/review_images.html", image_list=image_list)
 
-    @staticmethod
-    @__app.route('/do_deactivate_image', methods=['POST'])
-    @login_required
-    @UserManager.role_required("admin")
-    def do_deactivate_image():
-        image_id = Validate.make_objectid(request.form.get("image_id"))
-        image = TreeEngine.lookup_image(image_id)
-        if not image:
-            flash("Error with image identification. Deactivation not saved.", "warning")
-            return redirect(url_for("review_images"))
-        image_edits = {
-            "_id": image_id,
-            "is_active": False,
-        }
-        TreeEngine.save_image(image_edits, "edit")
-        image_list = TreeEngine.get_all_user_images()
-        flash(f"Image { image.name } deactivated.", "success")
-        return redirect(url_for("review_images"))
+    # @staticmethod
+    # @__app.route('/do_deactivate_image', methods=['POST'])
+    # @login_required
+    # @UserManager.role_required("admin")
+    # def do_deactivate_image():
+    #     image_id = Validate.make_objectid(request.form.get("image_id"))
+    #     image = TreeEngine.lookup_image(image_id)
+    #     if not image:
+    #         flash("Error with image identification. Deactivation not saved.", "warning")
+    #         return redirect(url_for("review_images"))
+    #     image_edits = {
+    #         "_id": image_id,
+    #         "is_active": False,
+    #     }
+    #     TreeEngine.save_image(image_edits, "edit")
+    #     image_list = TreeEngine.get_all_user_images()
+    #     flash(f"Image { image.name } deactivated.", "success")
+    #     return redirect(url_for("review_images"))
 
     @staticmethod
     @__app.route('/do_delete_image', methods=['POST'])
@@ -289,9 +339,7 @@ class AdminRoutes:
             return redirect(url_for("review_images"))
         image_name = TreeEngine.delete_image(image_id)
         if image_name:
-            flash(f"Image { image_name } deleted.", "success")
+            flash(f"Image {image_name} deleted.", "success")
         else:
             flash("Error. Image not found, delete unsuccessful.", "warning")
         return redirect(url_for("review_images"))
-
-

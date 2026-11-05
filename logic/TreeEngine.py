@@ -252,13 +252,13 @@ class TreeEngine:
     @classmethod
     def fetch_branch_images(cls, branch_id_list):
         """ Gets the images for a branch and returns as a list, sorted by quality """
-        approved_image_dict = {}
+        active_image_dict = {}
         print(f"Fetching images for {len(branch_id_list)} branches")
         for image in cls.active_user_images:
-            if image.is_approved and image.branch_id in branch_id_list:
-                approved_image_dict[image] = image.quality
-        print(f"Fetched {len(approved_image_dict)} images.")
-        return sorted(approved_image_dict, key=lambda x: approved_image_dict[x], reverse=True)
+            if image.is_active and image.branch_id in branch_id_list:
+                active_image_dict[image] = image.quality
+        print(f"Fetched {len(active_image_dict)} images.")
+        return sorted(active_image_dict, key=lambda x: active_image_dict[x], reverse=True)
 
 
 
@@ -277,3 +277,18 @@ class TreeEngine:
             return delete_name
         else:
             return None
+
+    @classmethod
+    def filter_image_list(cls, image_list, filter_active, filter_users, filter_branches):
+        filtered_list = image_list.copy()
+
+        print(f"Filtering {len(image_list)} images")
+        for image in image_list:
+            if filter_active and image.is_active not in filter_active:
+                filtered_list.remove(image)
+            elif filter_branches and image.branch_id not in filter_branches:
+                filtered_list.remove(image)
+            elif filter_users and image.author_id not in filter_users:
+                filtered_list.remove(image)
+        return filtered_list
+
