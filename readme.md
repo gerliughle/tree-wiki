@@ -138,10 +138,10 @@ To-Do:
   * jinja escapes check
   * Honeypot field for login, edit forms.
 * Photos
-
   * backup db
   * fix size error 413 thing
   * add pic icon in tree view
+  * Image resize, smaller images to fix loading
 * Paginate admin log
 * Clean up branch edit button forms
 * Homepage

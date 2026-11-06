@@ -3,6 +3,7 @@ from flask_login import login_required
 from bson import ObjectId
 
 import os
+import math
 
 from ui.WebUI import WebUI
 from logic.User import User
@@ -164,10 +165,33 @@ class AdminRoutes:
     @login_required
     @UserManager.role_required("admin")
     def admin_dashboard():
-        audit_log = AdminManager.get_audit_log()  # I would probably want to sequence by 25 rows. I should only pull that each time
+        per_page = 25
+
+        audit_log = AdminManager.get_audit_log()
+        page_number = request.args.get("page_number")
+        try:
+            page_number = int(page_number)
+        except (ValueError, TypeError):
+            page_number = 1
+
+        slice_end = page_number * per_page
+        slice_start = slice_end - per_page - 1
+        audit_log_slice = audit_log[slice_start:slice_end]
+        total_pages = math.ceil(len(audit_log_slice) / per_page)
+
+        if page_number == 1:
+            page_1 =
+        page_context = {
+            "page_number": page_number,
+            "audit_log": audit_log_slice,
+            "slice_start": slice_start,
+            "slice_end": slice_end,
+            "total_pages": total_pages,
+        }
+
         # I can take in a range based on the page, as a form or link.
         # For now do page/table design then do that.
-        return render_template("admin/admin_dashboard.html", audit_log=audit_log)
+        return render_template("admin/admin_dashboard.html", **page_context)
 
     @staticmethod
     @__app.route('/revert_change', methods=["POST"])
@@ -252,7 +276,9 @@ class AdminRoutes:
         print(f"{filter_users=}")
 
         image_list = TreeEngine.filter_image_list(image_list, filter_active, filter_users, filter_branches)
-        image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)  # FIXME reversible
+
+        # FIXME Moved sorting to database call. Can make reverse option here later.
+        # image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)
 
         page_context = {
             "image_list": image_list,

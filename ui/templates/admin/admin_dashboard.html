@@ -15,6 +15,19 @@
                     <th scope="col">Action</th>
                     <th scope="col">Log</th>
                 </tr>
+                <tr>
+                    <nav aria-label="Admin Page Navigation">
+                        <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="#">First</a></li>
+
+                            <li class="page-item"><a class="page-link" href="#">{{ page_number - 1 }}</a></li>
+                            <li class="page-item"><a class="page-link" href="#">{{ page_number }}</a></li>
+                            <li class="page-item"><a class="page-link" href="#">{{ page_number + 1 }}</a></li>
+
+                            <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                        </ul>
+                    </nav>
+                </tr>
                 {% for log in audit_log|reverse %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>

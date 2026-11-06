@@ -233,8 +233,6 @@ class TreeEngine:
 
             i += 1  # Generation incrementer
 
-
-
         print(f"Search complete. Found {len(image_list)} images.")
         if len(image_list) == 0:
             print(f"No images found. Searched {j} children through {i} generations")

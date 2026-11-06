@@ -71,7 +71,7 @@ class Database:
         active_leaves = [leaf for leaf in leaves if leaf.is_active]
 
         image_map = {}
-        image_dicts = list(cls.__user_images.find())
+        image_dicts = list(cls.__user_images.find().sort("_id", -1))
         user_images = [UserImage.build(img, image_map) for img in image_dicts]
         active_images = [img for img in user_images if img.is_active]
 
