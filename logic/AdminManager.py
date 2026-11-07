@@ -2,6 +2,8 @@ from functools import wraps
 from flask import abort
 from flask_login import current_user
 
+import math
+
 class AdminManager:
     @staticmethod
     def role_required(*roles):
@@ -27,3 +29,23 @@ class AdminManager:
         from data.Database import Database
         log_entry = Database.get_audit_entry(log_id)
         return log_entry
+
+    @staticmethod
+    def paginate(data_list, page_number, per_page):
+        print(f"{len(data_list)=}")
+
+
+        slice_end = page_number * per_page
+        slice_start = slice_end - per_page
+        data_list_slice = data_list[slice_start:slice_end]
+        print(f"{len(data_list_slice)=}")
+        print(f"{slice_end=} {slice_start=}")
+        total_pages = math.ceil(len(data_list) / per_page)
+        print(f"{total_pages=}")
+
+        return data_list_slice, {
+            "page_number": page_number,
+            "slice_start": slice_start,
+            "slice_end": slice_end,
+            "total_pages": total_pages,
+        }

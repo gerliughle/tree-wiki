@@ -2,8 +2,6 @@ from flask import render_template, request, redirect, url_for, flash, current_ap
 from flask_login import login_required
 from bson import ObjectId
 
-import os
-import math
 
 from ui.WebUI import WebUI
 from logic.User import User
@@ -161,37 +159,24 @@ class AdminRoutes:
         return render_template("manage_users.html")
 
     @staticmethod
-    @__app.route('/admin_dashboard')
+    @__app.route('/admin_dashboard', methods=["GET", "POST"])
     @login_required
     @UserManager.role_required("admin")
     def admin_dashboard():
-        per_page = 25
 
         audit_log = AdminManager.get_audit_log()
+        per_page = 25
+
         page_number = request.args.get("page_number")
         try:
             page_number = int(page_number)
         except (ValueError, TypeError):
             page_number = 1
 
-        slice_end = page_number * per_page
-        slice_start = slice_end - per_page - 1
-        audit_log_slice = audit_log[slice_start:slice_end]
-        total_pages = math.ceil(len(audit_log_slice) / per_page)
+        audit_log_slice, paginate_args = AdminManager.paginate(audit_log, page_number, per_page)
+        paginate_args["audit_log"] = audit_log_slice
 
-        if page_number == 1:
-            page_1 =
-        page_context = {
-            "page_number": page_number,
-            "audit_log": audit_log_slice,
-            "slice_start": slice_start,
-            "slice_end": slice_end,
-            "total_pages": total_pages,
-        }
-
-        # I can take in a range based on the page, as a form or link.
-        # For now do page/table design then do that.
-        return render_template("admin/admin_dashboard.html", **page_context)
+        return render_template("admin/admin_dashboard.html", **paginate_args)
 
     @staticmethod
     @__app.route('/revert_change', methods=["POST"])
@@ -242,6 +227,7 @@ class AdminRoutes:
     def review_images():
         """ Sends image list to moderation page """
         image_list = TreeEngine.get_all_user_images()
+        print(f"Initial image list length: {len(image_list)}")
 
         branch_list = TreeEngine.get_branches()
         user_list = UserManager.get_users()
@@ -278,16 +264,27 @@ class AdminRoutes:
         image_list = TreeEngine.filter_image_list(image_list, filter_active, filter_users, filter_branches)
 
         # FIXME Moved sorting to database call. Can make reverse option here later.
-        # image_list = sorted(image_list, key=lambda x: x.id.generation_time, reverse=True)
 
-        page_context = {
-            "image_list": image_list,
+        per_page = 10
+        page_number = request.args.get("page_number")
+        try:
+            page_number = int(page_number)
+        except (ValueError, TypeError):
+            page_number = 1
+
+        image_list_slice, paginate_context = AdminManager.paginate(image_list, page_number, per_page)
+        paginate_context["image_list"] = image_list_slice
+
+        image_context = {
             "branch_list": branch_list,
             "user_list": user_list,
             "filter_active": filter_active,
             "filter_users": filter_users,
             "filter_branches": filter_branches,
         }
+
+        page_context = paginate_context|image_context
+
         return render_template("admin/review_images.html", **page_context)
 
     @staticmethod

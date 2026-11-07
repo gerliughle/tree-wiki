@@ -5,9 +5,29 @@
     <div class="container my-2 col-10 d-flex-vertical">
         {% if current_user.role == "admin" %}
             <h2>Audit Log</h2>
+
+            <div class="d-flex justify-content-center">
+                <nav aria-label="Admin Page Navigation">
+                    <ul class="pagination my-2">
+                        <li class="page-item"><a class="page-link"
+                                                 href="/admin_dashboard?page_number=1"><<</a></li>
+
+                        {% for page in range(1, total_pages + 1) %}
+                            <li class="page-item {% if page_number == page %}active{% endif %}">
+                                <a class="page-link"
+                                   href="/admin_dashboard?page_number={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endfor %}
+
+                        <li class="page-item"><a class="page-link"
+                                                 href="/admin_dashboard?page_number={{ total_pages }}">>></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
             <table class="table table-hover table-sm">
                 <tr>
-                    <th></th>
                     <th scope="col">Time</th>
                     <th scope="col">Task</th>
                     <th scope="col">User</th>
@@ -15,25 +35,11 @@
                     <th scope="col">Action</th>
                     <th scope="col">Log</th>
                 </tr>
-                <tr>
-                    <nav aria-label="Admin Page Navigation">
-                        <ul class="pagination">
-                            <li class="page-item"><a class="page-link" href="#">First</a></li>
 
-                            <li class="page-item"><a class="page-link" href="#">{{ page_number - 1 }}</a></li>
-                            <li class="page-item"><a class="page-link" href="#">{{ page_number }}</a></li>
-                            <li class="page-item"><a class="page-link" href="#">{{ page_number + 1 }}</a></li>
-
-                            <li class="page-item"><a class="page-link" href="#">Last</a></li>
-                        </ul>
-                    </nav>
-                </tr>
-                {% for log in audit_log|reverse %}
+                {% for log in admin_log|reverse %}
                     <tr>
-                        <th scope="row">{{ loop.index }}</th>
                         <td>{{ log["timestamp"].strftime('%m/%d/%Y %H:%M:%S') }}</td>
                         <td>{{ log["task"] }} {{ log["obj_type"] }}</td>
-
                         <td>
                             <form method="POST" action="/edit_user">
                                 <input type="hidden" name="user_selection" value="{{ log.username }}">
@@ -86,6 +92,25 @@
                     </tr>
                 {% endfor %}
             </table>
+            <div class="d-flex justify-content-center">
+                <nav aria-label="Admin Page Navigation">
+                    <ul class="pagination my-2">
+                        <li class="page-item"><a class="page-link"
+                                                 href="/admin_dashboard?page_number=1"><<</a></li>
+
+                        {% for page in range(1, total_pages + 1) %}
+                            <li class="page-item {% if page_number == page %}active{% endif %}">
+                                <a class="page-link"
+                                   href="/admin_dashboard?page_number={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endfor %}
+
+                        <li class="page-item"><a class="page-link"
+                                                 href="/admin_dashboard?page_number={{ total_pages }}">>></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
 
         {% else %}
             <h3>Access Denied.</h3>
